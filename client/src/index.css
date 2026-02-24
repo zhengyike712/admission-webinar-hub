@@ -43,6 +43,8 @@
 }
 
 :root {
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Source Sans 3', system-ui, sans-serif;
   --primary: var(--color-blue-700);
   --primary-foreground: var(--color-blue-50);
   --sidebar-primary: var(--color-blue-600);
@@ -53,7 +55,7 @@
   --chart-4: var(--color-blue-700);
   --chart-5: var(--color-blue-800);
   --radius: 0.65rem;
-  --background: oklch(1 0 0);
+  --background: oklch(0.975 0.005 80);
   --foreground: oklch(0.235 0.015 65);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.235 0.015 65);
@@ -119,6 +121,10 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+  }
+  .font-serif {
+    font-family: var(--font-serif) !important;
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
