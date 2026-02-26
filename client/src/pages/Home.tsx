@@ -3,7 +3,7 @@
 // Font: system-ui for body, no decorative serifs
 // Layout: left sidebar filter + right content grid
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import {
   schools,
   sessions,
@@ -21,6 +21,8 @@ import {
   SlidersHorizontal,
   X,
   ArrowUpRight,
+  CalendarPlus,
+  ChevronDown,
 } from "lucide-react";
 
 type ViewMode = "sessions" | "schools";
@@ -118,6 +120,163 @@ function convertToLocalTime(timeStr: string, referenceDate?: string): string | n
   } catch {
     return null;
   }
+}
+
+// ── Calendar helpers ─────────────────────────────────────────
+// Parse "7:00 PM ET" on a given date string into a UTC Date
+function parseEventDateTime(dateStr: string, timeStr: string): Date | null {
+  const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)\s*(ET|CT|PT|MT)/i);
+  if (!match) return null;
+  const [, hourStr, minuteStr, ampm, tz] = match;
+  let hour = parseInt(hourStr, 10);
+  const minute = parseInt(minuteStr, 10);
+  if (ampm.toUpperCase() === "PM" && hour !== 12) hour += 12;
+  if (ampm.toUpperCase() === "AM" && hour === 12) hour = 0;
+  const tzMap: Record<string, string> = {
+    ET: "America/New_York",
+    CT: "America/Chicago",
+    MT: "America/Denver",
+    PT: "America/Los_Angeles",
+  };
+  const ianaZone = tzMap[tz.toUpperCase()] || "America/New_York";
+  try {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: ianaZone,
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: false,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    const baseDate = new Date(`${dateStr}T12:00:00Z`);
+    const parts = formatter.formatToParts(baseDate);
+    const tzHour = parseInt(parts.find((p) => p.type === "hour")?.value || "12", 10);
+    const utcOffset = 12 - tzHour;
+    const eventUtc = new Date(`${dateStr}T${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:00Z`);
+    eventUtc.setHours(eventUtc.getHours() + utcOffset);
+    return eventUtc;
+  } catch {
+    return null;
+  }
+}
+
+function toICSDatetime(d: Date): string {
+  return d.toISOString().replace(/[-:]/g, "").replace(".000", "");
+}
+
+function buildICS(title: string, description: string, url: string, dates: string[], timeStr: string, durationMin: number): string {
+  const events = dates.map((dateStr) => {
+    const start = parseEventDateTime(dateStr, timeStr);
+    if (!start) return "";
+    const end = new Date(start.getTime() + durationMin * 60000);
+    return [
+      "BEGIN:VEVENT",
+      `DTSTART:${toICSDatetime(start)}`,
+      `DTEND:${toICSDatetime(end)}`,
+      `SUMMARY:${title.replace(/,/g, "\\,")}`,
+      `DESCRIPTION:${description.replace(/,/g, "\\,")}\\n\\n报名链接: ${url}`,
+      `URL:${url}`,
+      `UID:${dateStr}-${title.replace(/\s+/g, "-").toLowerCase()}@admitlens`,
+      "END:VEVENT",
+    ].join("\r\n");
+  }).filter(Boolean);
+  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//AdmitLens//EN", "CALSCALE:GREGORIAN", ...events, "END:VCALENDAR"].join("\r\n");
+}
+
+function parseDurationMinutes(durationStr?: string): number {
+  if (!durationStr) return 60;
+  const match = durationStr.match(/(\d+)/);
+  return match ? parseInt(match[1], 10) : 60;
+}
+
+function buildGoogleCalendarUrl(title: string, description: string, url: string, dateStr: string, timeStr: string, durationMin: number): string {
+  const start = parseEventDateTime(dateStr, timeStr);
+  if (!start) return "";
+  const end = new Date(start.getTime() + durationMin * 60000);
+  const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(".000", "");
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: title,
+    dates: `${fmt(start)}/${fmt(end)}`,
+    details: `${description}\n\n报名链接: ${url}`,
+    location: url,
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+// ── Add to Calendar dropdown ──────────────────────────────
+function AddToCalendarButton({ session, school }: { session: (typeof sessions)[0]; school: ReturnType<typeof Object.values<(typeof sessions)[0]>> | undefined }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  if (!session.dates || session.dates.length === 0 || session.isRolling) return null;
+  if (!session.time || !session.time.match(/(ET|CT|PT|MT)/i)) return null;
+
+  const durationMin = parseDurationMinutes(session.duration);
+  const schoolName = typeof school === "object" && school !== null && "name" in school
+    ? (school as { name: string }).name
+    : "";
+  const title = `${schoolName ? schoolName + " - " : ""}${session.title}`;
+  const description = session.description;
+  const url = session.registrationUrl;
+
+  function downloadICS() {
+    const ics = buildICS(title, description, url, session.dates!, session.time!, durationMin);
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${title.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, "_").slice(0, 40)}.ics`;
+    link.click();
+    setOpen(false);
+  }
+
+  // For Google Calendar, use the first upcoming date
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const upcomingDates = session.dates.filter((d) => new Date(d + "T00:00:00") >= today);
+  const firstDate = upcomingDates[0] || session.dates[0];
+  const googleUrl = buildGoogleCalendarUrl(title, description, url, firstDate, session.time, durationMin);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center justify-center gap-1.5 w-full py-2 border border-stone-300 text-stone-500 hover:border-stone-500 hover:text-stone-700 text-xs font-medium transition-colors duration-150"
+      >
+        <CalendarPlus size={11} />
+        添加到日历
+        <ChevronDown size={10} className={`transition-transform duration-150 ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute bottom-full left-0 right-0 mb-1 bg-white border border-stone-200 shadow-md z-20 overflow-hidden">
+          <button
+            onClick={() => { window.open(googleUrl, "_blank"); setOpen(false); }}
+            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-stone-700 hover:bg-stone-50 transition-colors"
+          >
+            <span className="text-[11px] font-semibold text-red-500 w-4">G</span>
+            Google 日历
+          </button>
+          <div className="h-px bg-stone-100" />
+          <button
+            onClick={downloadICS}
+            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-stone-700 hover:bg-stone-50 transition-colors"
+          >
+            <span className="text-[11px] font-semibold text-blue-500 w-4">↓</span>
+            Apple / Outlook (.ics)
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ── Urgency helpers ─────────────────────────────────────────
@@ -261,15 +420,20 @@ function SessionCard({ session }: { session: (typeof sessions)[0] }) {
       </div>
 
       {/* CTA */}
-      <a
-        href={session.registrationUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center justify-center gap-1.5 py-2 border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white text-xs font-medium transition-colors duration-150 mt-auto"
-      >
-        前往报名
-        <ArrowUpRight size={12} />
-      </a>
+      <div className="flex flex-col gap-2 mt-auto">
+        {!session.isRolling && session.dates && session.dates.length > 0 && (
+          <AddToCalendarButton session={session} school={school as any} />
+        )}
+        <a
+          href={session.registrationUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-1.5 py-2 border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white text-xs font-medium transition-colors duration-150"
+        >
+          前往报名
+          <ArrowUpRight size={12} />
+        </a>
+      </div>
     </div>
   );
 }
