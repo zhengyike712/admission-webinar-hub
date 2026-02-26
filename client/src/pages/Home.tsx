@@ -35,16 +35,54 @@ const SESSION_TYPE_LABELS: Record<SessionType, string> = {
   "International Student Session": "国际生专场",
 };
 
+// ── Urgency helpers ─────────────────────────────────────────
+function getUrgency(session: (typeof sessions)[0]): "imminent" | "soon" | null {
+  if (session.isRolling || !session.dates || session.dates.length === 0) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const upcoming = session.dates
+    .map((d) => new Date(d + "T00:00:00"))
+    .filter((d) => d >= today)
+    .sort((a, b) => a.getTime() - b.getTime());
+  if (upcoming.length === 0) return null;
+  const diffDays = Math.ceil((upcoming[0].getTime() - today.getTime()) / 86400000);
+  if (diffDays <= 7) return "imminent";
+  if (diffDays <= 30) return "soon";
+  return null;
+}
+
+function getNextDate(session: (typeof sessions)[0]): Date | null {
+  if (session.isRolling || !session.dates || session.dates.length === 0) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const upcoming = session.dates
+    .map((d) => new Date(d + "T00:00:00"))
+    .filter((d) => d >= today)
+    .sort((a, b) => a.getTime() - b.getTime());
+  return upcoming[0] ?? null;
+}
+
 // ── Session Card ──────────────────────────────────────────────
 function SessionCard({ session }: { session: (typeof sessions)[0] }) {
   const school = schoolsMap[session.schoolId];
+  const urgency = getUrgency(session);
 
   return (
-    <div className="bg-white border border-stone-200 p-4 hover:border-stone-400 transition-colors duration-150 flex flex-col gap-3">
+    <div className={`bg-white border p-4 transition-colors duration-150 flex flex-col gap-3 relative ${
+      urgency === "imminent"
+        ? "border-red-400 hover:border-red-500"
+        : urgency === "soon"
+        ? "border-orange-300 hover:border-orange-400"
+        : "border-stone-200 hover:border-stone-400"
+    }`}>
+      {/* Urgency badge */}
+      {urgency === "imminent" && (
+        <div className="absolute -top-px left-0 right-0 h-0.5 bg-red-500" />
+      )}
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <div className="flex items-center gap-1.5 mb-1">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
             <span
               className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
               style={{ backgroundColor: school?.color || "#2563eb" }}
@@ -57,6 +95,17 @@ function SessionCard({ session }: { session: (typeof sessions)[0] }) {
                 </span>
               )}
             </span>
+            {urgency === "imminent" && (
+              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 bg-red-500 text-white font-semibold rounded-sm animate-pulse">
+                <span className="inline-block w-1 h-1 rounded-full bg-white" />
+                即将开始
+              </span>
+            )}
+            {urgency === "soon" && (
+              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 bg-orange-100 text-orange-600 font-semibold rounded-sm border border-orange-200">
+                本月
+              </span>
+            )}
           </div>
           <h3 className="text-sm font-semibold text-stone-900 leading-snug">
             {session.title}
@@ -461,9 +510,20 @@ export default function Home() {
                     </span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {filteredSessions.filter((s) => !s.isRolling).map((s) => (
-                      <SessionCard key={s.id} session={s} />
-                    ))}
+                    {filteredSessions
+                      .filter((s) => !s.isRolling)
+                      .slice()
+                      .sort((a, b) => {
+                        const da = getNextDate(a);
+                        const db = getNextDate(b);
+                        if (!da && !db) return 0;
+                        if (!da) return 1;
+                        if (!db) return -1;
+                        return da.getTime() - db.getTime();
+                      })
+                      .map((s) => (
+                        <SessionCard key={s.id} session={s} />
+                      ))}
                   </div>
                 </section>
               )}
