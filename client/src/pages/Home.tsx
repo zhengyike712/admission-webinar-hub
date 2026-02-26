@@ -207,7 +207,7 @@ function buildGoogleCalendarUrl(title: string, description: string, url: string,
 }
 
 // ── Add to Calendar dropdown ──────────────────────────────
-function AddToCalendarButton({ session, school }: { session: (typeof sessions)[0]; school: ReturnType<typeof Object.values<(typeof sessions)[0]>> | undefined }) {
+function AddToCalendarButton({ session, school, compact }: { session: (typeof sessions)[0]; school: ReturnType<typeof Object.values<(typeof sessions)[0]>> | undefined; compact?: boolean }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -251,11 +251,14 @@ function AddToCalendarButton({ session, school }: { session: (typeof sessions)[0
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center justify-center gap-1.5 w-full py-2 border border-stone-300 text-stone-500 hover:border-stone-500 hover:text-stone-700 text-xs font-medium transition-colors duration-150"
+        className={compact
+          ? "flex items-center gap-1 text-[10px] text-stone-400 hover:text-stone-700 transition-colors"
+          : "flex items-center justify-center gap-1.5 w-full py-2 border border-stone-300 text-stone-500 hover:border-stone-500 hover:text-stone-700 text-xs font-medium transition-colors duration-150"
+        }
       >
-        <CalendarPlus size={11} />
-        添加到日历
-        <ChevronDown size={10} className={`transition-transform duration-150 ${open ? "rotate-180" : ""}`} />
+        <CalendarPlus size={compact ? 10 : 11} />
+        {!compact && <>添加到日历</>}
+        <ChevronDown size={compact ? 9 : 10} className={`transition-transform duration-150 ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
         <div className="absolute bottom-full left-0 right-0 mb-1 bg-white border border-stone-200 shadow-md z-20 overflow-hidden">
@@ -307,38 +310,62 @@ function getNextDate(session: (typeof sessions)[0]): Date | null {
   return upcoming[0] ?? null;
 }
 
-// ── Session Card ──────────────────────────────────────────────
-function SessionCard({ session }: { session: (typeof sessions)[0] }) {
+// ── Session Card (scheduled / fixed-date) ────────────────────
+function ScheduledSessionCard({ session }: { session: (typeof sessions)[0] }) {
   const school = schoolsMap[session.schoolId];
   const urgency = getUrgency(session);
+  const nextDate = getNextDate(session);
+
+  // Local time conversion
+  const localTime = session.time ? convertToLocalTime(session.time, session.dates?.[0]) : null;
 
   return (
-    <div className={`bg-white border p-4 transition-colors duration-150 flex flex-col gap-3 relative ${
+    <div className={`bg-white border transition-colors duration-150 relative ${
       urgency === "imminent"
         ? "border-red-400 hover:border-red-500"
         : urgency === "soon"
         ? "border-orange-300 hover:border-orange-400"
         : "border-stone-200 hover:border-stone-400"
     }`}>
-      {/* Urgency badge */}
       {urgency === "imminent" && (
         <div className="absolute -top-px left-0 right-0 h-0.5 bg-red-500" />
       )}
-      {/* Header */}
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+
+      {/* Main row: date + info + CTA */}
+      <div className="flex items-stretch">
+        {/* Date column */}
+        <div className={`shrink-0 w-16 flex flex-col items-center justify-center py-4 border-r ${
+          urgency === "imminent" ? "border-red-200 bg-red-50" :
+          urgency === "soon" ? "border-orange-200 bg-orange-50" :
+          "border-stone-100 bg-stone-50"
+        }`}>
+          {nextDate ? (
+            <>
+              <span className={`text-xl font-bold leading-none ${
+                urgency === "imminent" ? "text-red-600" :
+                urgency === "soon" ? "text-orange-600" :
+                "text-stone-700"
+              }`}>
+                {nextDate.getDate()}
+              </span>
+              <span className="text-[10px] text-stone-400 mt-0.5">
+                {nextDate.toLocaleDateString("zh-CN", { month: "short" })}
+              </span>
+            </>
+          ) : (
+            <Calendar size={14} className="text-stone-300" />
+          )}
+        </div>
+
+        {/* Info column */}
+        <div className="flex-1 min-w-0 px-3 py-3 flex flex-col gap-1 justify-center">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <span
               className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
               style={{ backgroundColor: school?.color || "#2563eb" }}
             />
-            <span className="text-xs text-stone-500 font-medium truncate">
+            <span className="text-[11px] text-stone-500 font-medium">
               {school?.shortName || school?.name}
-              {school && (
-                <span className="text-stone-300 ml-1">
-                  #{school.rank}
-                </span>
-              )}
             </span>
             {urgency === "imminent" && (
               <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 bg-red-500 text-white font-semibold rounded-sm animate-pulse">
@@ -347,94 +374,66 @@ function SessionCard({ session }: { session: (typeof sessions)[0] }) {
               </span>
             )}
             {urgency === "soon" && (
-              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 bg-orange-100 text-orange-600 font-semibold rounded-sm border border-orange-200">
+              <span className="text-[10px] px-1.5 py-0.5 bg-orange-100 text-orange-600 font-semibold rounded-sm border border-orange-200">
                 本月
               </span>
             )}
           </div>
-          <h3 className="text-sm font-semibold text-stone-900 leading-snug">
+          <h3 className="text-xs font-semibold text-stone-900 leading-snug">
             {session.title}
           </h3>
-        </div>
-        <span className="shrink-0 text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded font-medium whitespace-nowrap">
-          {SESSION_TYPE_LABELS[session.type] || session.type}
-        </span>
-      </div>
-
-      {/* Description */}
-      <p className="text-xs text-stone-500 leading-relaxed line-clamp-2">
-        {session.description}
-      </p>
-
-      {/* Partner schools */}
-      {session.partnerSchools && session.partnerSchools.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {session.partnerSchools.map((p) => (
-            <span key={p} className="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded">
-              {p}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* Date / time */}
-      <div className="space-y-1">
-        {session.isRolling ? (
-          <div className="flex items-center gap-1.5 text-xs text-stone-400">
-            <RefreshCw size={10} />
-            <span>滚动开放，可选任意可用日期</span>
-          </div>
-        ) : session.dates && session.dates.length > 0 ? (
-          <div className="flex items-start gap-1.5 text-xs text-stone-400">
-            <Calendar size={10} className="mt-0.5 shrink-0" />
-            <div className="flex flex-wrap gap-1">
-              {session.dates.map((d) => (
-                <span key={d} className="font-mono text-stone-600">
-                  {new Date(d + "T00:00:00").toLocaleDateString("zh-CN", {
-                    month: "numeric",
-                    day: "numeric",
-                  })}
-                </span>
-              ))}
-            </div>
-          </div>
-        ) : null}
-
-        {session.time && (
-          <div className="flex items-start gap-1.5 text-xs text-stone-400">
-            <Clock size={10} className="mt-0.5 shrink-0" />
-            <div className="flex flex-col gap-0.5">
+          {session.time && (
+            <div className="flex items-center gap-1.5 text-[11px] text-stone-400">
+              <Clock size={9} />
               <span>{session.time}</span>
-              {(() => {
-                const refDate = session.dates?.[0] ?? undefined;
-                const local = convertToLocalTime(session.time, refDate);
-                return local ? (
-                  <span className="text-blue-500 font-medium">
-                    {LOCAL_TZ_LABEL} {local}
-                  </span>
-                ) : null;
-              })()}
-              {session.duration && <span className="text-stone-300">时长 {session.duration}</span>}
+              {localTime && (
+                <span className="text-blue-500 font-medium">· {LOCAL_TZ_LABEL} {localTime}</span>
+              )}
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      {/* CTA */}
-      <div className="flex flex-col gap-2 mt-auto">
-        {!session.isRolling && session.dates && session.dates.length > 0 && (
-          <AddToCalendarButton session={session} school={school as any} />
-        )}
-        <a
-          href={session.registrationUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-1.5 py-2 border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white text-xs font-medium transition-colors duration-150"
-        >
-          前往报名
-          <ArrowUpRight size={12} />
-        </a>
+        {/* CTA column */}
+        <div className="shrink-0 flex flex-col gap-1.5 items-end justify-center px-3 py-3">
+          <a
+            href={session.registrationUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 px-3 py-1.5 bg-stone-900 text-white hover:bg-stone-700 text-[11px] font-medium transition-colors duration-150 whitespace-nowrap"
+          >
+            报名
+            <ArrowUpRight size={10} />
+          </a>
+          <AddToCalendarButton session={session} school={school as any} compact />
+        </div>
       </div>
+    </div>
+  );
+}
+
+// ── Rolling Entry Row (compact, for right sidebar) ────────────
+function RollingRow({ session }: { session: (typeof sessions)[0] }) {
+  const school = schoolsMap[session.schoolId];
+  return (
+    <div className="flex items-center gap-2 py-2 border-b border-stone-100 last:border-0">
+      <span
+        className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
+        style={{ backgroundColor: school?.color || "#2563eb" }}
+      />
+      <div className="flex-1 min-w-0">
+        <div className="text-[11px] font-medium text-stone-700 truncate">
+          {school?.shortName || school?.name}
+        </div>
+        <div className="text-[10px] text-stone-400 truncate">{session.title}</div>
+      </div>
+      <a
+        href={session.registrationUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="shrink-0 text-[10px] text-stone-500 hover:text-stone-900 underline underline-offset-2 transition-colors"
+      >
+        报名
+      </a>
     </div>
   );
 }
@@ -756,69 +755,64 @@ export default function Home() {
         {/* ── Content ── */}
         <main className="flex-1 min-w-0">
           {view === "sessions" ? (
-            <div className="space-y-6">
-              {/* Rolling */}
-              {filteredSessions.filter((s) => s.isRolling).length > 0 && (
-                <section>
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-[11px] uppercase tracking-widest text-stone-400 font-medium">
-                      滚动开放报名
-                    </span>
-                    <div className="flex-1 h-px bg-stone-100" />
-                    <span className="text-[11px] text-stone-300">
-                      {filteredSessions.filter((s) => s.isRolling).length} 场
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {filteredSessions.filter((s) => s.isRolling).map((s) => (
-                      <SessionCard key={s.id} session={s} />
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* Scheduled */}
-              {filteredSessions.filter((s) => !s.isRolling).length > 0 && (
-                <section>
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-[11px] uppercase tracking-widest text-stone-400 font-medium">
-                      固定日期活动
-                    </span>
-                    <div className="flex-1 h-px bg-stone-100" />
-                    <span className="text-[11px] text-stone-300">
-                      {filteredSessions.filter((s) => !s.isRolling).length} 场
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {filteredSessions
-                      .filter((s) => !s.isRolling)
-                      .slice()
-                      .sort((a, b) => {
-                        const da = getNextDate(a);
-                        const db = getNextDate(b);
-                        if (!da && !db) return 0;
-                        if (!da) return 1;
-                        if (!db) return -1;
-                        return da.getTime() - db.getTime();
-                      })
-                      .map((s) => (
-                        <SessionCard key={s.id} session={s} />
-                      ))}
-                  </div>
-                </section>
-              )}
-
-              {filteredSessions.length === 0 && (
-                <div className="py-20 text-center text-stone-400">
-                  <p className="text-sm mb-2">没有匹配的活动</p>
-                  <button
-                    onClick={() => { setSearch(""); setTypeFilter("All"); setSchoolTypeFilter("All"); }}
-                    className="text-xs underline underline-offset-2 hover:text-stone-600"
-                  >
-                    清除筛选
-                  </button>
+            <div className="flex gap-6">
+              {/* Left: scheduled (fixed-date) sessions – primary */}
+              <div className="flex-1 min-w-0 space-y-3">
+                <div className="flex items-center gap-3 mb-1">
+                  <span className="text-[11px] uppercase tracking-widest text-stone-400 font-medium">即将开始</span>
+                  <div className="flex-1 h-px bg-stone-100" />
+                  <span className="text-[11px] text-stone-300">{filteredSessions.filter((s) => !s.isRolling).length} 场</span>
                 </div>
-              )}
+                {filteredSessions.filter((s) => !s.isRolling).length > 0 ? (
+                  filteredSessions
+                    .filter((s) => !s.isRolling)
+                    .slice()
+                    .sort((a, b) => {
+                      const da = getNextDate(a);
+                      const db = getNextDate(b);
+                      if (!da && !db) return 0;
+                      if (!da) return 1;
+                      if (!db) return -1;
+                      return da.getTime() - db.getTime();
+                    })
+                    .map((s) => <ScheduledSessionCard key={s.id} session={s} />)
+                ) : (
+                  <div className="py-12 text-center text-stone-400">
+                    <p className="text-xs">暂无固定日期活动</p>
+                  </div>
+                )}
+                {filteredSessions.length === 0 && (
+                  <div className="py-12 text-center text-stone-400">
+                    <p className="text-xs mb-2">没有匹配的活动</p>
+                    <button
+                      onClick={() => { setSearch(""); setTypeFilter("All"); setSchoolTypeFilter("All"); }}
+                      className="text-xs underline underline-offset-2 hover:text-stone-600"
+                    >
+                      清除筛选
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Right: rolling open sessions – secondary */}
+              <div className="hidden lg:block w-56 shrink-0">
+                <div className="sticky top-28">
+                  <div className="flex items-center gap-2 mb-3">
+                    <RefreshCw size={10} className="text-stone-400" />
+                    <span className="text-[11px] uppercase tracking-widest text-stone-400 font-medium">全年开放报名</span>
+                  </div>
+                  <div className="border border-stone-100 px-3 py-1">
+                    {filteredSessions.filter((s) => s.isRolling).length > 0 ? (
+                      filteredSessions.filter((s) => s.isRolling).map((s) => (
+                        <RollingRow key={s.id} session={s} />
+                      ))
+                    ) : (
+                      <p className="text-[11px] text-stone-300 py-3 text-center">暂无匹配</p>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-stone-300 mt-2 leading-relaxed">滚动开放活动全年可选日期，点击报名后可在官网自行选择时间段。</p>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="space-y-6">
