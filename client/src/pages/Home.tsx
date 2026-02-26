@@ -405,7 +405,7 @@ function getNextDate(session: (typeof allSessions)[0]): Date | null {
 }
 
 // ── Session Card (scheduled / fixed-date) ────────────────────
-function ScheduledSessionCard({ session, t }: { session: (typeof allSessions)[0]; t: typeof T["zh"] }) {
+function ScheduledSessionCard({ session, t, isSelected, onToggle }: { session: (typeof allSessions)[0]; t: typeof T["zh"]; isSelected?: boolean; onToggle?: (id: string) => void }) {
   const school = schoolsMap[session.schoolId];
   const urgency = getUrgency(session);
   const nextDate = getNextDate(session);
@@ -413,7 +413,9 @@ function ScheduledSessionCard({ session, t }: { session: (typeof allSessions)[0]
 
   return (
     <div className={`bg-white border transition-colors duration-150 relative ${
-      urgency === "imminent"
+      isSelected
+        ? "border-blue-500 ring-1 ring-blue-300"
+        : urgency === "imminent"
         ? "border-red-400 hover:border-red-500"
         : urgency === "soon"
         ? "border-orange-300 hover:border-orange-400"
@@ -423,6 +425,23 @@ function ScheduledSessionCard({ session, t }: { session: (typeof allSessions)[0]
         <div className="absolute -top-px left-0 right-0 h-0.5 bg-red-500" />
       )}
       <div className="flex items-stretch">
+        {/* Checkbox */}
+        {onToggle && (
+          <div
+            className="shrink-0 flex items-center justify-center w-8 cursor-pointer"
+            onClick={(e) => { e.preventDefault(); onToggle(session.id); }}
+          >
+            <div className={`w-4 h-4 border-2 flex items-center justify-center transition-colors ${
+              isSelected ? "bg-blue-600 border-blue-600" : "border-stone-300 bg-white"
+            }`}>
+              {isSelected && (
+                <svg viewBox="0 0 10 8" className="w-2.5 h-2 fill-none stroke-white stroke-2">
+                  <polyline points="1,4 4,7 9,1" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </div>
+          </div>
+        )}
         {/* Date column */}
         <div className={`shrink-0 w-16 flex flex-col items-center justify-center py-4 border-r ${
           urgency === "imminent" ? "border-red-200 bg-red-50" :
@@ -829,8 +848,54 @@ export default function Home() {
   const [regionFilter, setRegionFilter] = useState<Region | "All">("All");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [lang, setLang] = useState<Lang>("zh");
+  const [selectedSessions, setSelectedSessions] = useState<Set<string>>(new Set());
 
   const t = T[lang] as typeof T["zh"];
+
+  function toggleSelect(id: string) {
+    setSelectedSessions((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  function clearSelection() {
+    setSelectedSessions(new Set());
+  }
+
+  function exportBatchICS() {
+    const events: string[] = [];
+    for (const id of Array.from(selectedSessions)) {
+      const session = allSessions.find((s) => s.id === id);
+      if (!session || session.isRolling || !session.dates || !session.time) continue;
+      if (!session.time.match(/(ET|CT|PT|MT)/i)) continue;
+      const school = schoolsMap[session.schoolId];
+      const title = `${school?.name ? school.name + " - " : ""}${session.title}`;
+      const durationMin = parseDurationMinutes(session.duration);
+      for (const dateStr of session.dates) {
+        const start = parseEventDateTime(dateStr, session.time);
+        if (!start) continue;
+        const end = new Date(start.getTime() + durationMin * 60000);
+        events.push([
+          "BEGIN:VEVENT",
+          `DTSTART:${toICSDatetime(start)}`,
+          `DTEND:${toICSDatetime(end)}`,
+          `SUMMARY:${title.replace(/,/g, "\\,")}`,
+          `DESCRIPTION:Register: ${session.registrationUrl}`,
+          `URL:${session.registrationUrl}`,
+          `UID:${dateStr}-${id}@admitlens`,
+          "END:VEVENT",
+        ].join("\r\n"));
+      }
+    }
+    const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//AdmitLens//EN", "CALSCALE:GREGORIAN", ...events, "END:VCALENDAR"].join("\r\n");
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "admitlens-events.ics";
+    link.click();
+  }
 
   const sessionTypes: (SessionType | "All")[] = [
     "All",
@@ -1090,7 +1155,7 @@ export default function Home() {
                       if (!db) return -1;
                       return da.getTime() - db.getTime();
                     })
-                    .map((s) => <ScheduledSessionCard key={s.id} session={s} t={t} />)
+                    .map((s) => <ScheduledSessionCard key={s.id} session={s} t={t} isSelected={selectedSessions.has(s.id)} onToggle={toggleSelect} />)
                 ) : (
                   <div className="py-12 text-center text-stone-400">
                     <p className="text-xs">{t.noFixed}</p>
@@ -1209,6 +1274,30 @@ export default function Home() {
 
       {/* ── Onboarding Modal ── */}
       <OnboardingModal t={t} lang={lang} />
+
+      {/* ── Batch Export Bar ── */}
+      {selectedSessions.size > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-stone-900 text-white px-4 py-3 flex items-center justify-between shadow-lg">
+          <span className="text-sm font-medium">
+            {lang === "zh" ? `已选 ${selectedSessions.size} 场活动` : `${selectedSessions.size} event${selectedSessions.size > 1 ? "s" : ""} selected`}
+          </span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={clearSelection}
+              className="text-xs text-stone-400 hover:text-white transition-colors"
+            >
+              {lang === "zh" ? "清除选择" : "Clear"}
+            </button>
+            <button
+              onClick={exportBatchICS}
+              className="flex items-center gap-1.5 px-4 py-1.5 bg-white text-stone-900 text-xs font-semibold hover:bg-stone-100 transition-colors"
+            >
+              <CalendarPlus size={12} />
+              {lang === "zh" ? "批量导出日历 (.ics)" : "Export to Calendar (.ics)"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
