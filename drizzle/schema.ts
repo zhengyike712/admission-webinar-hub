@@ -67,6 +67,8 @@ export const crawlLogs = mysqlTable("crawl_logs", {
   status: mysqlEnum("status", ["success", "failed", "partial"]).notNull(),
   sessionsFound: int("sessionsFound").default(0).notNull(),
   sessionsUpdated: int("sessionsUpdated").default(0).notNull(),
+  /** How many consecutive failures this school has accumulated */
+  consecutiveFailures: int("consecutiveFailures").default(0).notNull(),
   errorMessage: text("errorMessage"),
   rawContent: text("rawContent"), // truncated HTML/text for debugging
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -74,3 +76,19 @@ export const crawlLogs = mysqlTable("crawl_logs", {
 
 export type CrawlLog = typeof crawlLogs.$inferSelect;
 export type InsertCrawlLog = typeof crawlLogs.$inferInsert;
+
+/**
+ * subscribers table — stores email addresses for activity update notifications.
+ */
+export const subscribers = mysqlTable("subscribers", {
+  id: int("id").autoincrement().primaryKey(),
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  /** Optional: regions the subscriber is interested in (JSON array) */
+  regions: json("regions").$type<string[]>(),
+  active: boolean("active").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Subscriber = typeof subscribers.$inferSelect;
+export type InsertSubscriber = typeof subscribers.$inferInsert;

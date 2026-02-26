@@ -1,0 +1,9 @@
+{
+  "query": "\nALTER TABLE `crawl_logs` ADD COLUMN `consecutiveFailures` int NOT NULL DEFAULT 0;\n\nCREATE TABLE IF NOT EXISTS `subscribers` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `email` varchar(320) NOT NULL,\n  `regions` json,\n  `active` boolean NOT NULL DEFAULT true,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  `updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `subscribers_id` PRIMARY KEY(`id`),\n  CONSTRAINT `subscribers_email_unique` UNIQUE(`email`)\n);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 28x4cWX34ZKHd6B.9c35f7d5c3f8 --database F6apVxHHK9H6xisJa5W5pf --execute \nALTER TABLE `crawl_logs` ADD COLUMN `consecutiveFailures` int NOT NULL DEFAULT 0;\n\nCREATE TABLE IF NOT EXISTS `subscribers` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `email` varchar(320) NOT NULL,\n  `regions` json,\n  `active` boolean NOT NULL DEFAULT true,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  `updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `subscribers_id` PRIMARY KEY(`id`),\n  CONSTRAINT `subscribers_email_unique` UNIQUE(`email`)\n);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 948
+}

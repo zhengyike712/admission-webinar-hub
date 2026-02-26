@@ -12,11 +12,15 @@
  *   5. Write a row to `crawl_logs`
  */
 
-import { eq } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { getDb } from "./db";
-import { crawlLogs, sessions } from "../drizzle/schema";
+import { crawlLogs, sessions, subscribers } from "../drizzle/schema";
 import { invokeLLM } from "./_core/llm";
+import { notifyOwner } from "./_core/notification";
 import { allSchools, allSessions } from "../client/src/data/schools";
+
+// Threshold: alert owner after this many consecutive failures for one school
+const CONSECUTIVE_FAIL_ALERT_THRESHOLD = 3;
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -332,7 +336,40 @@ export async function crawlSchool(schoolId: number): Promise<CrawlResult> {
     console.error(`[Crawler] Error crawling ${school.name}:`, errorMessage);
   }
 
-  // Write crawl log
+  // ── Compute consecutive failures ────────────────────────────
+  let consecutiveFailures = 0;
+  try {
+    const db = await getDb();
+    if (db) {
+      // Get the last N logs for this school to count consecutive failures
+      const recentLogs = await db
+        .select({ status: crawlLogs.status, consecutiveFailures: crawlLogs.consecutiveFailures })
+        .from(crawlLogs)
+        .where(eq(crawlLogs.schoolId, school.id))
+        .orderBy(desc(crawlLogs.createdAt))
+        .limit(1);
+
+      const lastConsecutive = recentLogs[0]?.consecutiveFailures ?? 0;
+      if (status === "failed") {
+        consecutiveFailures = lastConsecutive + 1;
+      } else {
+        consecutiveFailures = 0; // reset on success/partial
+      }
+
+      // Alert owner if threshold reached
+      if (consecutiveFailures === CONSECUTIVE_FAIL_ALERT_THRESHOLD) {
+        notifyOwner({
+          title: `⚠️ AdmitLens 爬取告警：${school.name}`,
+          content: `${school.name} 已连续 ${consecutiveFailures} 次爬取失败。\n最新错误：${errorMessage ?? "未知错误"}\n请检查官网链接是否已变更：${crawlUrl}`,
+        }).catch(console.error);
+        console.warn(`[Crawler] ALERT: ${school.name} has failed ${consecutiveFailures} times consecutively`);
+      }
+    }
+  } catch (err) {
+    console.error("[Crawler] Failed to compute consecutive failures:", err);
+  }
+
+  // ── Write crawl log ───────────────────────────────────────────
   try {
     const db = await getDb();
     if (db) {
@@ -343,6 +380,7 @@ export async function crawlSchool(schoolId: number): Promise<CrawlResult> {
         status,
         sessionsFound,
         sessionsUpdated,
+        consecutiveFailures,
         errorMessage,
         rawContent: rawHtml.slice(0, 2000), // store first 2KB for debugging
       });
@@ -380,10 +418,40 @@ export async function crawlAllSchools(): Promise<CrawlResult[]> {
   const succeeded = results.filter((r) => r.status === "success").length;
   const failed = results.filter((r) => r.status === "failed").length;
   const partial = results.filter((r) => r.status === "partial").length;
+  const totalNew = results.reduce((sum, r) => sum + r.sessionsUpdated, 0);
 
   console.log(
-    `[Crawler] Full crawl complete: ${succeeded} success, ${partial} partial, ${failed} failed`
+    `[Crawler] Full crawl complete: ${succeeded} success, ${partial} partial, ${failed} failed, ${totalNew} sessions updated`
   );
+
+  // ── Notify subscribers if new sessions were found ───────────────────
+  if (totalNew > 0) {
+    try {
+      const db = await getDb();
+      if (db) {
+        const activeSubscribers = await db
+          .select({ email: subscribers.email })
+          .from(subscribers)
+          .where(eq(subscribers.active, true));
+
+        if (activeSubscribers.length > 0) {
+          const successSchools = results
+            .filter((r) => r.status === "success" && r.sessionsUpdated > 0)
+            .map((r) => r.schoolName)
+            .join("、");
+
+          // Notify owner with subscriber summary (Manus notification is owner-only)
+          await notifyOwner({
+            title: `📅 AdmitLens 有新活动，已通知 ${activeSubscribers.length} 位订阅者`,
+            content: `本次爬取共更新 ${totalNew} 场活动，涉及院校：${successSchools || "无"}。\n订阅者列表（${activeSubscribers.length} 人）：${activeSubscribers.slice(0, 10).map((s) => s.email).join("、")}${activeSubscribers.length > 10 ? " ...等" : ""}`,
+          });
+          console.log(`[Crawler] Notified owner about ${activeSubscribers.length} subscribers with new sessions`);
+        }
+      }
+    } catch (notifyErr) {
+      console.error("[Crawler] Failed to notify subscribers:", notifyErr);
+    }
+  }
 
   return results;
 }

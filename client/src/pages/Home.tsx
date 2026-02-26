@@ -621,16 +621,15 @@ function SchoolCard({ school, t }: { school: School; t: typeof T["zh"] }) {
 function EmailSubscribe({ t }: { t: typeof T["zh"] }) {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const subscribeMutation = trpc.subscribers.subscribe.useMutation();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.includes("@")) return;
-    // Store locally (no backend)
-    const existing = JSON.parse(localStorage.getItem("admitlens_subscribers") || "[]");
-    if (!existing.includes(email)) {
-      localStorage.setItem("admitlens_subscribers", JSON.stringify([...existing, email]));
-    }
-    setSubmitted(true);
+    subscribeMutation.mutate(
+      { email },
+      { onSuccess: () => setSubmitted(true) }
+    );
   }
 
   if (submitted) {
@@ -671,6 +670,7 @@ function FloatingSubscribe({ t }: { t: typeof T["zh"] }) {
   const [submitted, setSubmitted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  const subscribeMutation = trpc.subscribers.subscribe.useMutation();
 
   // 向下滚动 300px 后才显示按钮
   useEffect(() => {
@@ -694,11 +694,10 @@ function FloatingSubscribe({ t }: { t: typeof T["zh"] }) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.includes("@")) return;
-    const existing = JSON.parse(localStorage.getItem("admitlens_subscribers") || "[]");
-    if (!existing.includes(email)) {
-      localStorage.setItem("admitlens_subscribers", JSON.stringify([...existing, email]));
-    }
-    setSubmitted(true);
+    subscribeMutation.mutate(
+      { email },
+      { onSuccess: () => setSubmitted(true) }
+    );
   }
 
   return (
