@@ -792,6 +792,14 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
           <p className="text-center text-[10px] text-stone-300 mt-2">
             {lang === "zh" ? "门始终开着。你需要的，只是知道在哪里敲门而入。" : "The door is always open. You just need to know where to knock."}
           </p>
+          <div className="text-center mt-2">
+            <button
+              onClick={dismiss}
+              className="text-[10px] text-stone-300 hover:text-stone-500 underline underline-offset-2 transition-colors"
+            >
+              {lang === "zh" ? "不再显示" : "Don't show again"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
