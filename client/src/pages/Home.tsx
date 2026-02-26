@@ -599,11 +599,9 @@ export default function Home() {
             汇聚各校招生官（AO）主持的线上宣讲活动，一键直达官方报名入口
           </p>
           {/* Mission statement */}
-          <div className="border-l-2 border-stone-300 pl-4 max-w-xl">
-            <p className="text-xs text-stone-400 leading-relaxed italic">
-              信息不对称，是教育不公平最隐蔽的形式。每一所顶尖大学都在定期举办公开的线上宣讲——招生官亲自出席，回答真实的问题。这些信息完全公开，却因语言和渠道的障碍，对大多数中国学生来说形同不存在。AdmitLens 就是要把这道墙拆掉。
-            </p>
-          </div>
+          <p className="text-xs text-stone-400 tracking-wide">
+            门始终开着。你需要的，只是知道在哪里敏门而入。
+          </p>
         </div>
       </div>
 
