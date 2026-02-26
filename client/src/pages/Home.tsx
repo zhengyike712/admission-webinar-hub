@@ -38,7 +38,7 @@ const T: Record<Lang, Record<string, string>> = {
     tagline: "全球高校招生公开信息平台",
     heroTitle: "招生 Virtual Info Session",
     heroDesc: "汇聚各校招生官（AO）主持的线上宣讲活动，一键直达官方报名入口",
-    mission: "门始终开着。你需要的，只是知道在哪里敲门而入。",
+    mission: "好信息，早知道",
     tabSessions: "活动日程",
     tabSchools: "学校目录",
     search: "搜索",
@@ -94,7 +94,7 @@ const T: Record<Lang, Record<string, string>> = {
     tagline: "Global University Admissions Info Hub",
     heroTitle: "Admission Virtual Info Sessions",
     heroDesc: "Official virtual events hosted by admissions officers — direct links to registration.",
-    mission: "The door is always open. You just need to know where to knock.",
+    mission: "Better info. Earlier.",
     tabSessions: "Events",
     tabSchools: "Schools",
     search: "Search",
@@ -871,7 +871,7 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
             {lang === "zh" ? "开始探索" : "Start Exploring"}
           </button>
           <p className="text-center text-[10px] text-stone-300 mt-2">
-            {lang === "zh" ? "门始终开着。你需要的，只是知道在哪里敲门而入。" : "The door is always open. You just need to know where to knock."}
+            {lang === "zh" ? "好信息，早知道" : "Better info. Earlier."}
           </p>
           <div className="text-center mt-2">
             <button
