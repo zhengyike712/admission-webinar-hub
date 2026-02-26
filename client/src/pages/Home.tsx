@@ -1,15 +1,16 @@
-// Design: Minimal — white background, clean typography, no decorative elements
+// Design: Minimal white, system-ui, stone palette
 // Palette: white bg, #111 text, #2563eb accent (blue-600), stone-100 borders
 // Font: system-ui for body, no decorative serifs
 // Layout: left sidebar filter + right content grid
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import {
-  schools,
-  sessions,
+  allSchools,
+  allSessions,
   schoolsMap,
   type SessionType,
   type School,
+  type Region,
 } from "@/data/schools";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,11 +25,129 @@ import {
   CalendarPlus,
   ChevronDown,
   Globe,
+  Mail,
 } from "lucide-react";
 
 type ViewMode = "sessions" | "schools";
+type Lang = "zh" | "en";
 
-const SESSION_TYPE_LABELS: Record<SessionType, string> = {
+// ── i18n ─────────────────────────────────────────────────────
+const T: Record<Lang, Record<string, string>> = {
+  zh: {
+    tagline: "全球高校招生公开信息平台",
+    heroTitle: "招生 Virtual Info Session",
+    heroDesc: "汇聚各校招生官（AO）主持的线上宣讲活动，一键直达官方报名入口",
+    mission: "门始终开着。你需要的，只是知道在哪里敲门而入。",
+    tabSessions: "活动日程",
+    tabSchools: "学校目录",
+    search: "搜索",
+    searchPlaceholder: "学校或活动名称",
+    schoolType: "学校类型",
+    all: "全部",
+    national: "综合大学",
+    liberal: "文理学院",
+    research: "研究型大学",
+    comprehensive: "综合类大学",
+    sessionType: "活动类型",
+    allTypes: "全部类型",
+    region: "地区",
+    upcoming: "即将开始",
+    rolling: "全年开放报名",
+    rollingNote: "滚动开放活动全年可选日期，点击报名后可在官网自行选择时间段。",
+    register: "报名",
+    viewSchedule: "查看日程",
+    noFixed: "暂无固定日期活动",
+    noMatch: "没有匹配的活动",
+    clearFilter: "清除筛选",
+    noRolling: "暂无匹配",
+    addToCalendar: "添加到日历",
+    googleCal: "Google 日历",
+    appleCal: "Apple / Outlook (.ics)",
+    imminent: "即将开始",
+    soon: "本月",
+    subscribe: "订阅活动提醒",
+    subscribePlaceholder: "输入邮箱，有新活动时通知你",
+    subscribeBtn: "订阅",
+    subscribeSuccess: "已订阅，感谢！",
+    calSubscribe: "订阅日历",
+    calSubscribeNote: "将所有活动同步到你的日历",
+    footerBrand: "信息公开是最基本的公平。我们相信，每一个学生——无论来自哪里——都应该能与顶尖院校的招生官面对面地对话。",
+    footerRoadmap: "覆盖计划",
+    footerUs: "美国本科",
+    footerUsLive: "已上线",
+    footerUk: "英国本科 (Russell Group)",
+    footerHk: "香港 / 澳大利亚顶尖院校",
+    footerCa: "加拿大本科 (U15)",
+    footerGrad: "研究生项目",
+    footerSoon: "即将",
+    footerPlanned: "规划中",
+    footerDisclaimer: "所有链接均指向各院校官方招生网站，请以各校官网最新日程为准",
+    footerMotto: "教育公平，从信息公开开始",
+    regionAll: "全部地区",
+    regionUS: "美国",
+    regionUK: "英国",
+    regionHK: "香港",
+    regionAU: "澳大利亚",
+  },
+  en: {
+    tagline: "Global University Admissions Info Hub",
+    heroTitle: "Admission Virtual Info Sessions",
+    heroDesc: "Official virtual events hosted by admissions officers — direct links to registration.",
+    mission: "The door is always open. You just need to know where to knock.",
+    tabSessions: "Events",
+    tabSchools: "Schools",
+    search: "Search",
+    searchPlaceholder: "School or event name",
+    schoolType: "School Type",
+    all: "All",
+    national: "National University",
+    liberal: "Liberal Arts College",
+    research: "Research University",
+    comprehensive: "Comprehensive University",
+    sessionType: "Event Type",
+    allTypes: "All Types",
+    region: "Region",
+    upcoming: "Upcoming",
+    rolling: "Open Year-Round",
+    rollingNote: "Rolling events allow you to pick a date on the school's website.",
+    register: "Register",
+    viewSchedule: "View Schedule",
+    noFixed: "No upcoming scheduled events",
+    noMatch: "No matching events",
+    clearFilter: "Clear filters",
+    noRolling: "No matches",
+    addToCalendar: "Add to Calendar",
+    googleCal: "Google Calendar",
+    appleCal: "Apple / Outlook (.ics)",
+    imminent: "Upcoming",
+    soon: "This Month",
+    subscribe: "Subscribe to Updates",
+    subscribePlaceholder: "Enter email to get notified",
+    subscribeBtn: "Subscribe",
+    subscribeSuccess: "Subscribed, thank you!",
+    calSubscribe: "Subscribe Calendar",
+    calSubscribeNote: "Sync all events to your calendar",
+    footerBrand: "Information equity is the most basic form of fairness. Every student — regardless of where they come from — deserves direct access to admissions officers at top universities.",
+    footerRoadmap: "Coverage Roadmap",
+    footerUs: "US Undergraduate",
+    footerUsLive: "Live",
+    footerUk: "UK Undergraduate (Russell Group)",
+    footerHk: "Hong Kong / Australia",
+    footerCa: "Canada Undergraduate (U15)",
+    footerGrad: "Graduate Programs",
+    footerSoon: "Soon",
+    footerPlanned: "Planned",
+    footerDisclaimer: "All links point to official university admissions websites. Please verify dates on each school's official site.",
+    footerMotto: "Equal access to information, equal access to opportunity.",
+    regionAll: "All Regions",
+    regionUS: "United States",
+    regionUK: "United Kingdom",
+    regionHK: "Hong Kong",
+    regionAU: "Australia",
+  },
+} as const;
+
+const SESSION_TYPE_LABELS_ZH: Record<SessionType, string> = {
   "General Info Session": "综合宣讲",
   "Up Close / Specialty": "专题深度",
   "Multi-College Session": "多校联合",
@@ -39,7 +158,6 @@ const SESSION_TYPE_LABELS: Record<SessionType, string> = {
 };
 
 // ── Timezone conversion ─────────────────────────────────────
-// Detect a friendly label for the user's local timezone
 function getLocalTzLabel(): string {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   if (tz.includes("Shanghai") || tz.includes("Chongqing") || tz.includes("Beijing")) return "北京时间";
@@ -47,32 +165,24 @@ function getLocalTzLabel(): string {
   if (tz.includes("Taipei")) return "台北时间";
   if (tz.includes("Singapore")) return "新加坡时间";
   if (tz.includes("Tokyo") || tz.includes("Seoul")) return "东京/首尔时间";
-  if (tz.includes("London")) return "伦敦时间";
-  if (tz.includes("Paris") || tz.includes("Berlin")) return "欧洲中部时间";
-  // Generic: show short timezone abbreviation
+  if (tz.includes("London")) return "London time";
+  if (tz.includes("Paris") || tz.includes("Berlin")) return "CET";
   const abbr = new Intl.DateTimeFormat("en", { timeZoneName: "short" })
     .formatToParts(new Date())
-    .find((p) => p.type === "timeZoneName")?.value || "当地";
-  return `当地时间 (${abbr})`;
+    .find((p) => p.type === "timeZoneName")?.value || "Local";
+  return `Local (${abbr})`;
 }
 
 const LOCAL_TZ_LABEL = getLocalTzLabel();
 
-// Parse a time string like "7:00 PM ET" or "8:00 PM ET / 7:00 PM CT"
-// and return the equivalent local time string.
 function convertToLocalTime(timeStr: string, referenceDate?: string): string | null {
-  // Only handle strings that contain a parseable ET/CT/PT time
   const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)\s*(ET|CT|PT|MT)/i);
   if (!match) return null;
-
   const [, hourStr, minuteStr, ampm, tz] = match;
   let hour = parseInt(hourStr, 10);
   const minute = parseInt(minuteStr, 10);
   if (ampm.toUpperCase() === "PM" && hour !== 12) hour += 12;
   if (ampm.toUpperCase() === "AM" && hour === 12) hour = 0;
-
-  // UTC offset for each zone (standard time; ET = UTC-5, CT = UTC-6, PT = UTC-8)
-  // We use a fixed reference date to determine DST: use the session date if available
   const tzMap: Record<string, string> = {
     ET: "America/New_York",
     CT: "America/Chicago",
@@ -80,11 +190,8 @@ function convertToLocalTime(timeStr: string, referenceDate?: string): string | n
     PT: "America/Los_Angeles",
   };
   const ianaZone = tzMap[tz.toUpperCase()] || "America/New_York";
-
   try {
-    // Build a UTC date by interpreting the time in the source timezone
     const dateStr = referenceDate || new Date().toISOString().slice(0, 10);
-    // Use Intl to get the UTC offset for that timezone on that date
     const formatter = new Intl.DateTimeFormat("en-US", {
       timeZone: ianaZone,
       hour: "numeric",
@@ -94,29 +201,20 @@ function convertToLocalTime(timeStr: string, referenceDate?: string): string | n
       month: "2-digit",
       day: "2-digit",
     });
-    // Create a Date at noon UTC on the reference date, then adjust
     const baseDate = new Date(`${dateStr}T12:00:00Z`);
-    // Get what time it is in the source timezone at noon UTC
     const parts = formatter.formatToParts(baseDate);
     const tzHour = parseInt(parts.find((p) => p.type === "hour")?.value || "12", 10);
-    // UTC offset in hours: 12 (UTC noon) - tzHour
     const utcOffset = 12 - tzHour;
-    // Build the event time in UTC
     const eventUtc = new Date(`${dateStr}T${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:00Z`);
     eventUtc.setHours(eventUtc.getHours() + utcOffset);
-
-    // Format in user's local timezone
     const localStr = eventUtc.toLocaleTimeString(navigator.language || "zh-CN", {
       hour: "numeric",
       minute: "2-digit",
       hour12: true,
     });
-
-    // Detect if user is in a non-ET timezone to avoid redundant display
     const userTzOffset = -new Date().getTimezoneOffset() / 60;
     const sourceTzOffset = -utcOffset;
-    if (Math.abs(userTzOffset - sourceTzOffset) < 0.5) return null; // same zone, skip
-
+    if (Math.abs(userTzOffset - sourceTzOffset) < 0.5) return null;
     return localStr;
   } catch {
     return null;
@@ -124,7 +222,6 @@ function convertToLocalTime(timeStr: string, referenceDate?: string): string | n
 }
 
 // ── Calendar helpers ─────────────────────────────────────────
-// Parse "7:00 PM ET" on a given date string into a UTC Date
 function parseEventDateTime(dateStr: string, timeStr: string): Date | null {
   const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)\s*(ET|CT|PT|MT)/i);
   if (!match) return null;
@@ -146,9 +243,6 @@ function parseEventDateTime(dateStr: string, timeStr: string): Date | null {
       hour: "numeric",
       minute: "2-digit",
       hour12: false,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
     });
     const baseDate = new Date(`${dateStr}T12:00:00Z`);
     const parts = formatter.formatToParts(baseDate);
@@ -176,7 +270,7 @@ function buildICS(title: string, description: string, url: string, dates: string
       `DTSTART:${toICSDatetime(start)}`,
       `DTEND:${toICSDatetime(end)}`,
       `SUMMARY:${title.replace(/,/g, "\\,")}`,
-      `DESCRIPTION:${description.replace(/,/g, "\\,")}\\n\\n报名链接: ${url}`,
+      `DESCRIPTION:${description.replace(/,/g, "\\,")}\\n\\nRegister: ${url}`,
       `URL:${url}`,
       `UID:${dateStr}-${title.replace(/\s+/g, "-").toLowerCase()}@admitlens`,
       "END:VEVENT",
@@ -200,14 +294,19 @@ function buildGoogleCalendarUrl(title: string, description: string, url: string,
     action: "TEMPLATE",
     text: title,
     dates: `${fmt(start)}/${fmt(end)}`,
-    details: `${description}\n\n报名链接: ${url}`,
+    details: `${description}\n\nRegister: ${url}`,
     location: url,
   });
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
 // ── Add to Calendar dropdown ──────────────────────────────
-function AddToCalendarButton({ session, school, compact }: { session: (typeof sessions)[0]; school: ReturnType<typeof Object.values<(typeof sessions)[0]>> | undefined; compact?: boolean }) {
+function AddToCalendarButton({ session, school, compact, t }: {
+  session: (typeof allSessions)[0];
+  school: School | undefined;
+  compact?: boolean;
+  t: typeof T["zh"];
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -223,15 +322,12 @@ function AddToCalendarButton({ session, school, compact }: { session: (typeof se
   if (!session.time || !session.time.match(/(ET|CT|PT|MT)/i)) return null;
 
   const durationMin = parseDurationMinutes(session.duration);
-  const schoolName = typeof school === "object" && school !== null && "name" in school
-    ? (school as { name: string }).name
-    : "";
+  const schoolName = school?.name || "";
   const title = `${schoolName ? schoolName + " - " : ""}${session.title}`;
-  const description = session.description;
   const url = session.registrationUrl;
 
   function downloadICS() {
-    const ics = buildICS(title, description, url, session.dates!, session.time!, durationMin);
+    const ics = buildICS(title, session.description, url, session.dates!, session.time!, durationMin);
     const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
@@ -240,12 +336,11 @@ function AddToCalendarButton({ session, school, compact }: { session: (typeof se
     setOpen(false);
   }
 
-  // For Google Calendar, use the first upcoming date
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const upcomingDates = session.dates.filter((d) => new Date(d + "T00:00:00") >= today);
   const firstDate = upcomingDates[0] || session.dates[0];
-  const googleUrl = buildGoogleCalendarUrl(title, description, url, firstDate, session.time, durationMin);
+  const googleUrl = buildGoogleCalendarUrl(title, session.description, url, firstDate, session.time, durationMin);
 
   return (
     <div className="relative" ref={ref}>
@@ -257,17 +352,17 @@ function AddToCalendarButton({ session, school, compact }: { session: (typeof se
         }
       >
         <CalendarPlus size={compact ? 10 : 11} />
-        {!compact && <>添加到日历</>}
+        {!compact && <>{t.addToCalendar}</>}
         <ChevronDown size={compact ? 9 : 10} className={`transition-transform duration-150 ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="absolute bottom-full left-0 right-0 mb-1 bg-white border border-stone-200 shadow-md z-20 overflow-hidden">
+        <div className="absolute bottom-full left-0 right-0 mb-1 bg-white border border-stone-200 shadow-md z-20 overflow-hidden min-w-[140px]">
           <button
             onClick={() => { window.open(googleUrl, "_blank"); setOpen(false); }}
             className="flex items-center gap-2 w-full px-3 py-2 text-xs text-stone-700 hover:bg-stone-50 transition-colors"
           >
             <span className="text-[11px] font-semibold text-red-500 w-4">G</span>
-            Google 日历
+            {t.googleCal}
           </button>
           <div className="h-px bg-stone-100" />
           <button
@@ -275,7 +370,7 @@ function AddToCalendarButton({ session, school, compact }: { session: (typeof se
             className="flex items-center gap-2 w-full px-3 py-2 text-xs text-stone-700 hover:bg-stone-50 transition-colors"
           >
             <span className="text-[11px] font-semibold text-blue-500 w-4">↓</span>
-            Apple / Outlook (.ics)
+            {t.appleCal}
           </button>
         </div>
       )}
@@ -284,7 +379,7 @@ function AddToCalendarButton({ session, school, compact }: { session: (typeof se
 }
 
 // ── Urgency helpers ─────────────────────────────────────────
-function getUrgency(session: (typeof sessions)[0]): "imminent" | "soon" | null {
+function getUrgency(session: (typeof allSessions)[0]): "imminent" | "soon" | null {
   if (session.isRolling || !session.dates || session.dates.length === 0) return null;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -299,7 +394,7 @@ function getUrgency(session: (typeof sessions)[0]): "imminent" | "soon" | null {
   return null;
 }
 
-function getNextDate(session: (typeof sessions)[0]): Date | null {
+function getNextDate(session: (typeof allSessions)[0]): Date | null {
   if (session.isRolling || !session.dates || session.dates.length === 0) return null;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -311,12 +406,10 @@ function getNextDate(session: (typeof sessions)[0]): Date | null {
 }
 
 // ── Session Card (scheduled / fixed-date) ────────────────────
-function ScheduledSessionCard({ session }: { session: (typeof sessions)[0] }) {
+function ScheduledSessionCard({ session, t }: { session: (typeof allSessions)[0]; t: typeof T["zh"] }) {
   const school = schoolsMap[session.schoolId];
   const urgency = getUrgency(session);
   const nextDate = getNextDate(session);
-
-  // Local time conversion
   const localTime = session.time ? convertToLocalTime(session.time, session.dates?.[0]) : null;
 
   return (
@@ -330,8 +423,6 @@ function ScheduledSessionCard({ session }: { session: (typeof sessions)[0] }) {
       {urgency === "imminent" && (
         <div className="absolute -top-px left-0 right-0 h-0.5 bg-red-500" />
       )}
-
-      {/* Main row: date + info + CTA */}
       <div className="flex items-stretch">
         {/* Date column */}
         <div className={`shrink-0 w-16 flex flex-col items-center justify-center py-4 border-r ${
@@ -367,15 +458,20 @@ function ScheduledSessionCard({ session }: { session: (typeof sessions)[0] }) {
             <span className="text-[11px] text-stone-500 font-medium">
               {school?.shortName || school?.name}
             </span>
+            {school?.region && school.region !== "US" && (
+              <span className="text-[10px] px-1 py-0.5 bg-stone-100 text-stone-400 rounded">
+                {school.region}
+              </span>
+            )}
             {urgency === "imminent" && (
               <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 bg-red-500 text-white font-semibold rounded-sm animate-pulse">
                 <span className="inline-block w-1 h-1 rounded-full bg-white" />
-                即将开始
+                {t.imminent}
               </span>
             )}
             {urgency === "soon" && (
               <span className="text-[10px] px-1.5 py-0.5 bg-orange-100 text-orange-600 font-semibold rounded-sm border border-orange-200">
-                本月
+                {t.soon}
               </span>
             )}
           </div>
@@ -401,18 +497,18 @@ function ScheduledSessionCard({ session }: { session: (typeof sessions)[0] }) {
             rel="noopener noreferrer"
             className="flex items-center gap-1 px-3 py-1.5 bg-stone-900 text-white hover:bg-stone-700 text-[11px] font-medium transition-colors duration-150 whitespace-nowrap"
           >
-            报名
+            {t.register}
             <ArrowUpRight size={10} />
           </a>
-          <AddToCalendarButton session={session} school={school as any} compact />
+          <AddToCalendarButton session={session} school={school} compact t={t} />
         </div>
       </div>
     </div>
   );
 }
 
-// ── Rolling Entry Row (compact, for right sidebar) ────────────
-function RollingRow({ session }: { session: (typeof sessions)[0] }) {
+// ── Rolling Entry Row ────────────────────────────────────────
+function RollingRow({ session, t }: { session: (typeof allSessions)[0]; t: typeof T["zh"] }) {
   const school = schoolsMap[session.schoolId];
   return (
     <div className="flex items-center gap-2 py-2 border-b border-stone-100 last:border-0">
@@ -423,6 +519,9 @@ function RollingRow({ session }: { session: (typeof sessions)[0] }) {
       <div className="flex-1 min-w-0">
         <div className="text-[11px] font-medium text-stone-700 truncate">
           {school?.shortName || school?.name}
+          {school?.region && school.region !== "US" && (
+            <span className="ml-1 text-[9px] text-stone-400">{school.region}</span>
+          )}
         </div>
         <div className="text-[10px] text-stone-400 truncate">{session.title}</div>
       </div>
@@ -432,15 +531,15 @@ function RollingRow({ session }: { session: (typeof sessions)[0] }) {
         rel="noopener noreferrer"
         className="shrink-0 text-[10px] text-stone-500 hover:text-stone-900 underline underline-offset-2 transition-colors"
       >
-        报名
+        {t.register}
       </a>
     </div>
   );
 }
 
 // ── School Card ───────────────────────────────────────────────
-function SchoolCard({ school }: { school: School }) {
-  const schoolSessions = sessions.filter((s) => s.schoolId === school.id);
+function SchoolCard({ school, t }: { school: School; t: typeof T["zh"] }) {
+  const schoolSessions = allSessions.filter((s) => s.schoolId === school.id);
 
   return (
     <div className="bg-white border border-stone-200 p-4 hover:border-stone-400 transition-colors duration-150">
@@ -459,23 +558,21 @@ function SchoolCard({ school }: { school: School }) {
             <p className="text-[11px] text-stone-400 truncate pl-3">{school.name}</p>
           )}
         </div>
-        <span className="shrink-0 text-xs font-mono text-stone-400">
-          #{school.rank}
-        </span>
+        <span className="shrink-0 text-xs font-mono text-stone-400">#{school.rank}</span>
       </div>
 
       <p className="text-[11px] text-stone-400 mb-3 pl-3">{school.location}</p>
 
       <div className="flex flex-wrap gap-1 mb-3 pl-3">
-        {school.tags.slice(0, 3).map((t) => (
-          <span key={t} className="text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded">
-            {t}
+        {school.tags.slice(0, 3).map((tag) => (
+          <span key={tag} className="text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded">
+            {tag}
           </span>
         ))}
       </div>
 
       <div className="text-[11px] text-stone-400 mb-3 pl-3">
-        {schoolSessions.length} 场活动可报名
+        {schoolSessions.length} {t.tabSessions === "Events" ? "events" : "场活动可报名"}
       </div>
 
       <div className="flex gap-2 pl-3">
@@ -485,7 +582,7 @@ function SchoolCard({ school }: { school: School }) {
           rel="noopener noreferrer"
           className="flex-1 flex items-center justify-center gap-1 py-1.5 border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white text-xs font-medium transition-colors duration-150"
         >
-          查看日程
+          {t.viewSchedule}
         </a>
         <a
           href={school.admissionPage}
@@ -500,15 +597,63 @@ function SchoolCard({ school }: { school: School }) {
   );
 }
 
+// ── Email Subscribe ───────────────────────────────────────────
+function EmailSubscribe({ t }: { t: typeof T["zh"] }) {
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.includes("@")) return;
+    // Store locally (no backend)
+    const existing = JSON.parse(localStorage.getItem("admitlens_subscribers") || "[]");
+    if (!existing.includes(email)) {
+      localStorage.setItem("admitlens_subscribers", JSON.stringify([...existing, email]));
+    }
+    setSubmitted(true);
+  }
+
+  if (submitted) {
+    return (
+      <div className="flex items-center gap-2 text-xs text-stone-500">
+        <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500" />
+        {t.subscribeSuccess}
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex gap-2">
+      <div className="relative flex-1">
+        <Mail size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-300" />
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder={t.subscribePlaceholder}
+          className="w-full pl-7 pr-3 py-1.5 text-xs border border-stone-200 focus:border-stone-900 outline-none transition-colors"
+        />
+      </div>
+      <button
+        type="submit"
+        className="px-3 py-1.5 bg-stone-900 text-white text-xs font-medium hover:bg-stone-700 transition-colors whitespace-nowrap"
+      >
+        {t.subscribeBtn}
+      </button>
+    </form>
+  );
+}
+
 // ── Main Page ─────────────────────────────────────────────────
 export default function Home() {
   const [view, setView] = useState<ViewMode>("sessions");
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<SessionType | "All">("All");
-  const [schoolTypeFilter, setSchoolTypeFilter] = useState<
-    "All" | "National University" | "Liberal Arts College"
-  >("All");
+  const [regionFilter, setRegionFilter] = useState<Region | "All">("All");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [lang, setLang] = useState<Lang>("zh");
+
+  const t = T[lang] as typeof T["zh"];
 
   const sessionTypes: (SessionType | "All")[] = [
     "All",
@@ -520,12 +665,19 @@ export default function Home() {
     "Financial Aid Session",
   ];
 
+  const regionOptions: { value: Region | "All"; label: string }[] = [
+    { value: "All", label: t.regionAll },
+    { value: "US", label: t.regionUS },
+    { value: "UK", label: t.regionUK },
+    { value: "HK", label: t.regionHK },
+    { value: "AU", label: t.regionAU },
+  ];
+
   const filteredSessions = useMemo(() => {
-    return sessions.filter((s) => {
+    return allSessions.filter((s) => {
       const school = schoolsMap[s.schoolId];
       const matchType = typeFilter === "All" || s.type === typeFilter;
-      const matchSchoolType =
-        schoolTypeFilter === "All" || school?.type === schoolTypeFilter;
+      const matchRegion = regionFilter === "All" || school?.region === regionFilter;
       const q = search.toLowerCase();
       const matchSearch =
         !q ||
@@ -533,27 +685,23 @@ export default function Home() {
         school?.name.toLowerCase().includes(q) ||
         (school?.shortName?.toLowerCase().includes(q) ?? false) ||
         s.description.toLowerCase().includes(q);
-      return matchType && matchSchoolType && matchSearch;
+      return matchType && matchRegion && matchSearch;
     });
-  }, [search, typeFilter, schoolTypeFilter]);
+  }, [search, typeFilter, regionFilter]);
 
   const filteredSchools = useMemo(() => {
-    return schools.filter((s) => {
-      const matchType =
-        schoolTypeFilter === "All" || s.type === schoolTypeFilter;
+    return allSchools.filter((s) => {
+      const matchRegion = regionFilter === "All" || s.region === regionFilter;
       const q = search.toLowerCase();
       const matchSearch =
         !q ||
         s.name.toLowerCase().includes(q) ||
         (s.shortName?.toLowerCase().includes(q) ?? false) ||
         s.location.toLowerCase().includes(q) ||
-        s.tags.some((t) => t.toLowerCase().includes(q));
-      return matchType && matchSearch;
+        s.tags.some((tag) => tag.toLowerCase().includes(q));
+      return matchRegion && matchSearch;
     });
-  }, [search, schoolTypeFilter]);
-
-  const rollingCount = filteredSessions.filter((s) => s.isRolling).length;
-  const scheduledCount = filteredSessions.filter((s) => !s.isRolling).length;
+  }, [search, regionFilter]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -561,23 +709,39 @@ export default function Home() {
       <header className="border-b border-stone-200 sticky top-0 z-50 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-12 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            {/* Lens mark: outer ring + inner dot */}
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <circle cx="9" cy="9" r="8" stroke="#111" strokeWidth="1.2" />
               <circle cx="9" cy="9" r="4.5" stroke="#111" strokeWidth="1.2" />
               <circle cx="9" cy="9" r="1.5" fill="#111" />
             </svg>
             <span className="text-sm font-bold tracking-tight text-stone-900">AdmitLens</span>
-            <span className="hidden sm:block text-xs text-stone-400">全球高校招生公开信息平台</span>
+            <span className="hidden sm:block text-xs text-stone-400">{t.tagline}</span>
           </div>
           <div className="flex items-center gap-3">
             {/* Region tabs */}
             <div className="hidden md:flex items-center gap-1">
-              <span className="text-[10px] px-2 py-0.5 bg-stone-900 text-white font-medium">美国</span>
-              <span className="text-[10px] px-2 py-0.5 border border-stone-200 text-stone-400 cursor-not-allowed" title="即将开放">英国 <span className="opacity-60">soon</span></span>
-              <span className="text-[10px] px-2 py-0.5 border border-stone-200 text-stone-400 cursor-not-allowed" title="即将开放">加拿大 <span className="opacity-60">soon</span></span>
-              <span className="text-[10px] px-2 py-0.5 border border-stone-200 text-stone-400 cursor-not-allowed" title="即将开放">香港 <span className="opacity-60">soon</span></span>
+              {regionOptions.filter(r => r.value !== "All").map((r) => (
+                <button
+                  key={r.value}
+                  onClick={() => setRegionFilter(r.value)}
+                  className={`text-[10px] px-2 py-0.5 transition-colors ${
+                    regionFilter === r.value
+                      ? "bg-stone-900 text-white"
+                      : "border border-stone-200 text-stone-400 hover:border-stone-400 hover:text-stone-600"
+                  }`}
+                >
+                  {r.label}
+                </button>
+              ))}
             </div>
+            {/* Language toggle */}
+            <button
+              onClick={() => setLang(lang === "zh" ? "en" : "zh")}
+              className="flex items-center gap-1 text-[11px] text-stone-400 hover:text-stone-700 transition-colors border border-stone-200 px-2 py-0.5 hover:border-stone-400"
+            >
+              <Globe size={10} />
+              {lang === "zh" ? "EN" : "中文"}
+            </button>
             <button
               className="sm:hidden text-stone-500"
               onClick={() => setMobileFilterOpen(true)}
@@ -588,24 +752,22 @@ export default function Home() {
         </div>
       </header>
 
-      {/* ── Hero — mission-driven ── */}
+      {/* ── Hero ── */}
       <div className="border-b border-stone-100 bg-stone-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-          <div className="flex items-center gap-2 mb-3">
-            <Globe size={12} className="text-stone-400" />
-            <p className="text-[11px] uppercase tracking-widest text-stone-400">
-              美国 · US News Top 50 综合大学 + Top 30 文理学院
-            </p>
-          </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 mb-3 leading-tight">
-            招生 Virtual Info Session
+            {t.heroTitle}
           </h1>
-          <p className="text-sm text-stone-500 max-w-xl leading-relaxed mb-4">
-            汇聚各校招生官（AO）主持的线上宣讲活动，一键直达官方报名入口
+          <p className="text-sm text-stone-500 max-w-xl leading-relaxed mb-5">
+            {t.heroDesc}
           </p>
-          {/* Mission statement */}
-          <p className="text-xs text-stone-400 tracking-wide">
-            门始终开着。你需要的，只是知道在哪里敏门而入。
+          {/* Email subscribe */}
+          <div className="max-w-sm mb-4">
+            <p className="text-[11px] text-stone-400 mb-2 uppercase tracking-widest">{t.subscribe}</p>
+            <EmailSubscribe t={t} />
+          </div>
+          <p className="text-xs text-stone-400 tracking-wide italic">
+            {t.mission}
           </p>
         </div>
       </div>
@@ -622,7 +784,7 @@ export default function Home() {
                   : "border-transparent text-stone-400 hover:text-stone-600"
               }`}
             >
-              活动日程
+              {t.tabSessions}
             </button>
             <button
               onClick={() => setView("schools")}
@@ -632,7 +794,7 @@ export default function Home() {
                   : "border-transparent text-stone-400 hover:text-stone-600"
               }`}
             >
-              学校目录
+              {t.tabSchools}
             </button>
           </div>
         </div>
@@ -653,9 +815,8 @@ export default function Home() {
             pt-4 sm:pt-0 px-4 sm:px-0
           `}
         >
-          {/* Mobile close */}
           <div className="flex items-center justify-between mb-4 sm:hidden">
-            <span className="text-sm font-medium text-stone-900">筛选</span>
+            <span className="text-sm font-medium text-stone-900">{lang === "zh" ? "筛选" : "Filter"}</span>
             <button onClick={() => setMobileFilterOpen(false)}>
               <X size={16} className="text-stone-400" />
             </button>
@@ -665,12 +826,12 @@ export default function Home() {
             {/* Search */}
             <div>
               <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
-                搜索
+                {t.search}
               </label>
               <div className="relative">
                 <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-300" />
                 <Input
-                  placeholder="学校或活动名称"
+                  placeholder={t.searchPlaceholder}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-8 h-8 text-xs border-stone-200 rounded-none focus-visible:ring-0 focus-visible:border-stone-900"
@@ -678,23 +839,23 @@ export default function Home() {
               </div>
             </div>
 
-            {/* School type */}
+            {/* Region filter */}
             <div>
               <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
-                学校类型
+                {t.region}
               </label>
               <div className="space-y-0.5">
-                {(["All", "National University", "Liberal Arts College"] as const).map((t) => (
+                {regionOptions.map((r) => (
                   <button
-                    key={t}
-                    onClick={() => setSchoolTypeFilter(t)}
+                    key={r.value}
+                    onClick={() => setRegionFilter(r.value)}
                     className={`w-full text-left text-xs px-2 py-1.5 transition-colors ${
-                      schoolTypeFilter === t
+                      regionFilter === r.value
                         ? "bg-stone-900 text-white"
                         : "text-stone-500 hover:bg-stone-50"
                     }`}
                   >
-                    {t === "All" ? "全部" : t === "National University" ? "综合大学" : "文理学院"}
+                    {r.label}
                   </button>
                 ))}
               </div>
@@ -704,40 +865,26 @@ export default function Home() {
             {view === "sessions" && (
               <div>
                 <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
-                  活动类型
+                  {t.sessionType}
                 </label>
                 <div className="space-y-0.5">
-                  {sessionTypes.map((t) => (
+                  {sessionTypes.map((type) => (
                     <button
-                      key={t}
-                      onClick={() => setTypeFilter(t)}
+                      key={type}
+                      onClick={() => setTypeFilter(type)}
                       className={`w-full text-left text-xs px-2 py-1.5 transition-colors ${
-                        typeFilter === t
+                        typeFilter === type
                           ? "bg-stone-900 text-white"
                           : "text-stone-500 hover:bg-stone-50"
                       }`}
                     >
-                      {t === "All" ? "全部类型" : SESSION_TYPE_LABELS[t as SessionType]}
+                      {type === "All"
+                        ? t.allTypes
+                        : lang === "zh"
+                        ? SESSION_TYPE_LABELS_ZH[type as SessionType]
+                        : type}
                     </button>
                   ))}
-                </div>
-              </div>
-            )}
-
-            {/* Stats */}
-            {view === "sessions" && (
-              <div className="border-t border-stone-100 pt-4 space-y-1.5 text-xs text-stone-400">
-                <div className="flex justify-between">
-                  <span>滚动报名</span>
-                  <span className="text-stone-700 font-medium">{rollingCount}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>固定日期</span>
-                  <span className="text-stone-700 font-medium">{scheduledCount}</span>
-                </div>
-                <div className="flex justify-between font-medium text-stone-700 pt-1 border-t border-stone-100">
-                  <span>合计</span>
-                  <span>{filteredSessions.length} 场</span>
                 </div>
               </div>
             )}
@@ -756,12 +903,11 @@ export default function Home() {
         <main className="flex-1 min-w-0">
           {view === "sessions" ? (
             <div className="flex gap-6">
-              {/* Left: scheduled (fixed-date) sessions – primary */}
+              {/* Left: scheduled sessions */}
               <div className="flex-1 min-w-0 space-y-3">
                 <div className="flex items-center gap-3 mb-1">
-                  <span className="text-[11px] uppercase tracking-widest text-stone-400 font-medium">即将开始</span>
+                  <span className="text-[11px] uppercase tracking-widest text-stone-400 font-medium">{t.upcoming}</span>
                   <div className="flex-1 h-px bg-stone-100" />
-                  <span className="text-[11px] text-stone-300">{filteredSessions.filter((s) => !s.isRolling).length} 场</span>
                 </div>
                 {filteredSessions.filter((s) => !s.isRolling).length > 0 ? (
                   filteredSessions
@@ -775,88 +921,68 @@ export default function Home() {
                       if (!db) return -1;
                       return da.getTime() - db.getTime();
                     })
-                    .map((s) => <ScheduledSessionCard key={s.id} session={s} />)
+                    .map((s) => <ScheduledSessionCard key={s.id} session={s} t={t} />)
                 ) : (
                   <div className="py-12 text-center text-stone-400">
-                    <p className="text-xs">暂无固定日期活动</p>
+                    <p className="text-xs">{t.noFixed}</p>
                   </div>
                 )}
                 {filteredSessions.length === 0 && (
                   <div className="py-12 text-center text-stone-400">
-                    <p className="text-xs mb-2">没有匹配的活动</p>
+                    <p className="text-xs mb-2">{t.noMatch}</p>
                     <button
-                      onClick={() => { setSearch(""); setTypeFilter("All"); setSchoolTypeFilter("All"); }}
+                      onClick={() => { setSearch(""); setTypeFilter("All"); setRegionFilter("All"); }}
                       className="text-xs underline underline-offset-2 hover:text-stone-600"
                     >
-                      清除筛选
+                      {t.clearFilter}
                     </button>
                   </div>
                 )}
               </div>
 
-              {/* Right: rolling open sessions – secondary */}
+              {/* Right: rolling sessions */}
               <div className="hidden lg:block w-56 shrink-0">
                 <div className="sticky top-28">
                   <div className="flex items-center gap-2 mb-3">
                     <RefreshCw size={10} className="text-stone-400" />
-                    <span className="text-[11px] uppercase tracking-widest text-stone-400 font-medium">全年开放报名</span>
+                    <span className="text-[11px] uppercase tracking-widest text-stone-400 font-medium">{t.rolling}</span>
                   </div>
                   <div className="border border-stone-100 px-3 py-1">
                     {filteredSessions.filter((s) => s.isRolling).length > 0 ? (
                       filteredSessions.filter((s) => s.isRolling).map((s) => (
-                        <RollingRow key={s.id} session={s} />
+                        <RollingRow key={s.id} session={s} t={t} />
                       ))
                     ) : (
-                      <p className="text-[11px] text-stone-300 py-3 text-center">暂无匹配</p>
+                      <p className="text-[11px] text-stone-300 py-3 text-center">{t.noRolling}</p>
                     )}
                   </div>
-                  <p className="text-[10px] text-stone-300 mt-2 leading-relaxed">滚动开放活动全年可选日期，点击报名后可在官网自行选择时间段。</p>
+                  <p className="text-[10px] text-stone-300 mt-2 leading-relaxed">{t.rollingNote}</p>
                 </div>
               </div>
             </div>
           ) : (
             <div className="space-y-6">
-              {/* National Universities */}
-              {filteredSchools.filter((s) => s.type === "National University").length > 0 && (
-                <section>
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-[11px] uppercase tracking-widest text-stone-400 font-medium">
-                      综合大学
-                    </span>
-                    <div className="flex-1 h-px bg-stone-100" />
-                    <span className="text-[11px] text-stone-300">
-                      {filteredSchools.filter((s) => s.type === "National University").length} 所
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {filteredSchools
-                      .filter((s) => s.type === "National University")
-                      .sort((a, b) => a.rank - b.rank)
-                      .map((s) => <SchoolCard key={s.id} school={s} />)}
-                  </div>
-                </section>
-              )}
-
-              {/* Liberal Arts Colleges */}
-              {filteredSchools.filter((s) => s.type === "Liberal Arts College").length > 0 && (
-                <section>
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-[11px] uppercase tracking-widest text-stone-400 font-medium">
-                      文理学院
-                    </span>
-                    <div className="flex-1 h-px bg-stone-100" />
-                    <span className="text-[11px] text-stone-300">
-                      {filteredSchools.filter((s) => s.type === "Liberal Arts College").length} 所
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {filteredSchools
-                      .filter((s) => s.type === "Liberal Arts College")
-                      .sort((a, b) => a.rank - b.rank)
-                      .map((s) => <SchoolCard key={s.id} school={s} />)}
-                  </div>
-                </section>
-              )}
+              {/* Group schools by region */}
+              {(["US", "UK", "HK", "AU"] as Region[]).map((region) => {
+                const regionSchools = filteredSchools.filter((s) => s.region === region);
+                if (regionSchools.length === 0) return null;
+                const regionLabel = regionOptions.find(r => r.value === region)?.label || region;
+                return (
+                  <section key={region}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-[11px] uppercase tracking-widest text-stone-400 font-medium">
+                        {regionLabel}
+                      </span>
+                      <div className="flex-1 h-px bg-stone-100" />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {regionSchools
+                        .sort((a, b) => a.rank - b.rank)
+                        .map((s) => <SchoolCard key={s.id} school={s} t={t} />)}
+                    </div>
+                  </section>
+                );
+              })}
             </div>
           )}
         </main>
@@ -867,47 +993,44 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
           <div className="flex flex-col sm:flex-row gap-8 sm:gap-16 mb-6">
             {/* Brand */}
-            <div className="shrink-0">
-              <div className="text-sm font-bold text-stone-900 mb-1">AdmitLens</div>
-              <div className="text-[11px] text-stone-400 leading-relaxed max-w-xs">
-                信息公开是最基本的公平。我们相信，每一个学生——无论来自哪里——都应该能与顶尖院校的招生官面对面地对话。
+            <div className="shrink-0 max-w-xs">
+              <div className="flex items-center gap-2 mb-2">
+                <svg width="14" height="14" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <circle cx="9" cy="9" r="8" stroke="#111" strokeWidth="1.2" />
+                  <circle cx="9" cy="9" r="4.5" stroke="#111" strokeWidth="1.2" />
+                  <circle cx="9" cy="9" r="1.5" fill="#111" />
+                </svg>
+                <div className="text-sm font-bold text-stone-900">AdmitLens</div>
+              </div>
+              <div className="text-[11px] text-stone-400 leading-relaxed">
+                {t.footerBrand}
               </div>
             </div>
             {/* Roadmap */}
             <div>
-              <div className="text-[11px] uppercase tracking-widest text-stone-400 mb-2">覆盖计划</div>
+              <div className="text-[11px] uppercase tracking-widest text-stone-400 mb-2">{t.footerRoadmap}</div>
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-stone-900 shrink-0" />
-                  <span className="text-stone-700">美国本科</span>
-                  <span className="text-[10px] px-1.5 py-0.5 bg-stone-900 text-white">80 所已上线</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="w-1.5 h-1.5 rounded-full border border-stone-300 shrink-0" />
-                  <span className="text-stone-400">英国本科 (Russell Group)</span>
-                  <span className="text-[10px] px-1.5 py-0.5 border border-stone-200 text-stone-400">即将</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="w-1.5 h-1.5 rounded-full border border-stone-300 shrink-0" />
-                  <span className="text-stone-400">加拿大本科 (U15)</span>
-                  <span className="text-[10px] px-1.5 py-0.5 border border-stone-200 text-stone-400">即将</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="w-1.5 h-1.5 rounded-full border border-stone-300 shrink-0" />
-                  <span className="text-stone-400">香港 / 新加坡顶尖院校</span>
-                  <span className="text-[10px] px-1.5 py-0.5 border border-stone-200 text-stone-400">即将</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="w-1.5 h-1.5 rounded-full border border-stone-300 shrink-0" />
-                  <span className="text-stone-400">研究生项目</span>
-                  <span className="text-[10px] px-1.5 py-0.5 border border-stone-200 text-stone-400">规划中</span>
-                </div>
+                {[
+                  { label: t.footerUs, status: t.footerUsLive, live: true },
+                  { label: t.footerUk, status: t.footerSoon, live: false },
+                  { label: t.footerHk, status: t.footerSoon, live: false },
+                  { label: t.footerCa, status: t.footerSoon, live: false },
+                  { label: t.footerGrad, status: t.footerPlanned, live: false },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center gap-2 text-xs">
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${item.live ? "bg-stone-900" : "border border-stone-300"}`} />
+                    <span className={item.live ? "text-stone-700" : "text-stone-400"}>{item.label}</span>
+                    <span className={`text-[10px] px-1.5 py-0.5 ${item.live ? "bg-stone-900 text-white" : "border border-stone-200 text-stone-400"}`}>
+                      {item.status}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
           <div className="border-t border-stone-100 pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[11px] text-stone-400">
-            <span>所有链接均指向各院校官方招生网站，请以各校官网最新日程为准</span>
-            <span className="text-stone-300">教育公平，从信息公开开始</span>
+            <span>{t.footerDisclaimer}</span>
+            <span className="text-stone-300">{t.footerMotto}</span>
           </div>
         </div>
       </footer>

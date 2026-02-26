@@ -5,7 +5,8 @@
 // - Session types: General Info Session, Up Close, Multi-College, Regional, Student Forum
 // ============================================================
 
-export type SchoolType = "National University" | "Liberal Arts College";
+export type SchoolType = "National University" | "Liberal Arts College" | "Research University" | "Comprehensive University";
+export type Region = "US" | "UK" | "HK" | "AU";
 
 export type SessionType =
   | "General Info Session"
@@ -21,6 +22,7 @@ export interface School {
   name: string;
   shortName?: string;
   type: SchoolType;
+  region: Region; // US / UK / HK / AU
   rank: number;
   location: string;
   state: string;
@@ -48,7 +50,7 @@ export interface Session {
 export const schools: School[] = [
   // ===== National Universities Top 50 =====
   {
-    id: 1, name: "Princeton University", type: "National University", rank: 1,
+    id: 1, name: "Princeton University", type: "National University", region: "US", rank: 1,
     location: "Princeton, NJ", state: "NJ", color: "#E87722",
     registrationPage: "https://apply.princeton.edu/portal/virtual_information_session",
     admissionPage: "https://admission.princeton.edu",
@@ -56,28 +58,28 @@ export const schools: School[] = [
   },
   {
     id: 2, name: "Massachusetts Institute of Technology", shortName: "MIT",
-    type: "National University", rank: 2,
+    type: "National University", region: "US", rank: 2,
     location: "Cambridge, MA", state: "MA", color: "#A31F34",
     registrationPage: "https://mitadmissions.org/apply/visit/",
     admissionPage: "https://mitadmissions.org",
     tags: ["STEM", "Ivy-equivalent"],
   },
   {
-    id: 3, name: "Harvard University", type: "National University", rank: 3,
+    id: 3, name: "Harvard University", type: "National University", region: "US", rank: 3,
     location: "Cambridge, MA", state: "MA", color: "#A51C30",
     registrationPage: "https://college.harvard.edu/admissions/explore-harvard/meet-us-online",
     admissionPage: "https://college.harvard.edu/admissions",
     tags: ["Ivy League", "No Loan Policy"],
   },
   {
-    id: 4, name: "Stanford University", type: "National University", rank: 4,
+    id: 4, name: "Stanford University", type: "National University", region: "US", rank: 4,
     location: "Stanford, CA", state: "CA", color: "#8C1515",
     registrationPage: "https://admission.stanford.edu/events/",
     admissionPage: "https://admission.stanford.edu",
     tags: ["Silicon Valley", "No Loan Policy"],
   },
   {
-    id: 5, name: "Yale University", type: "National University", rank: 5,
+    id: 5, name: "Yale University", type: "National University", region: "US", rank: 5,
     location: "New Haven, CT", state: "CT", color: "#00356B",
     registrationPage: "https://admissions.yale.edu/virtual-events",
     admissionPage: "https://admissions.yale.edu",
@@ -85,7 +87,7 @@ export const schools: School[] = [
   },
   {
     id: 6, name: "University of Pennsylvania", shortName: "UPenn",
-    type: "National University", rank: 6,
+    type: "National University", region: "US", rank: 6,
     location: "Philadelphia, PA", state: "PA", color: "#011F5B",
     registrationPage: "https://admissions.upenn.edu/visit/virtual-visits",
     admissionPage: "https://admissions.upenn.edu",
@@ -93,21 +95,21 @@ export const schools: School[] = [
   },
   {
     id: 7, name: "California Institute of Technology", shortName: "Caltech",
-    type: "National University", rank: 7,
+    type: "National University", region: "US", rank: 7,
     location: "Pasadena, CA", state: "CA", color: "#FF6C0C",
     registrationPage: "https://admissions.caltech.edu/connect/events",
     admissionPage: "https://admissions.caltech.edu",
     tags: ["STEM", "Research"],
   },
   {
-    id: 8, name: "Duke University", type: "National University", rank: 8,
+    id: 8, name: "Duke University", type: "National University", region: "US", rank: 8,
     location: "Durham, NC", state: "NC", color: "#003087",
     registrationPage: "https://admissions.duke.edu/visit/virtual-visits/",
     admissionPage: "https://admissions.duke.edu",
     tags: ["Pre-Med", "Public Policy"],
   },
   {
-    id: 9, name: "Brown University", type: "National University", rank: 9,
+    id: 9, name: "Brown University", type: "National University", region: "US", rank: 9,
     location: "Providence, RI", state: "RI", color: "#4E3629",
     registrationPage: "https://admission.brown.edu/visit/virtual-visit",
     admissionPage: "https://admission.brown.edu",
@@ -115,35 +117,35 @@ export const schools: School[] = [
   },
   {
     id: 10, name: "Johns Hopkins University", shortName: "JHU",
-    type: "National University", rank: 10,
+    type: "National University", region: "US", rank: 10,
     location: "Baltimore, MD", state: "MD", color: "#002D72",
     registrationPage: "https://apply.jhu.edu/visit/virtual-visits/",
     admissionPage: "https://apply.jhu.edu",
     tags: ["Pre-Med", "Research"],
   },
   {
-    id: 11, name: "Northwestern University", type: "National University", rank: 11,
+    id: 11, name: "Northwestern University", type: "National University", region: "US", rank: 11,
     location: "Evanston, IL", state: "IL", color: "#4E2A84",
     registrationPage: "https://admission.northwestern.edu/visit/virtual-visits/",
     admissionPage: "https://admission.northwestern.edu",
     tags: ["Journalism", "Business"],
   },
   {
-    id: 12, name: "Dartmouth College", type: "National University", rank: 12,
+    id: 12, name: "Dartmouth College", type: "National University", region: "US", rank: 12,
     location: "Hanover, NH", state: "NH", color: "#00693E",
     registrationPage: "https://admissions.dartmouth.edu/visit/virtual-visits",
     admissionPage: "https://admissions.dartmouth.edu",
     tags: ["Ivy League", "D-Plan"],
   },
   {
-    id: 13, name: "Vanderbilt University", type: "National University", rank: 13,
+    id: 13, name: "Vanderbilt University", type: "National University", region: "US", rank: 13,
     location: "Nashville, TN", state: "TN", color: "#866D4B",
     registrationPage: "https://admissions.vanderbilt.edu/visit/virtual/",
     admissionPage: "https://admissions.vanderbilt.edu",
     tags: ["No Loan Policy", "Nashville"],
   },
   {
-    id: 14, name: "Rice University", type: "National University", rank: 14,
+    id: 14, name: "Rice University", type: "National University", region: "US", rank: 14,
     location: "Houston, TX", state: "TX", color: "#00205B",
     registrationPage: "https://admission.rice.edu/visit/virtual-visits",
     admissionPage: "https://admission.rice.edu",
@@ -151,49 +153,49 @@ export const schools: School[] = [
   },
   {
     id: 15, name: "Washington University in St. Louis", shortName: "WashU",
-    type: "National University", rank: 15,
+    type: "National University", region: "US", rank: 15,
     location: "St. Louis, MO", state: "MO", color: "#A51417",
     registrationPage: "https://admissions.wustl.edu/visit/virtual-visits/",
     admissionPage: "https://admissions.wustl.edu",
     tags: ["Pre-Med", "Business"],
   },
   {
-    id: 16, name: "Cornell University", type: "National University", rank: 16,
+    id: 16, name: "Cornell University", type: "National University", region: "US", rank: 16,
     location: "Ithaca, NY", state: "NY", color: "#B31B1B",
     registrationPage: "https://admissions.cornell.edu/visit/virtual-visits",
     admissionPage: "https://admissions.cornell.edu",
     tags: ["Ivy League", "Engineering"],
   },
   {
-    id: 17, name: "University of Notre Dame", type: "National University", rank: 17,
+    id: 17, name: "University of Notre Dame", type: "National University", region: "US", rank: 17,
     location: "Notre Dame, IN", state: "IN", color: "#0C2340",
     registrationPage: "https://admissions.nd.edu/visit/virtual/",
     admissionPage: "https://admissions.nd.edu",
     tags: ["Catholic", "Business"],
   },
   {
-    id: 18, name: "UCLA", type: "National University", rank: 18,
+    id: 18, name: "UCLA", type: "National University", region: "US", rank: 18,
     location: "Los Angeles, CA", state: "CA", color: "#2774AE",
     registrationPage: "https://admission.ucla.edu/visit/virtual-visits",
     admissionPage: "https://admission.ucla.edu",
     tags: ["Public", "UC System"],
   },
   {
-    id: 19, name: "Emory University", type: "National University", rank: 19,
+    id: 19, name: "Emory University", type: "National University", region: "US", rank: 19,
     location: "Atlanta, GA", state: "GA", color: "#012169",
     registrationPage: "https://apply.emory.edu/visit/virtual.php",
     admissionPage: "https://apply.emory.edu",
     tags: ["Pre-Med", "Public Health"],
   },
   {
-    id: 20, name: "Georgetown University", type: "National University", rank: 20,
+    id: 20, name: "Georgetown University", type: "National University", region: "US", rank: 20,
     location: "Washington, D.C.", state: "DC", color: "#041E42",
     registrationPage: "https://uadmissions.georgetown.edu/visit/virtual-visits/",
     admissionPage: "https://uadmissions.georgetown.edu",
     tags: ["Jesuit", "International Relations"],
   },
   {
-    id: 21, name: "UC Berkeley", type: "National University", rank: 21,
+    id: 21, name: "UC Berkeley", type: "National University", region: "US", rank: 21,
     location: "Berkeley, CA", state: "CA", color: "#003262",
     registrationPage: "https://admissions.berkeley.edu/visit/events/",
     admissionPage: "https://admissions.berkeley.edu",
@@ -201,7 +203,7 @@ export const schools: School[] = [
   },
   {
     id: 22, name: "University of Michigan", shortName: "UMich",
-    type: "National University", rank: 22,
+    type: "National University", region: "US", rank: 22,
     location: "Ann Arbor, MI", state: "MI", color: "#00274C",
     registrationPage: "https://admissions.umich.edu/visit/virtual-visits",
     admissionPage: "https://admissions.umich.edu",
@@ -209,7 +211,7 @@ export const schools: School[] = [
   },
   {
     id: 23, name: "Carnegie Mellon University", shortName: "CMU",
-    type: "National University", rank: 23,
+    type: "National University", region: "US", rank: 23,
     location: "Pittsburgh, PA", state: "PA", color: "#C41230",
     registrationPage: "https://admission.cmu.edu/visit/virtual-visits.html",
     admissionPage: "https://admission.cmu.edu",
@@ -217,7 +219,7 @@ export const schools: School[] = [
   },
   {
     id: 24, name: "University of Virginia", shortName: "UVA",
-    type: "National University", rank: 24,
+    type: "National University", region: "US", rank: 24,
     location: "Charlottesville, VA", state: "VA", color: "#232D4B",
     registrationPage: "https://admission.virginia.edu/visit/virtual",
     admissionPage: "https://admission.virginia.edu",
@@ -225,21 +227,21 @@ export const schools: School[] = [
   },
   {
     id: 25, name: "University of North Carolina", shortName: "UNC",
-    type: "National University", rank: 25,
+    type: "National University", region: "US", rank: 25,
     location: "Chapel Hill, NC", state: "NC", color: "#4B9CD3",
     registrationPage: "https://admissions.unc.edu/visit/virtual-visits/",
     admissionPage: "https://admissions.unc.edu",
     tags: ["Public", "Journalism"],
   },
   {
-    id: 26, name: "Wake Forest University", type: "National University", rank: 26,
+    id: 26, name: "Wake Forest University", type: "National University", region: "US", rank: 26,
     location: "Winston-Salem, NC", state: "NC", color: "#9E7E38",
     registrationPage: "https://admissions.wfu.edu/visit/virtual/",
     admissionPage: "https://admissions.wfu.edu",
     tags: ["Test Optional", "Business"],
   },
   {
-    id: 27, name: "Tufts University", type: "National University", rank: 27,
+    id: 27, name: "Tufts University", type: "National University", region: "US", rank: 27,
     location: "Medford, MA", state: "MA", color: "#3E8EDE",
     registrationPage: "https://admissions.tufts.edu/visit/virtual-visits/",
     admissionPage: "https://admissions.tufts.edu",
@@ -247,7 +249,7 @@ export const schools: School[] = [
   },
   {
     id: 28, name: "University of Florida", shortName: "UF",
-    type: "National University", rank: 28,
+    type: "National University", region: "US", rank: 28,
     location: "Gainesville, FL", state: "FL", color: "#0021A5",
     registrationPage: "https://admissions.ufl.edu/visit/virtual/",
     admissionPage: "https://admissions.ufl.edu",
@@ -255,7 +257,7 @@ export const schools: School[] = [
   },
   {
     id: 29, name: "University of Southern California", shortName: "USC",
-    type: "National University", rank: 29,
+    type: "National University", region: "US", rank: 29,
     location: "Los Angeles, CA", state: "CA", color: "#990000",
     registrationPage: "https://admission.usc.edu/visit/virtual-visits/",
     admissionPage: "https://admission.usc.edu",
@@ -263,7 +265,7 @@ export const schools: School[] = [
   },
   {
     id: 30, name: "New York University", shortName: "NYU",
-    type: "National University", rank: 30,
+    type: "National University", region: "US", rank: 30,
     location: "New York, NY", state: "NY", color: "#57068C",
     registrationPage: "https://www.nyu.edu/admissions/undergraduate-admissions/visit-nyu/virtual-visits.html",
     admissionPage: "https://www.nyu.edu/admissions/undergraduate-admissions.html",
@@ -271,7 +273,7 @@ export const schools: School[] = [
   },
   {
     id: 31, name: "Boston College", shortName: "BC",
-    type: "National University", rank: 31,
+    type: "National University", region: "US", rank: 31,
     location: "Chestnut Hill, MA", state: "MA", color: "#8A0000",
     registrationPage: "https://www.bc.edu/bc-web/admission/visit/virtual.html",
     admissionPage: "https://www.bc.edu/bc-web/admission.html",
@@ -279,7 +281,7 @@ export const schools: School[] = [
   },
   {
     id: 32, name: "Georgia Institute of Technology", shortName: "Georgia Tech",
-    type: "National University", rank: 32,
+    type: "National University", region: "US", rank: 32,
     location: "Atlanta, GA", state: "GA", color: "#B3A369",
     registrationPage: "https://admission.gatech.edu/visit/virtual",
     admissionPage: "https://admission.gatech.edu",
@@ -287,7 +289,7 @@ export const schools: School[] = [
   },
   {
     id: 33, name: "University of Texas at Austin", shortName: "UT Austin",
-    type: "National University", rank: 33,
+    type: "National University", region: "US", rank: 33,
     location: "Austin, TX", state: "TX", color: "#BF5700",
     registrationPage: "https://admissions.utexas.edu/visit/virtual",
     admissionPage: "https://admissions.utexas.edu",
@@ -295,14 +297,14 @@ export const schools: School[] = [
   },
   {
     id: 34, name: "University of Wisconsin-Madison", shortName: "UW-Madison",
-    type: "National University", rank: 34,
+    type: "National University", region: "US", rank: 34,
     location: "Madison, WI", state: "WI", color: "#C5050C",
     registrationPage: "https://admissions.wisc.edu/visit/virtual/",
     admissionPage: "https://admissions.wisc.edu",
     tags: ["Public", "Research"],
   },
   {
-    id: 35, name: "Tulane University", type: "National University", rank: 35,
+    id: 35, name: "Tulane University", type: "National University", region: "US", rank: 35,
     location: "New Orleans, LA", state: "LA", color: "#006747",
     registrationPage: "https://admission.tulane.edu/visit/virtual",
     admissionPage: "https://admission.tulane.edu",
@@ -310,14 +312,14 @@ export const schools: School[] = [
   },
   {
     id: 36, name: "Boston University", shortName: "BU",
-    type: "National University", rank: 36,
+    type: "National University", region: "US", rank: 36,
     location: "Boston, MA", state: "MA", color: "#CC0000",
     registrationPage: "https://www.bu.edu/admissions/visit/virtual/",
     admissionPage: "https://www.bu.edu/admissions/",
     tags: ["Urban", "Research"],
   },
   {
-    id: 37, name: "Purdue University", type: "National University", rank: 37,
+    id: 37, name: "Purdue University", type: "National University", region: "US", rank: 37,
     location: "West Lafayette, IN", state: "IN", color: "#CEB888",
     registrationPage: "https://www.admissions.purdue.edu/visit/virtual.php",
     admissionPage: "https://www.admissions.purdue.edu",
@@ -325,7 +327,7 @@ export const schools: School[] = [
   },
   {
     id: 38, name: "Ohio State University", shortName: "OSU",
-    type: "National University", rank: 38,
+    type: "National University", region: "US", rank: 38,
     location: "Columbus, OH", state: "OH", color: "#BB0000",
     registrationPage: "https://undergrad.osu.edu/visit/virtual",
     admissionPage: "https://undergrad.osu.edu/apply",
@@ -333,7 +335,7 @@ export const schools: School[] = [
   },
   {
     id: 39, name: "Penn State University", shortName: "Penn State",
-    type: "National University", rank: 39,
+    type: "National University", region: "US", rank: 39,
     location: "University Park, PA", state: "PA", color: "#1E407C",
     registrationPage: "https://admissions.psu.edu/visit/virtual/",
     admissionPage: "https://admissions.psu.edu",
@@ -341,7 +343,7 @@ export const schools: School[] = [
   },
   {
     id: 40, name: "University of Illinois Urbana-Champaign", shortName: "UIUC",
-    type: "National University", rank: 40,
+    type: "National University", region: "US", rank: 40,
     location: "Champaign, IL", state: "IL", color: "#13294B",
     registrationPage: "https://admissions.illinois.edu/Visit/virtual",
     admissionPage: "https://admissions.illinois.edu",
@@ -349,28 +351,28 @@ export const schools: School[] = [
   },
   {
     id: 41, name: "University of Washington", shortName: "UW",
-    type: "National University", rank: 41,
+    type: "National University", region: "US", rank: 41,
     location: "Seattle, WA", state: "WA", color: "#4B2E83",
     registrationPage: "https://admit.uw.edu/visit/virtual/",
     admissionPage: "https://admit.uw.edu",
     tags: ["Public", "CS"],
   },
   {
-    id: 42, name: "Villanova University", type: "National University", rank: 42,
+    id: 42, name: "Villanova University", type: "National University", region: "US", rank: 42,
     location: "Villanova, PA", state: "PA", color: "#00205B",
     registrationPage: "https://www1.villanova.edu/university/undergraduate-admission/visit/virtual.html",
     admissionPage: "https://www1.villanova.edu/university/undergraduate-admission.html",
     tags: ["Augustinian", "Business"],
   },
   {
-    id: 43, name: "Lehigh University", type: "National University", rank: 43,
+    id: 43, name: "Lehigh University", type: "National University", region: "US", rank: 43,
     location: "Bethlehem, PA", state: "PA", color: "#653700",
     registrationPage: "https://admissions.lehigh.edu/visit/virtual",
     admissionPage: "https://admissions.lehigh.edu",
     tags: ["Engineering", "Business"],
   },
   {
-    id: 44, name: "Northeastern University", type: "National University", rank: 44,
+    id: 44, name: "Northeastern University", type: "National University", region: "US", rank: 44,
     location: "Boston, MA", state: "MA", color: "#CC0000",
     registrationPage: "https://admissions.northeastern.edu/visit/virtual/",
     admissionPage: "https://admissions.northeastern.edu",
@@ -378,14 +380,14 @@ export const schools: School[] = [
   },
   {
     id: 45, name: "UC San Diego", shortName: "UCSD",
-    type: "National University", rank: 45,
+    type: "National University", region: "US", rank: 45,
     location: "La Jolla, CA", state: "CA", color: "#00629B",
     registrationPage: "https://admissions.ucsd.edu/visit/virtual.html",
     admissionPage: "https://admissions.ucsd.edu",
     tags: ["Public", "UC System"],
   },
   {
-    id: 46, name: "UC Davis", type: "National University", rank: 46,
+    id: 46, name: "UC Davis", type: "National University", region: "US", rank: 46,
     location: "Davis, CA", state: "CA", color: "#002855",
     registrationPage: "https://admissions.ucdavis.edu/visit/virtual",
     admissionPage: "https://admissions.ucdavis.edu",
@@ -393,7 +395,7 @@ export const schools: School[] = [
   },
   {
     id: 47, name: "UC Santa Barbara", shortName: "UCSB",
-    type: "National University", rank: 47,
+    type: "National University", region: "US", rank: 47,
     location: "Santa Barbara, CA", state: "CA", color: "#003660",
     registrationPage: "https://admissions.ucsb.edu/visit/virtual",
     admissionPage: "https://admissions.ucsb.edu",
@@ -401,14 +403,14 @@ export const schools: School[] = [
   },
   {
     id: 48, name: "Case Western Reserve University", shortName: "Case Western",
-    type: "National University", rank: 48,
+    type: "National University", region: "US", rank: 48,
     location: "Cleveland, OH", state: "OH", color: "#0A304E",
     registrationPage: "https://case.edu/admission/undergraduate/visit/virtual",
     admissionPage: "https://case.edu/admission/undergraduate",
     tags: ["Pre-Med", "Engineering"],
   },
   {
-    id: 49, name: "University of Rochester", type: "National University", rank: 49,
+    id: 49, name: "University of Rochester", type: "National University", region: "US", rank: 49,
     location: "Rochester, NY", state: "NY", color: "#003B71",
     registrationPage: "https://enrollment.rochester.edu/admissions/visit/virtual/",
     admissionPage: "https://enrollment.rochester.edu/admissions/",
@@ -416,7 +418,7 @@ export const schools: School[] = [
   },
   {
     id: 50, name: "Rensselaer Polytechnic Institute", shortName: "RPI",
-    type: "National University", rank: 50,
+    type: "National University", region: "US", rank: 50,
     location: "Troy, NY", state: "NY", color: "#D6001C",
     registrationPage: "https://admissions.rpi.edu/visit/virtual",
     admissionPage: "https://admissions.rpi.edu",
@@ -425,56 +427,56 @@ export const schools: School[] = [
 
   // ===== Liberal Arts Colleges Top 30 =====
   {
-    id: 51, name: "Williams College", type: "Liberal Arts College", rank: 1,
+    id: 51, name: "Williams College", type: "Liberal Arts College", region: "US", rank: 1,
     location: "Williamstown, MA", state: "MA", color: "#512698",
     registrationPage: "https://admission.williams.edu/visit/virtual/",
     admissionPage: "https://admission.williams.edu",
     tags: ["No Loan Policy", "Small Class"],
   },
   {
-    id: 52, name: "Amherst College", type: "Liberal Arts College", rank: 2,
+    id: 52, name: "Amherst College", type: "Liberal Arts College", region: "US", rank: 2,
     location: "Amherst, MA", state: "MA", color: "#3F1F69",
     registrationPage: "https://www.amherst.edu/admission/visit/virtual",
     admissionPage: "https://www.amherst.edu/admission",
     tags: ["No Loan Policy", "Open Curriculum"],
   },
   {
-    id: 53, name: "Swarthmore College", type: "Liberal Arts College", rank: 3,
+    id: 53, name: "Swarthmore College", type: "Liberal Arts College", region: "US", rank: 3,
     location: "Swarthmore, PA", state: "PA", color: "#8C1515",
     registrationPage: "https://www.swarthmore.edu/admissions-aid/virtual-visits",
     admissionPage: "https://www.swarthmore.edu/admissions-aid",
     tags: ["No Loan Policy", "Engineering"],
   },
   {
-    id: 54, name: "Pomona College", type: "Liberal Arts College", rank: 4,
+    id: 54, name: "Pomona College", type: "Liberal Arts College", region: "US", rank: 4,
     location: "Claremont, CA", state: "CA", color: "#0C2340",
     registrationPage: "https://www.pomona.edu/admissions/visit/virtual",
     admissionPage: "https://www.pomona.edu/admissions",
     tags: ["No Loan Policy", "Claremont Consortium"],
   },
   {
-    id: 55, name: "Wellesley College", type: "Liberal Arts College", rank: 5,
+    id: 55, name: "Wellesley College", type: "Liberal Arts College", region: "US", rank: 5,
     location: "Wellesley, MA", state: "MA", color: "#1D6FA4",
     registrationPage: "https://www.wellesley.edu/admission/visit/virtual",
     admissionPage: "https://www.wellesley.edu/admission",
     tags: ["Women's College", "No Loan Policy"],
   },
   {
-    id: 56, name: "Bowdoin College", type: "Liberal Arts College", rank: 6,
+    id: 56, name: "Bowdoin College", type: "Liberal Arts College", region: "US", rank: 6,
     location: "Brunswick, ME", state: "ME", color: "#000000",
     registrationPage: "https://www.bowdoin.edu/admissions/visit/virtual.html",
     admissionPage: "https://www.bowdoin.edu/admissions/",
     tags: ["No Loan Policy", "Test Optional"],
   },
   {
-    id: 57, name: "Carleton College", type: "Liberal Arts College", rank: 7,
+    id: 57, name: "Carleton College", type: "Liberal Arts College", region: "US", rank: 7,
     location: "Northfield, MN", state: "MN", color: "#003865",
     registrationPage: "https://www.carleton.edu/admissions/visit/virtual/",
     admissionPage: "https://www.carleton.edu/admissions/",
     tags: ["Trimester", "Research"],
   },
   {
-    id: 58, name: "Middlebury College", type: "Liberal Arts College", rank: 8,
+    id: 58, name: "Middlebury College", type: "Liberal Arts College", region: "US", rank: 8,
     location: "Middlebury, VT", state: "VT", color: "#003B71",
     registrationPage: "https://www.middlebury.edu/admissions/visit/virtual",
     admissionPage: "https://www.middlebury.edu/admissions",
@@ -482,21 +484,21 @@ export const schools: School[] = [
   },
   {
     id: 59, name: "Claremont McKenna College", shortName: "CMC",
-    type: "Liberal Arts College", rank: 9,
+    type: "Liberal Arts College", region: "US", rank: 9,
     location: "Claremont, CA", state: "CA", color: "#8B0000",
     registrationPage: "https://www.cmc.edu/admission/visit/virtual",
     admissionPage: "https://www.cmc.edu/admission",
     tags: ["Economics", "Government"],
   },
   {
-    id: 60, name: "Haverford College", type: "Liberal Arts College", rank: 10,
+    id: 60, name: "Haverford College", type: "Liberal Arts College", region: "US", rank: 10,
     location: "Haverford, PA", state: "PA", color: "#003865",
     registrationPage: "https://www.haverford.edu/admission/visit/virtual",
     admissionPage: "https://www.haverford.edu/admission",
     tags: ["Honor Code", "Quaker"],
   },
   {
-    id: 61, name: "Davidson College", type: "Liberal Arts College", rank: 11,
+    id: 61, name: "Davidson College", type: "Liberal Arts College", region: "US", rank: 11,
     location: "Davidson, NC", state: "NC", color: "#CC0000",
     registrationPage: "https://www.davidson.edu/admission-and-financial-aid/visit/virtual",
     admissionPage: "https://www.davidson.edu/admission-and-financial-aid",
@@ -504,133 +506,133 @@ export const schools: School[] = [
   },
   {
     id: 62, name: "Washington and Lee University", shortName: "W&L",
-    type: "Liberal Arts College", rank: 12,
+    type: "Liberal Arts College", region: "US", rank: 12,
     location: "Lexington, VA", state: "VA", color: "#041E42",
     registrationPage: "https://www.wlu.edu/admission/visit/virtual/",
     admissionPage: "https://www.wlu.edu/admission/",
     tags: ["Honor System", "Law"],
   },
   {
-    id: 63, name: "Colgate University", type: "Liberal Arts College", rank: 13,
+    id: 63, name: "Colgate University", type: "Liberal Arts College", region: "US", rank: 13,
     location: "Hamilton, NY", state: "NY", color: "#821019",
     registrationPage: "https://www.colgate.edu/admission/visit/virtual",
     admissionPage: "https://www.colgate.edu/admission",
     tags: ["Core Curriculum"],
   },
   {
-    id: 64, name: "Hamilton College", type: "Liberal Arts College", rank: 14,
+    id: 64, name: "Hamilton College", type: "Liberal Arts College", region: "US", rank: 14,
     location: "Clinton, NY", state: "NY", color: "#003865",
     registrationPage: "https://www.hamilton.edu/admission/visit/virtual",
     admissionPage: "https://www.hamilton.edu/admission",
     tags: ["Writing", "Open Curriculum"],
   },
   {
-    id: 65, name: "Smith College", type: "Liberal Arts College", rank: 15,
+    id: 65, name: "Smith College", type: "Liberal Arts College", region: "US", rank: 15,
     location: "Northampton, MA", state: "MA", color: "#002855",
     registrationPage: "https://www.smith.edu/admission/visit/virtual",
     admissionPage: "https://www.smith.edu/admission",
     tags: ["Women's College", "Five College"],
   },
   {
-    id: 66, name: "Vassar College", type: "Liberal Arts College", rank: 16,
+    id: 66, name: "Vassar College", type: "Liberal Arts College", region: "US", rank: 16,
     location: "Poughkeepsie, NY", state: "NY", color: "#721422",
     registrationPage: "https://admissions.vassar.edu/visit/virtual.html",
     admissionPage: "https://admissions.vassar.edu",
     tags: ["Arts", "No Loan Policy"],
   },
   {
-    id: 67, name: "Colby College", type: "Liberal Arts College", rank: 17,
+    id: 67, name: "Colby College", type: "Liberal Arts College", region: "US", rank: 17,
     location: "Waterville, ME", state: "ME", color: "#003865",
     registrationPage: "https://www.colby.edu/admission/visit/virtual/",
     admissionPage: "https://www.colby.edu/admission/",
     tags: ["No Loan Policy", "Sustainability"],
   },
   {
-    id: 68, name: "Bates College", type: "Liberal Arts College", rank: 18,
+    id: 68, name: "Bates College", type: "Liberal Arts College", region: "US", rank: 18,
     location: "Lewiston, ME", state: "ME", color: "#8C1515",
     registrationPage: "https://www.bates.edu/admission/visit/virtual/",
     admissionPage: "https://www.bates.edu/admission/",
     tags: ["Test Optional", "Thesis"],
   },
   {
-    id: 69, name: "Grinnell College", type: "Liberal Arts College", rank: 19,
+    id: 69, name: "Grinnell College", type: "Liberal Arts College", region: "US", rank: 19,
     location: "Grinnell, IA", state: "IA", color: "#C1292E",
     registrationPage: "https://www.grinnell.edu/admission/visit/virtual",
     admissionPage: "https://www.grinnell.edu/admission",
     tags: ["No Loan Policy", "Social Justice"],
   },
   {
-    id: 70, name: "Barnard College", type: "Liberal Arts College", rank: 20,
+    id: 70, name: "Barnard College", type: "Liberal Arts College", region: "US", rank: 20,
     location: "New York, NY", state: "NY", color: "#003865",
     registrationPage: "https://admissions.barnard.edu/visit/virtual",
     admissionPage: "https://admissions.barnard.edu",
     tags: ["Women's College", "Columbia Affiliation"],
   },
   {
-    id: 71, name: "Oberlin College", type: "Liberal Arts College", rank: 21,
+    id: 71, name: "Oberlin College", type: "Liberal Arts College", region: "US", rank: 21,
     location: "Oberlin, OH", state: "OH", color: "#CC0000",
     registrationPage: "https://www.oberlin.edu/admissions-and-aid/visit/virtual",
     admissionPage: "https://www.oberlin.edu/admissions-and-aid",
     tags: ["Music Conservatory", "Social Justice"],
   },
   {
-    id: 72, name: "Colorado College", type: "Liberal Arts College", rank: 22,
+    id: 72, name: "Colorado College", type: "Liberal Arts College", region: "US", rank: 22,
     location: "Colorado Springs, CO", state: "CO", color: "#000000",
     registrationPage: "https://www.coloradocollege.edu/admission/visit/virtual/",
     admissionPage: "https://www.coloradocollege.edu/admission/",
     tags: ["Block Plan", "Outdoor"],
   },
   {
-    id: 73, name: "Bryn Mawr College", type: "Liberal Arts College", rank: 23,
+    id: 73, name: "Bryn Mawr College", type: "Liberal Arts College", region: "US", rank: 23,
     location: "Bryn Mawr, PA", state: "PA", color: "#003865",
     registrationPage: "https://www.brynmawr.edu/admissions/visit/virtual",
     admissionPage: "https://www.brynmawr.edu/admissions",
     tags: ["Women's College"],
   },
   {
-    id: 74, name: "Mount Holyoke College", type: "Liberal Arts College", rank: 24,
+    id: 74, name: "Mount Holyoke College", type: "Liberal Arts College", region: "US", rank: 24,
     location: "South Hadley, MA", state: "MA", color: "#003865",
     registrationPage: "https://www.mtholyoke.edu/admission/visit/virtual",
     admissionPage: "https://www.mtholyoke.edu/admission",
     tags: ["Women's College", "Five College"],
   },
   {
-    id: 75, name: "Trinity College", type: "Liberal Arts College", rank: 25,
+    id: 75, name: "Trinity College", type: "Liberal Arts College", region: "US", rank: 25,
     location: "Hartford, CT", state: "CT", color: "#003865",
     registrationPage: "https://www.trincoll.edu/admissions/visit/virtual/",
     admissionPage: "https://www.trincoll.edu/admissions/",
     tags: ["Urban", "Hartford"],
   },
   {
-    id: 76, name: "Kenyon College", type: "Liberal Arts College", rank: 26,
+    id: 76, name: "Kenyon College", type: "Liberal Arts College", region: "US", rank: 26,
     location: "Gambier, OH", state: "OH", color: "#4A2C6E",
     registrationPage: "https://www.kenyon.edu/admissions-aid/visit/virtual/",
     admissionPage: "https://www.kenyon.edu/admissions-aid/",
     tags: ["Writing", "Literature"],
   },
   {
-    id: 77, name: "Macalester College", type: "Liberal Arts College", rank: 27,
+    id: 77, name: "Macalester College", type: "Liberal Arts College", region: "US", rank: 27,
     location: "St. Paul, MN", state: "MN", color: "#003865",
     registrationPage: "https://www.macalester.edu/admissions/visit/virtual/",
     admissionPage: "https://www.macalester.edu/admissions/",
     tags: ["International", "Diversity"],
   },
   {
-    id: 78, name: "Occidental College", type: "Liberal Arts College", rank: 28,
+    id: 78, name: "Occidental College", type: "Liberal Arts College", region: "US", rank: 28,
     location: "Los Angeles, CA", state: "CA", color: "#CC0000",
     registrationPage: "https://www.oxy.edu/admission-aid/visit/virtual",
     admissionPage: "https://www.oxy.edu/admission-aid",
     tags: ["Diversity", "Los Angeles"],
   },
   {
-    id: 79, name: "Scripps College", type: "Liberal Arts College", rank: 29,
+    id: 79, name: "Scripps College", type: "Liberal Arts College", region: "US", rank: 29,
     location: "Claremont, CA", state: "CA", color: "#8B0000",
     registrationPage: "https://www.scrippscollege.edu/admission/visit/virtual",
     admissionPage: "https://www.scrippscollege.edu/admission",
     tags: ["Women's College", "Claremont Consortium"],
   },
   {
-    id: 80, name: "Union College", type: "Liberal Arts College", rank: 30,
+    id: 80, name: "Union College", type: "Liberal Arts College", region: "US", rank: 30,
     location: "Schenectady, NY", state: "NY", color: "#862633",
     registrationPage: "https://www.union.edu/admissions/visit/virtual",
     admissionPage: "https://www.union.edu/admissions",
@@ -1059,7 +1061,65 @@ export const sessions: Session[] = [
   },
 ];
 
-export const schoolsMap = Object.fromEntries(schools.map((s) => [s.id, s]));
+// ===== International Schools =====
+export const intlSchools: School[] = [
+  // ── UK: Russell Group Top 10 ──
+  { id: 101, name: "University of Oxford", shortName: "Oxford", type: "Research University", region: "UK", rank: 1, location: "Oxford, England", state: "England", color: "#002147", registrationPage: "https://www.ox.ac.uk/admissions/undergraduate/increasing-access/events-calendar", admissionPage: "https://www.ox.ac.uk/admissions/undergraduate", tags: ["Russell Group", "World Top 5"] },
+  { id: 102, name: "University of Cambridge", shortName: "Cambridge", type: "Research University", region: "UK", rank: 2, location: "Cambridge, England", state: "England", color: "#003B71", registrationPage: "https://www.undergraduate.study.cam.ac.uk/events", admissionPage: "https://www.undergraduate.study.cam.ac.uk/", tags: ["Russell Group", "World Top 5"] },
+  { id: 103, name: "Imperial College London", shortName: "Imperial", type: "Research University", region: "UK", rank: 3, location: "London, England", state: "England", color: "#003E74", registrationPage: "https://www.imperial.ac.uk/study/visit/undergraduate/open-days/", admissionPage: "https://www.imperial.ac.uk/study/undergraduate/", tags: ["Russell Group", "STEM Focus"] },
+  { id: 104, name: "University College London", shortName: "UCL", type: "Research University", region: "UK", rank: 4, location: "London, England", state: "England", color: "#500778", registrationPage: "https://www.ucl.ac.uk/prospective-students/undergraduate/events-and-open-days", admissionPage: "https://www.ucl.ac.uk/prospective-students/undergraduate/degrees", tags: ["Russell Group", "London"] },
+  { id: 105, name: "London School of Economics", shortName: "LSE", type: "Research University", region: "UK", rank: 5, location: "London, England", state: "England", color: "#D32011", registrationPage: "https://www.lse.ac.uk/study-at-lse/Undergraduate/Prospective-Students/Virtual-undergraduate-open-day/virtual-online-events", admissionPage: "https://www.lse.ac.uk/study-at-lse/Undergraduate/Prospective-Students/How-to-Apply", tags: ["Russell Group", "Social Sciences"] },
+  { id: 106, name: "University of Edinburgh", shortName: "Edinburgh", type: "Research University", region: "UK", rank: 6, location: "Edinburgh, Scotland", state: "Scotland", color: "#041E42", registrationPage: "https://study.ed.ac.uk/undergraduate/open-days-events-visits/online-information-sessions", admissionPage: "https://study.ed.ac.uk/undergraduate", tags: ["Russell Group", "Scotland"] },
+  { id: 107, name: "University of Manchester", shortName: "UoM", type: "Research University", region: "UK", rank: 7, location: "Manchester, England", state: "England", color: "#660099", registrationPage: "https://www.manchester.ac.uk/study/undergraduate/open-days-visits/virtual/", admissionPage: "https://www.manchester.ac.uk/study/undergraduate/applying/", tags: ["Russell Group"] },
+  { id: 108, name: "King's College London", shortName: "KCL", type: "Research University", region: "UK", rank: 8, location: "London, England", state: "England", color: "#1E3A5F", registrationPage: "https://www.kcl.ac.uk/study/undergraduate/events", admissionPage: "https://www.kcl.ac.uk/study/undergraduate/how-to-apply", tags: ["Russell Group", "London"] },
+  { id: 109, name: "University of Bristol", shortName: "Bristol", type: "Research University", region: "UK", rank: 9, location: "Bristol, England", state: "England", color: "#B01C2E", registrationPage: "https://www.bristol.ac.uk/study/virtual-bristol/undergraduate/", admissionPage: "https://www.bristol.ac.uk/study/undergraduate/", tags: ["Russell Group"] },
+  { id: 110, name: "University of Warwick", shortName: "Warwick", type: "Research University", region: "UK", rank: 10, location: "Coventry, England", state: "England", color: "#5C2D91", registrationPage: "https://warwick.ac.uk/study/undergraduate/opendays/virtual/", admissionPage: "https://warwick.ac.uk/study/undergraduate/apply/", tags: ["Russell Group"] },
+  // ── Hong Kong: Top 5 ──
+  { id: 201, name: "University of Hong Kong", shortName: "HKU", type: "Research University", region: "HK", rank: 1, location: "Pokfulam, Hong Kong", state: "HK", color: "#006B3C", registrationPage: "https://admissions.hku.hk/events", admissionPage: "https://admissions.hku.hk/", tags: ["QS Top 30", "English-medium"] },
+  { id: 202, name: "Hong Kong University of Science and Technology", shortName: "HKUST", type: "Research University", region: "HK", rank: 2, location: "Clear Water Bay, Hong Kong", state: "HK", color: "#003D7C", registrationPage: "https://join.hkust.edu.hk/whats-on", admissionPage: "https://join.hkust.edu.hk/", tags: ["QS Top 50", "STEM Focus"] },
+  { id: 203, name: "Chinese University of Hong Kong", shortName: "CUHK", type: "Research University", region: "HK", rank: 3, location: "Sha Tin, Hong Kong", state: "HK", color: "#6B0D0D", registrationPage: "https://admission.cuhk.edu.hk/news-and-events", admissionPage: "https://admission.cuhk.edu.hk/", tags: ["QS Top 50"] },
+  { id: 204, name: "City University of Hong Kong", shortName: "CityU", type: "Comprehensive University", region: "HK", rank: 4, location: "Kowloon Tong, Hong Kong", state: "HK", color: "#006F51", registrationPage: "https://www.cityu.edu.hk/admo/", admissionPage: "https://www.cityu.edu.hk/admo/", tags: ["QS Top 100"] },
+  { id: 205, name: "Hong Kong Polytechnic University", shortName: "PolyU", type: "Comprehensive University", region: "HK", rank: 5, location: "Hung Hom, Hong Kong", state: "HK", color: "#8B0000", registrationPage: "https://www.polyu.edu.hk/study/events/", admissionPage: "https://www.polyu.edu.hk/study/ug", tags: ["QS Top 100"] },
+  // ── Australia: Group of Eight ──
+  { id: 301, name: "University of Melbourne", shortName: "UniMelb", type: "Research University", region: "AU", rank: 1, location: "Melbourne, VIC", state: "VIC", color: "#003087", registrationPage: "https://study.unimelb.edu.au/connect-with-us/events", admissionPage: "https://study.unimelb.edu.au/how-to-apply", tags: ["Group of Eight", "QS Top 50"] },
+  { id: 302, name: "University of Sydney", shortName: "USYD", type: "Research University", region: "AU", rank: 2, location: "Sydney, NSW", state: "NSW", color: "#002147", registrationPage: "https://www.sydney.edu.au/study/events-for-prospective-students/undergraduate.html", admissionPage: "https://www.sydney.edu.au/study/how-to-apply/undergraduate-courses.html", tags: ["Group of Eight"] },
+  { id: 303, name: "Australian National University", shortName: "ANU", type: "Research University", region: "AU", rank: 3, location: "Canberra, ACT", state: "ACT", color: "#1B3A6B", registrationPage: "https://www.anu.edu.au/study/study-experience/open-day", admissionPage: "https://study.anu.edu.au/apply", tags: ["Group of Eight"] },
+  { id: 304, name: "University of Queensland", shortName: "UQ", type: "Research University", region: "AU", rank: 4, location: "Brisbane, QLD", state: "QLD", color: "#4E2A84", registrationPage: "https://study.uq.edu.au/events", admissionPage: "https://study.uq.edu.au/admissions", tags: ["Group of Eight"] },
+  { id: 305, name: "University of New South Wales", shortName: "UNSW", type: "Research University", region: "AU", rank: 5, location: "Sydney, NSW", state: "NSW", color: "#FFD100", registrationPage: "https://www.unsw.edu.au/study/events/undergraduate", admissionPage: "https://www.unsw.edu.au/study/how-to-apply/undergraduate/admissions", tags: ["Group of Eight", "STEM Focus"] },
+  { id: 306, name: "Monash University", shortName: "Monash", type: "Research University", region: "AU", rank: 6, location: "Melbourne, VIC", state: "VIC", color: "#006DAE", registrationPage: "https://www.monash.edu/discover/events", admissionPage: "https://www.monash.edu/study/how-to-apply", tags: ["Group of Eight"] },
+  { id: 307, name: "University of Western Australia", shortName: "UWA", type: "Research University", region: "AU", rank: 7, location: "Perth, WA", state: "WA", color: "#003087", registrationPage: "https://www.uwa.edu.au/study/EVENTS", admissionPage: "https://www.uwa.edu.au/study/how-to-apply/undergraduate", tags: ["Group of Eight"] },
+  { id: 308, name: "University of Adelaide", shortName: "Adelaide", type: "Research University", region: "AU", rank: 8, location: "Adelaide, SA", state: "SA", color: "#005A9C", registrationPage: "https://www.adelaide.edu.au/study/events", admissionPage: "https://www.adelaide.edu.au/study/undergraduate", tags: ["Group of Eight"] },
+];
+
+// Merge all schools
+export const allSchools: School[] = [...schools, ...intlSchools];
+
+// Sessions for international schools
+export const intlSessions: Session[] = [
+  // ── UK Sessions ──
+  { id: "oxford-events", schoolId: 101, title: "Oxford Undergraduate Events", type: "General Info Session", description: "牛津大学招生活动，包含在线开放日、学科讲座和申请指导，部分场次可在线参与。", dates: ["2026-03-02", "2026-04-15", "2026-06-20"], time: "varies (GMT)", duration: "60-120 min", registrationUrl: "https://www.ox.ac.uk/admissions/undergraduate/increasing-access/events-calendar", isRolling: false },
+  { id: "cambridge-events", schoolId: 102, title: "Cambridge Undergraduate Events", type: "General Info Session", description: "剑桥大学本科招生活动，包含在线开放日、学院参观和申请工作坊。", dates: ["2026-03-01", "2026-07-09", "2026-07-10"], time: "varies (GMT)", duration: "varies", registrationUrl: "https://www.undergraduate.study.cam.ac.uk/events", isRolling: false },
+  { id: "lse-virtual", schoolId: 105, title: "LSE Virtual Undergraduate Open Day", type: "General Info Session", description: "伦敦政经学院虚拟开放日，招生官介绍各专业课程、奖学金和学生生活。", dates: ["2026-03-10", "2026-04-07"], time: "varies (GMT)", duration: "varies", registrationUrl: "https://www.lse.ac.uk/study-at-lse/Undergraduate/Prospective-Students/Virtual-undergraduate-open-day/virtual-online-events", isRolling: false },
+  { id: "manchester-virtual", schoolId: 107, title: "Manchester Virtual Open Day", type: "General Info Session", description: "曼彻斯特大学虚拟开放日，了解专业设置、校园生活和申请流程。", dates: ["2026-04-20", "2026-07-06"], time: "varies (GMT)", duration: "varies", registrationUrl: "https://www.manchester.ac.uk/study/undergraduate/open-days-visits/virtual/", isRolling: false },
+  { id: "bristol-webinars", schoolId: 109, title: "Bristol Undergraduate Webinars", type: "General Info Session", description: "布里斯托大学系列线上宣讲，涵盖学生生活、住宿和学费资助，每场约45分钟。", dates: ["2026-03-26", "2026-04-22", "2026-04-30"], time: "5:00 PM GMT", duration: "45 min", registrationUrl: "https://www.bristol.ac.uk/study/virtual-bristol/undergraduate/", isRolling: false },
+  // UK Rolling
+  { id: "ucl-ondemand", schoolId: 104, title: "UCL On-Demand Virtual Events", type: "General Info Session", description: "UCL 提供 31 场按需观看的虚拟活动，涵盖各学院专业介绍、申请指导和学生生活。", dates: null, time: "随时可看", duration: "varies", registrationUrl: "https://www.ucl.ac.uk/prospective-students/undergraduate/events-and-open-days", isRolling: true },
+  { id: "edinburgh-online", schoolId: 106, title: "Edinburgh Online Information Sessions", type: "General Info Session", description: "爱丁堡大学在线信息宣讲，招生官介绍苏格兰大学体系、专业选择和申请要求。", dates: null, time: "多时段可选", duration: "60 min", registrationUrl: "https://study.ed.ac.uk/undergraduate/open-days-events-visits/online-information-sessions", isRolling: true },
+  // ── HK Sessions ──
+  { id: "hku-events", schoolId: 201, title: "HKU Admissions Events", type: "General Info Session", description: "香港大学招生活动，包含学生大使在线分享系列和本科招生信息日，适合国际申请者。", dates: ["2026-03-15", "2026-04-20", "2026-05-11"], time: "varies (HKT)", duration: "varies", registrationUrl: "https://admissions.hku.hk/events", isRolling: false },
+  { id: "hkust-webinars", schoolId: 202, title: "HKUST Programs Showcase Webinars", type: "General Info Session", description: "香港科技大学专业展示宣讲，招生官介绍工程、商科、理学和人文学科的课程特色。", dates: null, time: "多时段可选", duration: "60 min", registrationUrl: "https://join.hkust.edu.hk/whats-on", isRolling: true },
+  { id: "cuhk-events", schoolId: 203, title: "CUHK Admissions Events", type: "General Info Session", description: "香港中文大学招生活动，了解本科课程、书院制度和国际学生申请流程。", dates: null, time: "多时段可选", duration: "varies", registrationUrl: "https://admission.cuhk.edu.hk/news-and-events", isRolling: true },
+  // ── AU Sessions ──
+  { id: "unsw-events", schoolId: 305, title: "UNSW Undergraduate Info Sessions", type: "General Info Session", description: "新南威尔士大学本科招生信息宣讲，招生官介绍工程、商科、法学和医学课程。", dates: ["2026-03-11", "2026-03-31", "2026-04-22", "2026-05-06", "2026-05-20"], time: "varies (AEDT)", duration: "60 min", registrationUrl: "https://www.unsw.edu.au/study/events/undergraduate", isRolling: false },
+  { id: "monash-events", schoolId: 306, title: "Monash University Info Sessions", type: "General Info Session", description: "莫纳什大学招生信息宣讲，介绍本科课程、奖学金和国际学生支持服务。", dates: ["2026-03-03", "2026-03-18", "2026-04-14", "2026-05-05", "2026-05-12"], time: "varies (AEDT)", duration: "60 min", registrationUrl: "https://www.monash.edu/discover/events", isRolling: false },
+  { id: "unimelb-events", schoolId: 301, title: "UniMelb Connect Events", type: "General Info Session", description: "墨尔本大学招生联络活动，包含在线信息宣讲和学科深度讲座，适合国际申请者。", dates: null, time: "多时段可选", duration: "varies", registrationUrl: "https://study.unimelb.edu.au/connect-with-us/events", isRolling: true },
+  { id: "usyd-events", schoolId: 302, title: "USYD Prospective Student Events", type: "General Info Session", description: "悉尼大学准学生活动，了解本科课程、校园生活和国际学生申请要求。", dates: null, time: "多时段可选", duration: "varies", registrationUrl: "https://www.sydney.edu.au/study/events-for-prospective-students/undergraduate.html", isRolling: true },
+];
+
+// Merge all sessions
+export const allSessions: Session[] = [...sessions, ...intlSessions];
+
+export const schoolsMap = Object.fromEntries(allSchools.map((s) => [s.id, s]));
 
 export const allSessionTypes: SessionType[] = [
   "General Info Session",
