@@ -648,7 +648,17 @@ function FloatingSubscribe({ t }: { t: typeof T["zh"] }) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+
+  // 向下滚动 300px 后才显示按钮
+  useEffect(() => {
+    function handleScroll() {
+      setScrolled(window.scrollY > 300);
+    }
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -671,7 +681,12 @@ function FloatingSubscribe({ t }: { t: typeof T["zh"] }) {
   }
 
   return (
-    <div ref={panelRef} className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
+    <div
+      ref={panelRef}
+      className={`fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2 transition-all duration-300 ${
+        scrolled ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-4 pointer-events-none"
+      }`}
+    >
       {open && (
         <div className="bg-white border border-stone-200 shadow-lg p-4 w-72 animate-in fade-in slide-in-from-bottom-2 duration-200">
           <div className="flex items-center justify-between mb-3">
