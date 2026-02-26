@@ -23,6 +23,7 @@ import {
   ArrowUpRight,
   CalendarPlus,
   ChevronDown,
+  Globe,
 } from "lucide-react";
 
 type ViewMode = "sessions" | "schools";
@@ -562,10 +563,16 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-12 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-sm font-bold tracking-tight text-stone-900">AdmitLens</span>
-            <span className="hidden sm:block text-xs text-stone-400">美国本科招生 Virtual Info Session</span>
+            <span className="hidden sm:block text-xs text-stone-400">全球高校招生公开信息平台</span>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-xs text-stone-400">80 所院校</span>
+          <div className="flex items-center gap-3">
+            {/* Region tabs */}
+            <div className="hidden md:flex items-center gap-1">
+              <span className="text-[10px] px-2 py-0.5 bg-stone-900 text-white font-medium">美国</span>
+              <span className="text-[10px] px-2 py-0.5 border border-stone-200 text-stone-400 cursor-not-allowed" title="即将开放">英国 <span className="opacity-60">soon</span></span>
+              <span className="text-[10px] px-2 py-0.5 border border-stone-200 text-stone-400 cursor-not-allowed" title="即将开放">加拿大 <span className="opacity-60">soon</span></span>
+              <span className="text-[10px] px-2 py-0.5 border border-stone-200 text-stone-400 cursor-not-allowed" title="即将开放">香港 <span className="opacity-60">soon</span></span>
+            </div>
             <button
               className="sm:hidden text-stone-500"
               onClick={() => setMobileFilterOpen(true)}
@@ -576,18 +583,27 @@ export default function Home() {
         </div>
       </header>
 
-      {/* ── Hero — minimal text only ── */}
+      {/* ── Hero — mission-driven ── */}
       <div className="border-b border-stone-100 bg-stone-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-          <p className="text-[11px] uppercase tracking-widest text-stone-400 mb-2">
-            US News Top 50 综合大学 · Top 30 文理学院
-          </p>
-          <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 mb-1">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+          <div className="flex items-center gap-2 mb-3">
+            <Globe size={12} className="text-stone-400" />
+            <p className="text-[11px] uppercase tracking-widest text-stone-400">
+              美国 · US News Top 50 综合大学 + Top 30 文理学院
+            </p>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 mb-3 leading-tight">
             招生 Virtual Info Session
           </h1>
-          <p className="text-sm text-stone-500">
+          <p className="text-sm text-stone-500 max-w-xl leading-relaxed mb-4">
             汇聚各校招生官（AO）主持的线上宣讲活动，一键直达官方报名入口
           </p>
+          {/* Mission statement */}
+          <div className="border-l-2 border-stone-300 pl-4 max-w-xl">
+            <p className="text-xs text-stone-400 leading-relaxed italic">
+              信息不对称，是教育不公平最隐蔽的形式。每一所顶尖大学都在定期举办公开的线上宣讲——招生官亲自出席，回答真实的问题。这些信息完全公开，却因语言和渠道的障碍，对大多数中国学生来说形同不存在。AdmitLens 就是要把这道墙拆掉。
+            </p>
+          </div>
         </div>
       </div>
 
@@ -849,10 +865,52 @@ export default function Home() {
       </div>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-stone-100 mt-8 py-5">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-400">
-          <span className="font-medium text-stone-600">AdmitLens</span>
-          <span>所有链接均指向各大学官方招生网站，请以各校官网最新日程为准</span>
+      <footer className="border-t border-stone-100 mt-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+          <div className="flex flex-col sm:flex-row gap-8 sm:gap-16 mb-6">
+            {/* Brand */}
+            <div className="shrink-0">
+              <div className="text-sm font-bold text-stone-900 mb-1">AdmitLens</div>
+              <div className="text-[11px] text-stone-400 leading-relaxed max-w-xs">
+                信息公开是最基本的公平。我们相信，每一个学生——无论来自哪里——都应该能与顶尖院校的招生官面对面地对话。
+              </div>
+            </div>
+            {/* Roadmap */}
+            <div>
+              <div className="text-[11px] uppercase tracking-widest text-stone-400 mb-2">覆盖计划</div>
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-stone-900 shrink-0" />
+                  <span className="text-stone-700">美国本科</span>
+                  <span className="text-[10px] px-1.5 py-0.5 bg-stone-900 text-white">80 所已上线</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="w-1.5 h-1.5 rounded-full border border-stone-300 shrink-0" />
+                  <span className="text-stone-400">英国本科 (Russell Group)</span>
+                  <span className="text-[10px] px-1.5 py-0.5 border border-stone-200 text-stone-400">即将</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="w-1.5 h-1.5 rounded-full border border-stone-300 shrink-0" />
+                  <span className="text-stone-400">加拿大本科 (U15)</span>
+                  <span className="text-[10px] px-1.5 py-0.5 border border-stone-200 text-stone-400">即将</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="w-1.5 h-1.5 rounded-full border border-stone-300 shrink-0" />
+                  <span className="text-stone-400">香港 / 新加坡顶尖院校</span>
+                  <span className="text-[10px] px-1.5 py-0.5 border border-stone-200 text-stone-400">即将</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="w-1.5 h-1.5 rounded-full border border-stone-300 shrink-0" />
+                  <span className="text-stone-400">研究生项目</span>
+                  <span className="text-[10px] px-1.5 py-0.5 border border-stone-200 text-stone-400">规划中</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-stone-100 pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[11px] text-stone-400">
+            <span>所有链接均指向各院校官方招生网站，请以各校官网最新日程为准</span>
+            <span className="text-stone-300">教育公平，从信息公开开始</span>
+          </div>
         </div>
       </footer>
     </div>
