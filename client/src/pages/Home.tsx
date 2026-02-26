@@ -69,9 +69,9 @@ const T: Record<Lang, Record<string, string>> = {
     subscribe: "订阅活动提醒",
     subscribePlaceholder: "输入邮箱，有新活动时通知你",
     subscribeBtn: "订阅",
-    subscribeSuccess: "已订阅，感谢！",
+    subscribeSuccess: "已订阅！发现新活动时将第一时间通知你",
     calSubscribe: "订阅日历",
-    calSubscribeNote: "将所有活动同步到你的日历",
+    calSubscribeNote: "发现新活动时，我们会发邮件通知你。",
     footerBrand: "信息公开是最基本的公平。我们相信，每一个学生——无论来自哪里——都应该能与顶尖院校的招生官面对面地对话。",
     footerRoadmap: "覆盖计划",
     footerUs: "美国本科",
@@ -125,9 +125,9 @@ const T: Record<Lang, Record<string, string>> = {
     subscribe: "Subscribe to Updates",
     subscribePlaceholder: "Enter email to get notified",
     subscribeBtn: "Subscribe",
-    subscribeSuccess: "Subscribed, thank you!",
+    subscribeSuccess: "Subscribed! We'll notify you when new events are added.",
     calSubscribe: "Subscribe Calendar",
-    calSubscribeNote: "Sync all events to your calendar",
+    calSubscribeNote: "We'll email you when new events are added.",
     footerBrand: "Information equity is the most basic form of fairness. Every student — regardless of where they come from — deserves direct access to admissions officers at top universities.",
     footerRoadmap: "Coverage Roadmap",
     footerUs: "US Undergraduate",
@@ -406,16 +406,27 @@ function getNextDate(session: (typeof allSessions)[0]): Date | null {
   return upcoming[0] ?? null;
 }
 
+function isExpiredSession(session: (typeof allSessions)[0]): boolean {
+  if (session.isRolling || !session.dates || session.dates.length === 0) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const hasUpcoming = session.dates.some((d) => new Date(d + "T00:00:00") >= today);
+  return !hasUpcoming;
+}
+
 // ── Session Card (scheduled / fixed-date) ────────────────────
 function ScheduledSessionCard({ session, t, isSelected, onToggle }: { session: (typeof allSessions)[0]; t: typeof T["zh"]; isSelected?: boolean; onToggle?: (id: string) => void }) {
   const school = schoolsMap[session.schoolId];
   const urgency = getUrgency(session);
   const nextDate = getNextDate(session);
+  const expired = isExpiredSession(session);
   const localTime = session.time ? convertToLocalTime(session.time, session.dates?.[0]) : null;
 
   return (
     <div className={`bg-white border transition-colors duration-150 relative ${
-      isSelected
+      expired
+        ? "border-stone-100 opacity-40 hover:opacity-60"
+        : isSelected
         ? "border-blue-500 ring-1 ring-blue-300"
         : urgency === "imminent"
         ? "border-red-400 hover:border-red-500"
@@ -1177,6 +1188,11 @@ export default function Home() {
                     .filter((s) => !s.isRolling)
                     .slice()
                     .sort((a, b) => {
+                      const aExpired = isExpiredSession(a);
+                      const bExpired = isExpiredSession(b);
+                      // 过期活动移至底部
+                      if (aExpired && !bExpired) return 1;
+                      if (!aExpired && bExpired) return -1;
                       const da = getNextDate(a);
                       const db = getNextDate(b);
                       if (!da && !db) return 0;

@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, openId, name, role, createdAt FROM users ORDER BY createdAt ASC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 28x4cWX34ZKHd6B.9c35f7d5c3f8 --database F6apVxHHK9H6xisJa5W5pf --execute SELECT id, openId, name, role, createdAt FROM users ORDER BY createdAt ASC LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "openId": "MxkVYzu8YQdbx3k5w7Qe3j",
+      "name": "ZHENGYI KE",
+      "role": "admin",
+      "createdAt": "2026-02-26 12:11:58"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\trole\tcreatedAt\n1\tMxkVYzu8YQdbx3k5w7Qe3j\tZHENGYI KE\tadmin\t2026-02-26 12:11:58\n",
+  "stderr": "",
+  "execution_time_ms": 356
+}
