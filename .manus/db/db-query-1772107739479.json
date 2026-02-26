@@ -1,0 +1,31 @@
+{
+  "query": "SHOW TABLES; SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 28x4cWX34ZKHd6B.9c35f7d5c3f8 --database F6apVxHHK9H6xisJa5W5pf --execute SHOW TABLES; SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() LIMIT 10;",
+  "rows": [
+    {
+      "Tables_in_F6apVxHHK9H6xisJa5W5pf": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_F6apVxHHK9H6xisJa5W5pf": "crawl_logs"
+    },
+    {
+      "Tables_in_F6apVxHHK9H6xisJa5W5pf": "users"
+    },
+    {
+      "Tables_in_F6apVxHHK9H6xisJa5W5pf": "TABLE_CATALOG\tTABLE_SCHEMA\tTABLE_NAME\tTABLE_TYPE\tENGINE\tVERSION\tROW_FORMAT\tTABLE_ROWS\tAVG_ROW_LENGTH\tDATA_LENGTH\tMAX_DATA_LENGTH\tINDEX_LENGTH\tDATA_FREE\tAUTO_INCREMENT\tCREATE_TIME\tUPDATE_TIME\tCHECK_TIME\tTABLE_COLLATION\tCHECKSUM\tCREATE_OPTIONS\tTABLE_COMMENT\tTIDB_TABLE_ID\tTIDB_ROW_ID_SHARDING_INFO\tTIDB_PK_TYPE\tTIDB_PLACEMENT_POLICY_NAME\tTIDB_STORAGE_CLASS"
+    },
+    {
+      "Tables_in_F6apVxHHK9H6xisJa5W5pf": "def\tF6apVxHHK9H6xisJa5W5pf\t__drizzle_migrations\tBASE TABLE\tInnoDB\t10\tCompact\t1\t82\t82\t0\t8\t0\t2\t2026-02-26 12:07:26\tNULL\tNULL\tutf8mb4_unicode_ci\tNULL\t\t\t147\tNOT_SHARDED(PK_IS_HANDLE)\tCLUSTERED\tNULL\t"
+    },
+    {
+      "Tables_in_F6apVxHHK9H6xisJa5W5pf": "def\tF6apVxHHK9H6xisJa5W5pf\tusers\tBASE TABLE\tInnoDB\t10\tCompact\t0\t0\t0\t0\t0\t0\t1\t2026-02-26 12:07:27\tNULL\tNULL\tutf8mb4_unicode_ci\tNULL\t\t\t149\tNOT_SHARDED(PK_IS_HANDLE)\tCLUSTERED\tNULL\t"
+    },
+    {
+      "Tables_in_F6apVxHHK9H6xisJa5W5pf": "def\tF6apVxHHK9H6xisJa5W5pf\tcrawl_logs\tBASE TABLE\tInnoDB\t10\tCompact\t0\t0\t0\t0\t0\t0\t1\t2026-02-26 12:08:23\tNULL\tNULL\tutf8mb4_unicode_ci\tNULL\t\t\t151\tNOT_SHARDED(PK_IS_HANDLE)\tCLUSTERED\tNULL\t"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_F6apVxHHK9H6xisJa5W5pf\n__drizzle_migrations\ncrawl_logs\nusers\nTABLE_CATALOG\tTABLE_SCHEMA\tTABLE_NAME\tTABLE_TYPE\tENGINE\tVERSION\tROW_FORMAT\tTABLE_ROWS\tAVG_ROW_LENGTH\tDATA_LENGTH\tMAX_DATA_LENGTH\tINDEX_LENGTH\tDATA_FREE\tAUTO_INCREMENT\tCREATE_TIME\tUPDATE_TIME\tCHECK_TIME\tTABLE_COLLATION\tCHECKSUM\tCREATE_OPTIONS\tTABLE_COMMENT\tTIDB_TABLE_ID\tTIDB_ROW_ID_SHARDING_INFO\tTIDB_PK_TYPE\tTIDB_PLACEMENT_POLICY_NAME\tTIDB_STORAGE_CLASS\ndef\tF6apVxHHK9H6xisJa5W5pf\t__drizzle_migrations\tBASE TABLE\tInnoDB\t10\tCompact\t1\t82\t82\t0\t8\t0\t2\t2026-02-26 12:07:26\tNULL\tNULL\tutf8mb4_unicode_ci\tNULL\t\t\t147\tNOT_SHARDED(PK_IS_HANDLE)\tCLUSTERED\tNULL\t\ndef\tF6apVxHHK9H6xisJa5W5pf\tusers\tBASE TABLE\tInnoDB\t10\tCompact\t0\t0\t0\t0\t0\t0\t1\t2026-02-26 12:07:27\tNULL\tNULL\tutf8mb4_unicode_ci\tNULL\t\t\t149\tNOT_SHARDED(PK_IS_HANDLE)\tCLUSTERED\tNULL\t\ndef\tF6apVxHHK9H6xisJa5W5pf\tcrawl_logs\tBASE TABLE\tInnoDB\t10\tCompact\t0\t0\t0\t0\t0\t0\t1\t2026-02-26 12:08:23\tNULL\tNULL\tutf8mb4_unicode_ci\tNULL\t\t\t151\tNOT_SHARDED(PK_IS_HANDLE)\tCLUSTERED\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 413
+}

@@ -1,0 +1,8 @@
+{
+  "query": "DESCRIBE sessions; DESCRIBE crawl_logs;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 28x4cWX34ZKHd6B.9c35f7d5c3f8 --database F6apVxHHK9H6xisJa5W5pf --execute DESCRIBE sessions; DESCRIBE crawl_logs;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 1: Table 'f6apvxhhk9h6xisja5w5pf.sessions' doesn't exist"
+  ]
+}

@@ -10,7 +10,9 @@ import {
   type SessionType,
   type School,
   type Region,
+  type Session,
 } from "@/data/schools";
+import { trpc } from "@/lib/trpc";
 import { Input } from "@/components/ui/input";
 import {
   Search,
@@ -852,6 +854,34 @@ export default function Home() {
 
   const t = T[lang] as typeof T["zh"];
 
+  // Fetch sessions from DB (falls back to static data if unavailable)
+  const { data: dbData } = trpc.sessions.list.useQuery(
+    { region: "All" },
+    { staleTime: 5 * 60 * 1000 } // re-fetch every 5 min
+  );
+
+  // Merge DB sessions with static data: DB takes priority, static fills gaps
+  const activeSessions = useMemo<Session[]>(() => {
+    if (dbData?.sessions && dbData.sessions.length > 0) {
+      // Map DB rows to Session shape
+      return dbData.sessions.map((row) => ({
+        id: row.id,
+        schoolId: row.schoolId,
+        title: row.title,
+        type: row.type as Session["type"],
+        description: row.description,
+        dates: row.dates as string[] | null,
+        time: row.time ?? undefined,
+        duration: row.duration ?? undefined,
+        registrationUrl: row.registrationUrl,
+        isRolling: row.isRolling,
+        partnerSchools: (row.partnerSchools as string[]) ?? undefined,
+      }));
+    }
+    // Fallback to static data
+    return allSessions;
+  }, [dbData]);
+
   function toggleSelect(id: string) {
     setSelectedSessions((prev) => {
       const next = new Set(prev);
@@ -867,7 +897,7 @@ export default function Home() {
   function exportBatchICS() {
     const events: string[] = [];
     for (const id of Array.from(selectedSessions)) {
-      const session = allSessions.find((s) => s.id === id);
+      const session = activeSessions.find((s) => s.id === id);
       if (!session || session.isRolling || !session.dates || !session.time) continue;
       if (!session.time.match(/(ET|CT|PT|MT)/i)) continue;
       const school = schoolsMap[session.schoolId];
@@ -916,7 +946,7 @@ export default function Home() {
   ];
 
   const filteredSessions = useMemo(() => {
-    return allSessions.filter((s) => {
+    return activeSessions.filter((s) => {
       const school = schoolsMap[s.schoolId];
       const matchType = typeFilter === "All" || s.type === typeFilter;
       const matchRegion = regionFilter === "All" || school?.region === regionFilter;
@@ -929,7 +959,7 @@ export default function Home() {
         s.description.toLowerCase().includes(q);
       return matchType && matchRegion && matchSearch;
     });
-  }, [search, typeFilter, regionFilter]);
+  }, [activeSessions, search, typeFilter, regionFilter]);
 
   const filteredSchools = useMemo(() => {
     return allSchools.filter((s) => {
@@ -1246,8 +1276,8 @@ export default function Home() {
               <div className="space-y-1.5">
                 {([
                   { label: t.footerUs, status: t.footerUsLive, state: "live" as const },
-                  { label: t.footerUk, status: t.footerSoon, state: "soon" as const },
-                  { label: t.footerHk, status: t.footerSoon, state: "soon" as const },
+                  { label: t.footerUk, status: t.footerUsLive, state: "live" as const },
+                  { label: t.footerHk, status: t.footerUsLive, state: "live" as const },
                   { label: t.footerCa, status: t.footerSoon, state: "soon" as const },
                   { label: t.footerGrad, status: t.footerPlanned, state: "planned" as const },
                 ] as { label: string; status: string; state: "live" | "soon" | "planned" }[]).map((item) => (
