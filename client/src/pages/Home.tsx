@@ -12,6 +12,7 @@ import {
   type Region,
   type Session,
 } from "@/data/schools";
+import { interviewData, type SchoolInterview } from "@/data/interviews";
 import { trpc } from "@/lib/trpc";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,9 +28,12 @@ import {
   ChevronDown,
   Globe,
   Mail,
+  UserCheck,
+  UserX,
+  Info,
 } from "lucide-react";
 
-type ViewMode = "sessions" | "schools";
+type ViewMode = "sessions" | "schools" | "interviews";
 type Lang = "zh" | "en";
 
 // ── i18n ─────────────────────────────────────────────────────
@@ -41,6 +45,7 @@ const T: Record<Lang, Record<string, string>> = {
     mission: "好信息，早知道",
     tabSessions: "活动日程",
     tabSchools: "学校目录",
+    tabInterviews: "面试入口",
     search: "搜索",
     searchPlaceholder: "学校或活动名称",
     schoolType: "学校类型",
@@ -89,6 +94,21 @@ const T: Record<Lang, Record<string, string>> = {
     regionUK: "英国",
     regionHK: "香港",
     regionAU: "澳大利亚",
+    interviewAvailable: "提供面试",
+    interviewNotAvailable: "不提供面试",
+    interviewTypeLabel: "面试形式",
+    interviewTimingLabel: "时间安排",
+    interviewMethodSchool: "学校主动联系",
+    interviewMethodApplicant: "申请人主动申请",
+    interviewMethodRequired: "申请必须",
+    interviewGoPortal: "前往报名入口",
+    interviewLearnMore: "了解详情",
+    interviewFilterAll: "全部",
+    interviewFilterAvailable: "提供面试",
+    interviewFilterNone: "不提供面试",
+    interviewSearchPlaceholder: "搜索学校名称",
+    interviewNote: "面试信息仅供参考，请以各校官网最新政策为准。部分面试名额有限，建议尽早申请。",
+    interviewCount: "所学校面试信息",
   },
   en: {
     tagline: "Global University Admissions Info Hub",
@@ -97,6 +117,7 @@ const T: Record<Lang, Record<string, string>> = {
     mission: "Better info. Earlier.",
     tabSessions: "Events",
     tabSchools: "Schools",
+    tabInterviews: "Interviews",
     search: "Search",
     searchPlaceholder: "School or event name",
     schoolType: "School Type",
@@ -145,6 +166,21 @@ const T: Record<Lang, Record<string, string>> = {
     regionUK: "United Kingdom",
     regionHK: "Hong Kong",
     regionAU: "Australia",
+    interviewAvailable: "Interview Available",
+    interviewNotAvailable: "No Interview",
+    interviewTypeLabel: "Interview Type",
+    interviewTimingLabel: "Timing",
+    interviewMethodSchool: "School contacts applicant",
+    interviewMethodApplicant: "Applicant requests",
+    interviewMethodRequired: "Required",
+    interviewGoPortal: "Go to Portal",
+    interviewLearnMore: "Learn More",
+    interviewFilterAll: "All",
+    interviewFilterAvailable: "Available",
+    interviewFilterNone: "Not Available",
+    interviewSearchPlaceholder: "Search school name",
+    interviewNote: "Interview information is for reference only. Please verify the latest policies on each school's official website. Some interview slots are limited — apply early.",
+    interviewCount: "schools with interview info",
   },
 } as const;
 
@@ -628,6 +664,120 @@ function SchoolCard({ school, t }: { school: School; t: typeof T["zh"] }) {
   );
 }
 
+// ── Interview Card ──────────────────────────────────────────────
+function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof T["zh"]; lang: Lang }) {
+  const methodLabel = {
+    school_contacts: t.interviewMethodSchool,
+    applicant_requests: t.interviewMethodApplicant,
+    required: t.interviewMethodRequired,
+    none: "",
+  }[school.requestMethod];
+
+  const notes = lang === "zh" ? school.notesZh : school.notesEn;
+
+  return (
+    <div className={`bg-white border transition-colors duration-150 ${
+      school.available
+        ? "border-stone-200 hover:border-stone-400"
+        : "border-stone-100 opacity-60"
+    }`}>
+      <div className="p-4">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              {school.available ? (
+                <UserCheck size={12} className="text-green-600 shrink-0" />
+              ) : (
+                <UserX size={12} className="text-stone-300 shrink-0" />
+              )}
+              <h3 className="text-sm font-semibold text-stone-900 truncate">
+                {school.shortName || school.schoolName}
+              </h3>
+            </div>
+            {school.shortName && (
+              <p className="text-[11px] text-stone-400 truncate pl-4">{school.schoolName}</p>
+            )}
+          </div>
+          <span className={`shrink-0 text-[10px] px-1.5 py-0.5 font-medium ${
+            school.available
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : "bg-stone-50 text-stone-400 border border-stone-200"
+          }`}>
+            {school.available ? t.interviewAvailable : t.interviewNotAvailable}
+          </span>
+        </div>
+
+        {/* Interview types */}
+        {school.available && school.types.length > 0 && (
+          <div className="mb-2">
+            <div className="text-[10px] uppercase tracking-widest text-stone-400 mb-1">{t.interviewTypeLabel}</div>
+            <div className="flex flex-wrap gap-1">
+              {school.types.map((type) => (
+                <span key={type} className="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-100">
+                  {type}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Method */}
+        {school.available && methodLabel && (
+          <div className="mb-2 text-[11px] text-stone-500">
+            <span className="text-stone-400">{lang === "zh" ? "申请方式：" : "How: "}</span>
+            {methodLabel}
+          </div>
+        )}
+
+        {/* Timing */}
+        {school.available && school.timing && school.timing !== "N/A" && (
+          <div className="mb-2">
+            <div className="text-[10px] uppercase tracking-widest text-stone-400 mb-0.5">{t.interviewTimingLabel}</div>
+            <div className="text-[11px] text-stone-600 leading-relaxed">{school.timing}</div>
+          </div>
+        )}
+
+        {/* Notes */}
+        {notes && (
+          <div className="flex gap-1.5 mt-2 pt-2 border-t border-stone-100">
+            <Info size={10} className="text-stone-300 shrink-0 mt-0.5" />
+            <p className="text-[10px] text-stone-400 leading-relaxed">{notes}</p>
+          </div>
+        )}
+
+        {/* CTA */}
+        {school.available && school.portalUrl && school.portalUrl !== "N/A" && (
+          <div className="mt-3">
+            <a
+              href={school.portalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-1 w-full py-1.5 border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white text-xs font-medium transition-colors duration-150"
+            >
+              {t.interviewGoPortal}
+              <ArrowUpRight size={10} />
+            </a>
+          </div>
+        )}
+        {!school.available && school.portalUrl && school.portalUrl !== "N/A" && (
+          <div className="mt-3">
+            <a
+              href={school.portalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-1 w-full py-1.5 border border-stone-200 text-stone-400 hover:border-stone-400 hover:text-stone-600 text-xs transition-colors duration-150"
+            >
+              {t.interviewLearnMore}
+              <ExternalLink size={10} />
+            </a>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Email Subscribe ───────────────────────────────────────────
 function EmailSubscribe({ t }: { t: typeof T["zh"] }) {
   const [email, setEmail] = useState("");
@@ -896,6 +1046,8 @@ export default function Home() {
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [lang, setLang] = useState<Lang>("zh");
   const [selectedSessions, setSelectedSessions] = useState<Set<string>>(new Set());
+  const [interviewSearch, setInterviewSearch] = useState("");
+  const [interviewFilter, setInterviewFilter] = useState<"all" | "available" | "none">("all");
 
   const t = T[lang] as typeof T["zh"];
 
@@ -1020,6 +1172,21 @@ export default function Home() {
     });
   }, [search, regionFilter]);
 
+  const filteredInterviews = useMemo(() => {
+    return interviewData.filter((s) => {
+      const matchFilter =
+        interviewFilter === "all" ||
+        (interviewFilter === "available" && s.available) ||
+        (interviewFilter === "none" && !s.available);
+      const q = interviewSearch.toLowerCase();
+      const matchSearch =
+        !q ||
+        s.schoolName.toLowerCase().includes(q) ||
+        (s.shortName?.toLowerCase().includes(q) ?? false);
+      return matchFilter && matchSearch;
+    });
+  }, [interviewSearch, interviewFilter]);
+
   return (
     <div className="min-h-screen bg-white">
       {/* ── Nav ── */}
@@ -1105,6 +1272,16 @@ export default function Home() {
             >
               {t.tabSchools}
             </button>
+            <button
+              onClick={() => setView("interviews")}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                view === "interviews"
+                  ? "border-stone-900 text-stone-900"
+                  : "border-transparent text-stone-400 hover:text-stone-600"
+              }`}
+            >
+              {t.tabInterviews}
+            </button>
           </div>
         </div>
       </div>
@@ -1140,9 +1317,9 @@ export default function Home() {
               <div className="relative">
                 <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-300" />
                 <Input
-                  placeholder={t.searchPlaceholder}
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder={view === "interviews" ? t.interviewSearchPlaceholder : t.searchPlaceholder}
+                  value={view === "interviews" ? interviewSearch : search}
+                  onChange={(e) => view === "interviews" ? setInterviewSearch(e.target.value) : setSearch(e.target.value)}
                   className="pl-8 h-8 text-xs border-stone-200 rounded-none focus-visible:ring-0 focus-visible:border-stone-900"
                 />
               </div>
@@ -1169,6 +1346,34 @@ export default function Home() {
                 ))}
               </div>
             </div>
+
+            {/* Interview filter */}
+            {view === "interviews" && (
+              <div>
+                <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
+                  {lang === "zh" ? "面试状态" : "Status"}
+                </label>
+                <div className="space-y-0.5">
+                  {([
+                    { value: "all" as const, label: t.interviewFilterAll },
+                    { value: "available" as const, label: t.interviewFilterAvailable },
+                    { value: "none" as const, label: t.interviewFilterNone },
+                  ]).map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setInterviewFilter(opt.value)}
+                      className={`w-full text-left text-xs px-2 py-1.5 transition-colors ${
+                        interviewFilter === opt.value
+                          ? "bg-stone-900 text-white"
+                          : "text-stone-500 hover:bg-stone-50"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Session type */}
             {view === "sessions" && (
@@ -1272,6 +1477,56 @@ export default function Home() {
                   </div>
                   <p className="text-[10px] text-stone-300 mt-2 leading-relaxed">{t.rollingNote}</p>
                 </div>
+              </div>
+            </div>
+          ) : view === "interviews" ? (
+            <div>
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-[11px] uppercase tracking-widest text-stone-400 font-medium">
+                  {lang === "zh" ? `共 ${filteredInterviews.length} 所学校面试信息` : `${filteredInterviews.length} ${t.interviewCount}`}
+                </span>
+                <div className="flex-1 h-px bg-stone-100" />
+              </div>
+
+              {/* Stats bar */}
+              <div className="flex gap-4 mb-4 p-3 bg-stone-50 border border-stone-100">
+                <div className="flex items-center gap-1.5 text-xs">
+                  <UserCheck size={12} className="text-green-600" />
+                  <span className="text-stone-600 font-medium">{interviewData.filter(s => s.available).length}</span>
+                  <span className="text-stone-400">{lang === "zh" ? "提供面试" : "offer interviews"}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs">
+                  <UserX size={12} className="text-stone-300" />
+                  <span className="text-stone-600 font-medium">{interviewData.filter(s => !s.available).length}</span>
+                  <span className="text-stone-400">{lang === "zh" ? "不提供" : "no interview"}</span>
+                </div>
+              </div>
+
+              {/* Cards grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {filteredInterviews
+                  .sort((a, b) => {
+                    // Available first, then by rank
+                    if (a.available && !b.available) return -1;
+                    if (!a.available && b.available) return 1;
+                    return a.rank - b.rank;
+                  })
+                  .map((s) => (
+                    <InterviewCard key={s.id} school={s} t={t} lang={lang} />
+                  ))}
+              </div>
+
+              {filteredInterviews.length === 0 && (
+                <div className="py-12 text-center text-stone-400">
+                  <p className="text-xs">{lang === "zh" ? "没有匹配的学校" : "No matching schools"}</p>
+                </div>
+              )}
+
+              {/* Disclaimer */}
+              <div className="mt-6 p-3 bg-stone-50 border border-stone-100 flex gap-2">
+                <Info size={12} className="text-stone-300 shrink-0 mt-0.5" />
+                <p className="text-[11px] text-stone-400 leading-relaxed">{t.interviewNote}</p>
               </div>
             </div>
           ) : (
