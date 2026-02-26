@@ -74,9 +74,9 @@ const T: Record<Lang, Record<string, string>> = {
     footerRoadmap: "覆盖计划",
     footerUs: "美国本科",
     footerUsLive: "已上线",
-    footerUk: "英国本科 (Russell Group)",
+    footerUk: "英国本科（Russell Group）",
     footerHk: "香港 / 澳大利亚顶尖院校",
-    footerCa: "加拿大本科 (U15)",
+    footerCa: "加拿大本科（U15）",
     footerGrad: "研究生项目",
     footerSoon: "即将",
     footerPlanned: "规划中",
@@ -131,7 +131,7 @@ const T: Record<Lang, Record<string, string>> = {
     footerUs: "US Undergraduate",
     footerUsLive: "Live",
     footerUk: "UK Undergraduate (Russell Group)",
-    footerHk: "Hong Kong / Australia",
+    footerHk: "Hong Kong / Australia Top Universities",
     footerCa: "Canada Undergraduate (U15)",
     footerGrad: "Graduate Programs",
     footerSoon: "Soon",
@@ -778,12 +778,12 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
     { icon: "🎓", title: "招生官亲自出席", desc: "每场活动均由各校 Admissions Officer 主持，直接解答申请疑问" },
     { icon: "🌍", title: "覆盖全球顶校", desc: "美国、英国、香港、澳大利亚顶尖院校，持续扩展中" },
     { icon: "🕐", title: "自动时区转换", desc: "活动时间自动转换为你的本地时区，无需手动换算" },
-    { icon: "📅", title: "一键加入日历", desc: "支持 Google Calendar 和 Apple/Outlook，不错过任何活动" },
+    { icon: "📅", title: "日历导出 · 支持批量", desc: "勾选多场活动一键批量导出 .ics，或单独添加至 Google / Apple / Outlook" },
   ] : [
     { icon: "🎓", title: "Direct AO Access", desc: "Every session is hosted by Admissions Officers who answer real questions" },
     { icon: "🌍", title: "Global Coverage", desc: "US, UK, Hong Kong, Australia — and growing" },
     { icon: "🕐", title: "Auto Timezone", desc: "Event times are automatically converted to your local timezone" },
-    { icon: "📅", title: "Add to Calendar", desc: "One-click Google Calendar or Apple/Outlook integration" },
+    { icon: "📅", title: "Calendar Export · Batch", desc: "Select multiple events and export as one .ics, or add individually to Google / Apple / Outlook" },
   ];
 
   return (
@@ -1244,17 +1244,25 @@ export default function Home() {
             <div>
               <div className="text-[11px] uppercase tracking-widest text-stone-400 mb-2">{t.footerRoadmap}</div>
               <div className="space-y-1.5">
-                {[
-                  { label: t.footerUs, status: t.footerUsLive, live: true },
-                  { label: t.footerUk, status: t.footerSoon, live: false },
-                  { label: t.footerHk, status: t.footerSoon, live: false },
-                  { label: t.footerCa, status: t.footerSoon, live: false },
-                  { label: t.footerGrad, status: t.footerPlanned, live: false },
-                ].map((item) => (
+                {([
+                  { label: t.footerUs, status: t.footerUsLive, state: "live" as const },
+                  { label: t.footerUk, status: t.footerSoon, state: "soon" as const },
+                  { label: t.footerHk, status: t.footerSoon, state: "soon" as const },
+                  { label: t.footerCa, status: t.footerSoon, state: "soon" as const },
+                  { label: t.footerGrad, status: t.footerPlanned, state: "planned" as const },
+                ] as { label: string; status: string; state: "live" | "soon" | "planned" }[]).map((item) => (
                   <div key={item.label} className="flex items-center gap-2 text-xs">
-                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${item.live ? "bg-stone-900" : "border border-stone-300"}`} />
-                    <span className={item.live ? "text-stone-700" : "text-stone-400"}>{item.label}</span>
-                    <span className={`text-[10px] px-1.5 py-0.5 ${item.live ? "bg-stone-900 text-white" : "border border-stone-200 text-stone-400"}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                      item.state === "live" ? "bg-stone-900" :
+                      item.state === "soon" ? "bg-stone-300" :
+                      "border border-dashed border-stone-300"
+                    }`} />
+                    <span className={item.state === "live" ? "text-stone-700" : "text-stone-400"}>{item.label}</span>
+                    <span className={`text-[10px] px-1.5 py-0.5 ${
+                      item.state === "live" ? "bg-stone-900 text-white" :
+                      item.state === "soon" ? "bg-stone-100 text-stone-500 border border-stone-200" :
+                      "border border-dashed border-stone-200 text-stone-400"
+                    }`}>
                       {item.status}
                     </span>
                   </div>
