@@ -1,9 +1,8 @@
 // Design: Minimal white, system-ui, stone palette
 // Palette: white bg, #111 text, #2563eb accent (blue-600), stone-100 borders
 // Font: system-ui for body, no decorative serifs
-// Layout: left sidebar filter + right content grid
-
-import { useState, useMemo, useRef, useEffect } from "react";
+// Layout: left sidebar filter + right content
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import {
   allSchools,
   allSessions,
@@ -644,6 +643,161 @@ function EmailSubscribe({ t }: { t: typeof T["zh"] }) {
   );
 }
 
+// ── Floating Subscribe Button ────────────────────────────────────────────────
+function FloatingSubscribe({ t }: { t: typeof T["zh"] }) {
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [open]);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.includes("@")) return;
+    const existing = JSON.parse(localStorage.getItem("admitlens_subscribers") || "[]");
+    if (!existing.includes(email)) {
+      localStorage.setItem("admitlens_subscribers", JSON.stringify([...existing, email]));
+    }
+    setSubmitted(true);
+  }
+
+  return (
+    <div ref={panelRef} className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
+      {open && (
+        <div className="bg-white border border-stone-200 shadow-lg p-4 w-72 animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-semibold text-stone-900">{t.subscribe}</span>
+            <button onClick={() => setOpen(false)} className="text-stone-300 hover:text-stone-600 transition-colors">
+              <X size={12} />
+            </button>
+          </div>
+          {submitted ? (
+            <div className="flex items-center gap-2 text-xs text-stone-500 py-1">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500" />
+              {t.subscribeSuccess}
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="flex gap-2">
+              <div className="relative flex-1">
+                <Mail size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-300" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={t.subscribePlaceholder}
+                  className="w-full pl-7 pr-3 py-1.5 text-xs border border-stone-200 focus:border-stone-900 outline-none transition-colors"
+                  autoFocus
+                />
+              </div>
+              <button
+                type="submit"
+                className="px-3 py-1.5 bg-stone-900 text-white text-xs font-medium hover:bg-stone-700 transition-colors whitespace-nowrap"
+              >
+                {t.subscribeBtn}
+              </button>
+            </form>
+          )}
+          <p className="text-[10px] text-stone-300 mt-2">{t.calSubscribeNote}</p>
+        </div>
+      )}
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1.5 px-3 py-2 bg-stone-900 text-white text-xs font-medium shadow-lg hover:bg-stone-700 transition-colors"
+      >
+        <Mail size={12} />
+        {!open && <span>{t.subscribe}</span>}
+        {open && <X size={12} />}
+      </button>
+    </div>
+  );
+}
+
+// ── Onboarding Modal ──────────────────────────────────────────────────────────
+function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const seen = localStorage.getItem("admitlens_onboarded");
+    if (!seen) {
+      const timer = setTimeout(() => setVisible(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const dismiss = useCallback(() => {
+    localStorage.setItem("admitlens_onboarded", "1");
+    setVisible(false);
+  }, []);
+
+  if (!visible) return null;
+
+  const features = lang === "zh" ? [
+    { icon: "🎓", title: "招生官亲自出席", desc: "每场活动均由各校 Admissions Officer 主持，直接解答申请疑问" },
+    { icon: "🌍", title: "覆盖全球顶校", desc: "美国、英国、香港、澳大利亚顶尖院校，持续扩展中" },
+    { icon: "🕐", title: "自动时区转换", desc: "活动时间自动转换为你的本地时区，无需手动换算" },
+    { icon: "📅", title: "一键加入日历", desc: "支持 Google Calendar 和 Apple/Outlook，不错过任何活动" },
+  ] : [
+    { icon: "🎓", title: "Direct AO Access", desc: "Every session is hosted by Admissions Officers who answer real questions" },
+    { icon: "🌍", title: "Global Coverage", desc: "US, UK, Hong Kong, Australia — and growing" },
+    { icon: "🕐", title: "Auto Timezone", desc: "Event times are automatically converted to your local timezone" },
+    { icon: "📅", title: "Add to Calendar", desc: "One-click Google Calendar or Apple/Outlook integration" },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="bg-white border border-stone-200 shadow-2xl max-w-md w-full mx-4 animate-in zoom-in-95 duration-300">
+        <div className="p-6">
+          <div className="flex items-start justify-between mb-5">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+                  <circle cx="9" cy="9" r="8" stroke="#111" strokeWidth="1.2" />
+                  <circle cx="9" cy="9" r="4.5" stroke="#111" strokeWidth="1.2" />
+                  <circle cx="9" cy="9" r="1.5" fill="#111" />
+                </svg>
+                <span className="text-sm font-bold text-stone-900">AdmitLens</span>
+              </div>
+              <p className="text-xs text-stone-400">
+                {lang === "zh" ? "欢迎使用，这里是你了解顶尖大学招生的第一手窗口" : "Welcome — your direct window into top university admissions"}
+              </p>
+            </div>
+            <button onClick={dismiss} className="text-stone-300 hover:text-stone-600 transition-colors mt-0.5">
+              <X size={14} />
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-3 mb-5">
+            {features.map((f) => (
+              <div key={f.title} className="border border-stone-100 p-3 hover:border-stone-300 transition-colors">
+                <div className="text-lg mb-1.5">{f.icon}</div>
+                <div className="text-xs font-semibold text-stone-900 mb-0.5">{f.title}</div>
+                <div className="text-[11px] text-stone-400 leading-relaxed">{f.desc}</div>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={dismiss}
+            className="w-full py-2.5 bg-stone-900 text-white text-sm font-medium hover:bg-stone-700 transition-colors"
+          >
+            {lang === "zh" ? "开始探索" : "Start Exploring"}
+          </button>
+          <p className="text-center text-[10px] text-stone-300 mt-2">
+            {lang === "zh" ? "门始终开着。你需要的，只是知道在哪里敲门而入。" : "The door is always open. You just need to know where to knock."}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Page ─────────────────────────────────────────────────
 export default function Home() {
   const [view, setView] = useState<ViewMode>("sessions");
@@ -1034,6 +1188,12 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* ── Floating Subscribe ── */}
+      <FloatingSubscribe t={t} />
+
+      {/* ── Onboarding Modal ── */}
+      <OnboardingModal t={t} lang={lang} />
     </div>
   );
 }
