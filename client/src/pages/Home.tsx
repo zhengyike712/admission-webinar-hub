@@ -35,6 +35,91 @@ const SESSION_TYPE_LABELS: Record<SessionType, string> = {
   "International Student Session": "国际生专场",
 };
 
+// ── Timezone conversion ─────────────────────────────────────
+// Detect a friendly label for the user's local timezone
+function getLocalTzLabel(): string {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  if (tz.includes("Shanghai") || tz.includes("Chongqing") || tz.includes("Beijing")) return "北京时间";
+  if (tz.includes("Hong_Kong")) return "香港时间";
+  if (tz.includes("Taipei")) return "台北时间";
+  if (tz.includes("Singapore")) return "新加坡时间";
+  if (tz.includes("Tokyo") || tz.includes("Seoul")) return "东京/首尔时间";
+  if (tz.includes("London")) return "伦敦时间";
+  if (tz.includes("Paris") || tz.includes("Berlin")) return "欧洲中部时间";
+  // Generic: show short timezone abbreviation
+  const abbr = new Intl.DateTimeFormat("en", { timeZoneName: "short" })
+    .formatToParts(new Date())
+    .find((p) => p.type === "timeZoneName")?.value || "当地";
+  return `当地时间 (${abbr})`;
+}
+
+const LOCAL_TZ_LABEL = getLocalTzLabel();
+
+// Parse a time string like "7:00 PM ET" or "8:00 PM ET / 7:00 PM CT"
+// and return the equivalent local time string.
+function convertToLocalTime(timeStr: string, referenceDate?: string): string | null {
+  // Only handle strings that contain a parseable ET/CT/PT time
+  const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)\s*(ET|CT|PT|MT)/i);
+  if (!match) return null;
+
+  const [, hourStr, minuteStr, ampm, tz] = match;
+  let hour = parseInt(hourStr, 10);
+  const minute = parseInt(minuteStr, 10);
+  if (ampm.toUpperCase() === "PM" && hour !== 12) hour += 12;
+  if (ampm.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+  // UTC offset for each zone (standard time; ET = UTC-5, CT = UTC-6, PT = UTC-8)
+  // We use a fixed reference date to determine DST: use the session date if available
+  const tzMap: Record<string, string> = {
+    ET: "America/New_York",
+    CT: "America/Chicago",
+    MT: "America/Denver",
+    PT: "America/Los_Angeles",
+  };
+  const ianaZone = tzMap[tz.toUpperCase()] || "America/New_York";
+
+  try {
+    // Build a UTC date by interpreting the time in the source timezone
+    const dateStr = referenceDate || new Date().toISOString().slice(0, 10);
+    // Use Intl to get the UTC offset for that timezone on that date
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: ianaZone,
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: false,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    // Create a Date at noon UTC on the reference date, then adjust
+    const baseDate = new Date(`${dateStr}T12:00:00Z`);
+    // Get what time it is in the source timezone at noon UTC
+    const parts = formatter.formatToParts(baseDate);
+    const tzHour = parseInt(parts.find((p) => p.type === "hour")?.value || "12", 10);
+    // UTC offset in hours: 12 (UTC noon) - tzHour
+    const utcOffset = 12 - tzHour;
+    // Build the event time in UTC
+    const eventUtc = new Date(`${dateStr}T${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:00Z`);
+    eventUtc.setHours(eventUtc.getHours() + utcOffset);
+
+    // Format in user's local timezone
+    const localStr = eventUtc.toLocaleTimeString(navigator.language || "zh-CN", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+    // Detect if user is in a non-ET timezone to avoid redundant display
+    const userTzOffset = -new Date().getTimezoneOffset() / 60;
+    const sourceTzOffset = -utcOffset;
+    if (Math.abs(userTzOffset - sourceTzOffset) < 0.5) return null; // same zone, skip
+
+    return localStr;
+  } catch {
+    return null;
+  }
+}
+
 // ── Urgency helpers ─────────────────────────────────────────
 function getUrgency(session: (typeof sessions)[0]): "imminent" | "soon" | null {
   if (session.isRolling || !session.dates || session.dates.length === 0) return null;
@@ -156,10 +241,21 @@ function SessionCard({ session }: { session: (typeof sessions)[0] }) {
         ) : null}
 
         {session.time && (
-          <div className="flex items-center gap-1.5 text-xs text-stone-400">
-            <Clock size={10} />
-            <span>{session.time}</span>
-            {session.duration && <span>· {session.duration}</span>}
+          <div className="flex items-start gap-1.5 text-xs text-stone-400">
+            <Clock size={10} className="mt-0.5 shrink-0" />
+            <div className="flex flex-col gap-0.5">
+              <span>{session.time}</span>
+              {(() => {
+                const refDate = session.dates?.[0] ?? undefined;
+                const local = convertToLocalTime(session.time, refDate);
+                return local ? (
+                  <span className="text-blue-500 font-medium">
+                    {LOCAL_TZ_LABEL} {local}
+                  </span>
+                ) : null;
+              })()}
+              {session.duration && <span className="text-stone-300">时长 {session.duration}</span>}
+            </div>
           </div>
         )}
       </div>
