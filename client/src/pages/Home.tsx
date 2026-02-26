@@ -561,7 +561,13 @@ export default function Home() {
       {/* ── Nav ── */}
       <header className="border-b border-stone-200 sticky top-0 z-50 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-12 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            {/* Lens mark: outer ring + inner dot */}
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="9" cy="9" r="8" stroke="#111" strokeWidth="1.2" />
+              <circle cx="9" cy="9" r="4.5" stroke="#111" strokeWidth="1.2" />
+              <circle cx="9" cy="9" r="1.5" fill="#111" />
+            </svg>
             <span className="text-sm font-bold tracking-tight text-stone-900">AdmitLens</span>
             <span className="hidden sm:block text-xs text-stone-400">全球高校招生公开信息平台</span>
           </div>
