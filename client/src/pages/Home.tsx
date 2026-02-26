@@ -932,17 +932,9 @@ export default function Home() {
       {/* ── Hero ── */}
       <div className="border-b border-stone-100 bg-stone-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-          <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 mb-3 leading-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 mb-4 leading-tight">
             {t.heroTitle}
           </h1>
-          <p className="text-sm text-stone-500 max-w-xl leading-relaxed mb-5">
-            {t.heroDesc}
-          </p>
-          {/* Email subscribe */}
-          <div className="max-w-sm mb-4">
-            <p className="text-[11px] text-stone-400 mb-2 uppercase tracking-widest">{t.subscribe}</p>
-            <EmailSubscribe t={t} />
-          </div>
           <p className="text-xs text-stone-400 tracking-wide italic">
             {t.mission}
           </p>
