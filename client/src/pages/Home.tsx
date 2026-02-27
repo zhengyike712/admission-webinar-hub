@@ -124,6 +124,25 @@ const T: Record<Lang, Record<string, string>> = {
     interviewDeadlineGoogleCal: "Google 日历",
     interviewDeadlineICS: "Apple / Outlook (.ics)",
     interviewDeadlineTitle: "面试报名截止",
+    onboardingWelcome: "欢迎使用，这里是你了解顶尖大学招生的第一手窗口",
+    onboardingAoTitle: "为什么要参加 Info Session？",
+    onboardingAo1Label: "直接对话招生官",
+    onboardingAo1Detail: "每场均由 Admissions Officer 主持，可当场提问、了解录取偏好和当年申请季的实际动态",
+    onboardingAo2Label: "深入了解校园文化",
+    onboardingAo2Detail: "听招生官讲述学校特色、学生生活和社区氛围，这些内容是官网找不到的",
+    onboardingAo3Label: "展示 Demonstrated Interest",
+    onboardingAo3Detail: "部分院校会记录出席情况，参加官方活动是向学校传递真实兴趣的有效方式",
+    onboardingF1Title: "覆盖全球顶校",
+    onboardingF1Desc: "美国、英国、香港、澳大利亚顶尖院校，持续扩展中",
+    onboardingF2Title: "自动时区转换",
+    onboardingF2Desc: "活动时间自动转换为你的本地时区，无需手动换算",
+    onboardingF3Title: "日历导出 · 支持批量",
+    onboardingF3Desc: "勾选多场活动一键批量导出 .ics，或单独添加至 Google / Apple / Outlook",
+    onboardingF4Title: "面试入口",
+    onboardingF4Desc: "70+ 所美国顶尖院校面试政策，一键直达报名入口，支持截止日期日历提醒",
+    onboardingStart: "开始探索",
+    onboardingMotto: "好信息，早知道",
+    onboardingDismiss: "不再显示",
   },
   en: {
     tagline: "Global University Admissions Info Hub",
@@ -207,6 +226,25 @@ const T: Record<Lang, Record<string, string>> = {
     interviewDeadlineGoogleCal: "Google Calendar",
     interviewDeadlineICS: "Apple / Outlook (.ics)",
     interviewDeadlineTitle: "Interview Request Deadline",
+    onboardingWelcome: "Welcome — your direct window into top university admissions",
+    onboardingAoTitle: "Why Attend an Info Session?",
+    onboardingAo1Label: "Talk Directly to Admissions Officers",
+    onboardingAo1Detail: "Every session is AO-hosted. Ask real questions and learn about selection criteria directly from the source",
+    onboardingAo2Label: "Understand Campus Culture",
+    onboardingAo2Detail: "Hear firsthand about student life, community, and what makes each school unique — beyond rankings",
+    onboardingAo3Label: "Demonstrate Genuine Interest",
+    onboardingAo3Detail: "Some schools track attendance. Showing up signals real commitment and can support your application",
+    onboardingF1Title: "Global Coverage",
+    onboardingF1Desc: "US, UK, Hong Kong, Australia — and growing",
+    onboardingF2Title: "Auto Timezone",
+    onboardingF2Desc: "Event times are automatically converted to your local timezone",
+    onboardingF3Title: "Calendar Export · Batch",
+    onboardingF3Desc: "Select multiple events and export as one .ics, or add individually to Google / Apple / Outlook",
+    onboardingF4Title: "Interview Portal",
+    onboardingF4Desc: "70+ US schools' interview policies, direct signup links, and deadline calendar reminders",
+    onboardingStart: "Start Exploring",
+    onboardingMotto: "Better info. Earlier.",
+    onboardingDismiss: "Don't show again",
   },
   hi: {
     tagline: "विश्वविद्यालय प्रवेश सूचना केंद्र",
@@ -290,6 +328,25 @@ const T: Record<Lang, Record<string, string>> = {
     interviewDeadlineGoogleCal: "Google कैलेंडर",
     interviewDeadlineICS: "Apple / Outlook (.ics)",
     interviewDeadlineTitle: "इंटरव्यू अनुरोध अंतिम तारीख",
+    onboardingWelcome: "स्वागत — शीर्ष विश्वविद्यालय प्रवेश की सीधी जानकारी",
+    onboardingAoTitle: "Info Session में क्यों शामिल हों?",
+    onboardingAo1Label: "प्रवेश अधिकारियों से सीधी बात",
+    onboardingAo1Detail: "हर सेशन AO द्वारा होस्ट किया जाता है। सीधे सवाल पूछें और चयन मानदंड जानें",
+    onboardingAo2Label: "कैंपस संस्कृति को गहराई से समझें",
+    onboardingAo2Detail: "छात्र जीवन, समुदाय और विशेषताओं के बारे में सीधे सुनें — रैंकिंग से परे",
+    onboardingAo3Label: "वास्तविक रुचि दिखाएं",
+    onboardingAo3Detail: "कुछ विश्वविद्यालय उपस्थिति रिकॉर्ड करते हैं। शामिल होना आपकी वास्तविक रुचि दर्शाता है",
+    onboardingF1Title: "वैश्विक कवरेज",
+    onboardingF1Desc: "अमेरिका, यूके, हांगकांग, ऑस्ट्रेलिया — और बढ़ता हुआ",
+    onboardingF2Title: "स्वचालित समय क्षेत्र",
+    onboardingF2Desc: "कार्यक्रम समय स्वचालित रूप से आपके स्थानीय समय क्षेत्र में बदलता है",
+    onboardingF3Title: "कैलेंडर एक्सपोर्ट · बैच",
+    onboardingF3Desc: "कई कार्यक्रम चुनें और .ics निर्यात करें, या Google / Apple / Outlook में अलग से जोड़ें",
+    onboardingF4Title: "इंटरव्यू पोर्टल",
+    onboardingF4Desc: "70+ अमेरिकी विश्वविद्यालयों की इंटरव्यू नीति, सीधे साइनअप लिंक",
+    onboardingStart: "अन्वेषण शुरू करें",
+    onboardingMotto: "अच्छी जानकारी। पहले।",
+    onboardingDismiss: "फिर नहीं दिखाएं",
   },
 } as const;
 
@@ -1174,34 +1231,21 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
 
   if (!visible) return null;
 
-  const aoCard = lang === "zh" ? {
+  const aoCard = {
     icon: "🎓",
-    title: "为什么要参加 Info Session？",
+    title: t.onboardingAoTitle,
     points: [
-      { label: "直接对话招生官", detail: "每场均由 Admissions Officer 主持，可当场提问、了解录取偏好和当年申请季的实际动态" },
-      { label: "深入了解校园文化", detail: "听招生官讲述学校特色、学生生活和社区氛围，这些内容是官网找不到的" },
-      { label: "展示 Demonstrated Interest", detail: "部分院校会记录出席情况，参加官方活动是向学校传递真实兴趣的有效方式" },
-    ]
-  } : {
-    icon: "🎓",
-    title: "Why Attend an Info Session?",
-    points: [
-      { label: "Talk Directly to Admissions Officers", detail: "Every session is AO-hosted. Ask real questions and learn about selection criteria directly from the source" },
-      { label: "Understand Campus Culture", detail: "Hear firsthand about student life, community, and what makes each school unique — beyond rankings" },
-      { label: "Demonstrate Genuine Interest", detail: "Some schools track attendance. Showing up signals real commitment and can support your application" },
+      { label: t.onboardingAo1Label, detail: t.onboardingAo1Detail },
+      { label: t.onboardingAo2Label, detail: t.onboardingAo2Detail },
+      { label: t.onboardingAo3Label, detail: t.onboardingAo3Detail },
     ]
   };
 
-  const features = lang === "zh" ? [
-    { icon: "🌍", title: "覆盖全球顶校", desc: "美国、英国、香港、澳大利亚顶尖院校，持续扩展中" },
-    { icon: "🕐", title: "自动时区转换", desc: "活动时间自动转换为你的本地时区，无需手动换算" },
-    { icon: "📅", title: "日历导出 · 支持批量", desc: "勾选多场活动一键批量导出 .ics，或单独添加至 Google / Apple / Outlook" },
-    { icon: "🤝", title: "面试入口", desc: "70+ 所美国顶尖院校面试政策，一键直达报名入口，支持截止日期日历提醒" },
-  ] : [
-    { icon: "🌍", title: "Global Coverage", desc: "US, UK, Hong Kong, Australia — and growing" },
-    { icon: "🕐", title: "Auto Timezone", desc: "Event times are automatically converted to your local timezone" },
-    { icon: "📅", title: "Calendar Export · Batch", desc: "Select multiple events and export as one .ics, or add individually to Google / Apple / Outlook" },
-    { icon: "🤝", title: "Interview Portal", desc: "70+ US schools' interview policies, direct signup links, and deadline calendar reminders" },
+  const features = [
+    { icon: "🌍", title: t.onboardingF1Title, desc: t.onboardingF1Desc },
+    { icon: "🕐", title: t.onboardingF2Title, desc: t.onboardingF2Desc },
+    { icon: "📅", title: t.onboardingF3Title, desc: t.onboardingF3Desc },
+    { icon: "🤝", title: t.onboardingF4Title, desc: t.onboardingF4Desc },
   ];
 
   return (
@@ -1219,7 +1263,7 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
                 <span className="text-sm font-bold text-stone-900">景深留学</span>
               </div>
               <p className="text-xs text-stone-400">
-                {lang === "zh" ? "欢迎使用，这里是你了解顶尖大学招生的第一手窗口" : "Welcome — your direct window into top university admissions"}
+                {t.onboardingWelcome}
               </p>
             </div>
             <button onClick={dismiss} className="text-stone-300 hover:text-stone-600 transition-colors mt-0.5">
@@ -1258,17 +1302,17 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
             onClick={dismiss}
             className="w-full py-2.5 bg-stone-900 text-white text-sm font-medium hover:bg-stone-700 transition-colors"
           >
-            {lang === "zh" ? "开始探索" : "Start Exploring"}
+            {t.onboardingStart}
           </button>
           <p className="text-center text-[10px] text-stone-300 mt-2">
-            {lang === "zh" ? "好信息，早知道" : "Better info. Earlier."}
+            {t.onboardingMotto}
           </p>
           <div className="text-center mt-2">
             <button
               onClick={dismiss}
               className="text-[10px] text-stone-300 hover:text-stone-500 underline underline-offset-2 transition-colors"
             >
-              {lang === "zh" ? "不再显示" : "Don't show again"}
+              {t.onboardingDismiss}
             </button>
           </div>
         </div>
