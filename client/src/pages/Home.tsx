@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 
 type ViewMode = "sessions" | "schools" | "interviews";
-type Lang = "zh" | "en";
+type Lang = "zh" | "en" | "hi";
 
 // ── i18n ─────────────────────────────────────────────────────
 const T: Record<Lang, Record<string, string>> = {
@@ -207,6 +207,89 @@ const T: Record<Lang, Record<string, string>> = {
     interviewDeadlineGoogleCal: "Google Calendar",
     interviewDeadlineICS: "Apple / Outlook (.ics)",
     interviewDeadlineTitle: "Interview Request Deadline",
+  },
+  hi: {
+    tagline: "विश्वविद्यालय प्रवेश सूचना केंद्र",
+    heroTitle: "सही जानकारी, सही समय पर",
+    heroDesc: "प्रवेश अधिकारियों द्वारा आयोजित ऑनलाइन कार्यक्रम — सीधे रजिस्ट्रेशन लिंक",
+    mission: "अच्छी जानकारी। पहले।",
+    tabSessions: "कार्यक्रम",
+    tabSchools: "विश्वविद्यालय",
+    tabInterviews: "इंटरव्यू",
+    search: "खोजें",
+    searchPlaceholder: "विश्वविद्यालय या कार्यक्रम नाम",
+    schoolType: "विश्वविद्यालय प्रकार",
+    all: "सभी",
+    national: "राष्ट्रीय विश्वविद्यालय",
+    liberal: "उदार कला महाविद्यालय",
+    research: "शोध विश्वविद्यालय",
+    comprehensive: "व्यापक विश्वविद्यालय",
+    sessionType: "कार्यक्रम प्रकार",
+    allTypes: "सभी प्रकार",
+    region: "क्षेत्र",
+    upcoming: "आगामी",
+    rolling: "साल भर खुला",
+    rollingNote: "रोलिंग इवेंट में आप विश्वविद्यालय की वेबसाइट पर तारीख चुन सकते हैं।",
+    register: "रजिस्टर",
+    viewSchedule: "शेड्यूल देखें",
+    noFixed: "कोई निर्धारित कार्यक्रम नहीं",
+    noMatch: "कोई मिलान नहीं",
+    clearFilter: "फ़िल्टर हटाएं",
+    noRolling: "कोई मिलान नहीं",
+    addToCalendar: "कैलेंडर में जोड़ें",
+    googleCal: "Google कैलेंडर",
+    appleCal: "Apple / Outlook (.ics)",
+    imminent: "आगामी",
+    soon: "इस महीने",
+    subscribe: "अपडेट सदस्यता",
+    subscribePlaceholder: "सूचना के लिए ईमेल दर्ज करें",
+    subscribeBtn: "सदस्यता लें",
+    subscribeSuccess: "सदस्यता सफल! नए कार्यक्रम जुड़ने पर सूचित करेंगे।",
+    calSubscribe: "कैलेंडर सदस्यता",
+    calSubscribeNote: "नए कार्यक्रम जुड़ने पर ईमेल भेजेंगे।",
+    footerBrand: "सूचना की समानता सबसे बुनियादी न्याय है। हर छात्र — चाहे कहीं से हो — शीर्ष विश्वविद्यालयों के प्रवेश अधिकारियों तक सीधी पहुंच का अधिकार रखता है।",
+    footerRoadmap: "कवरेज रोडमैप",
+    footerUs: "अमेरिकी स्नातक",
+    footerUsLive: "लाइव",
+    footerUk: "यूके स्नातक (Russell Group)",
+    footerHk: "हांगकांग / ऑस्ट्रेलिया",
+    footerCa: "कनाडा स्नातक (U15)",
+    footerGrad: "स्नातकोत्तर कार्यक्रम",
+    footerSoon: "जल्द",
+    footerPlanned: "योजनाबद्ध",
+    footerDisclaimer: "सभी लिंक संबंधित विश्वविद्यालय की अधिकारिक वेबसाइट की ओर इंगित करते हैं। कृपया नवीनतम तारिखें सत्यापित करें।",
+    footerMotto: "सूचना तक समान पहुंच, अवसर तक समान पहुंच।",
+    regionAll: "सभी क्षेत्र",
+    regionUS: "अमेरिका",
+    regionUK: "यूनाइटेड किंगडम",
+    regionHK: "हांगकांग",
+    regionAU: "ऑस्ट्रेलिया",
+    interviewAvailable: "इंटरव्यू उपलब्ध",
+    interviewNotAvailable: "इंटरव्यू नहीं",
+    interviewTypeLabel: "इंटरव्यू प्रकार",
+    interviewTimingLabel: "समय",
+    interviewMethodSchool: "विश्वविद्यालय संपर्क करता है",
+    interviewMethodApplicant: "आवेदक अनुरोध करता है",
+    interviewMethodRequired: "अनिवार्य",
+    interviewGoPortal: "पोर्टल पर जाएं",
+    interviewLearnMore: "अधिक जानें",
+    interviewFilterAll: "सभी",
+    interviewFilterAvailable: "उपलब्ध",
+    interviewFilterNone: "उपलब्ध नहीं",
+    interviewFilterNearDeadline: "अंतिम तारीख ≤30 दिन",
+    interviewMethodFilterLabel: "अनुरोध विधि",
+    interviewMethodFilterAll: "सभी विधि",
+    interviewMethodFilterSchool: "विश्वविद्यालय संपर्क करता है",
+    interviewMethodFilterApplicant: "आप अनुरोध करते हैं",
+    interviewMethodFilterRequired: "अनिवार्य",
+    interviewSearchPlaceholder: "विश्वविद्यालय नाम खोजें",
+    interviewNote: "इंटरव्यू जानकारी केवल संदर्भ के लिए है। कृपया नवीनतम नीतियां सत्यापित करें। कुछ स्लॉट सीमित हैं — जल्द आवेदन करें।",
+    interviewCount: "विश्वविद्यालयों की इंटरव्यू जानकारी",
+    interviewDeadlineLabel: "अंतिम तारीख",
+    interviewAddDeadlineCal: "अंतिम तारीख जोड़ें",
+    interviewDeadlineGoogleCal: "Google कैलेंडर",
+    interviewDeadlineICS: "Apple / Outlook (.ics)",
+    interviewDeadlineTitle: "इंटरव्यू अनुरोध अंतिम तारीख",
   },
 } as const;
 
@@ -1493,6 +1576,25 @@ export default function Home() {
             <span className="hidden sm:block text-xs text-stone-400">{t.tagline}</span>
           </div>
           <div className="flex items-center gap-2">
+            {/* Language switcher */}
+            <div className="flex items-center border border-stone-200 bg-white overflow-hidden">
+              {(["zh", "en", "hi"] as Lang[]).map((l, i) => (
+                <button
+                  key={l}
+                  onClick={() => setLang(l)}
+                  className={`px-2 py-1 text-[11px] transition-colors ${
+                    i > 0 ? "border-l border-stone-200" : ""
+                  } ${
+                    lang === l
+                      ? "bg-stone-900 text-white font-semibold"
+                      : "text-stone-500 hover:text-stone-800 hover:bg-stone-50"
+                  }`}
+                  title={l === "zh" ? "中文" : l === "en" ? "English" : "हिन्दी"}
+                >
+                  {l === "zh" ? "中" : l === "en" ? "EN" : "हिं"}
+                </button>
+              ))}
+            </div>
             {/* Share button */}
             <ShareButton lang={lang} />
             <button
