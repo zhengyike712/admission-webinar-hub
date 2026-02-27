@@ -1342,14 +1342,16 @@ export default function Home() {
       const matchMethod =
         interviewMethodFilter === "all" ||
         s.requestMethod === interviewMethodFilter;
+      const matchRegionInterview =
+        regionFilter === "All" || s.region === regionFilter;
       const q = interviewSearch.toLowerCase();
       const matchSearch =
         !q ||
         s.schoolName.toLowerCase().includes(q) ||
         (s.shortName?.toLowerCase().includes(q) ?? false);
-      return matchFilter && matchMethod && matchSearch;
+      return matchFilter && matchMethod && matchRegionInterview && matchSearch;
     });
-  }, [interviewSearch, interviewFilter, interviewMethodFilter]);
+  }, [interviewSearch, interviewFilter, interviewMethodFilter, regionFilter]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -1714,25 +1716,63 @@ export default function Home() {
                 })()}
               </div>
 
-              {/* Cards grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {filteredInterviews
-                  .sort((a, b) => {
-                    // Available first, then by rank
+              {/* Cards: grouped by request method when no method filter active, else flat */}
+              {(() => {
+                const isFiltered = interviewFilter !== "all" || interviewMethodFilter !== "all" || interviewSearch.trim() !== "";
+                if (isFiltered) {
+                  // Flat view when filters are active
+                  const sorted = [...filteredInterviews].sort((a, b) => {
                     if (a.available && !b.available) return -1;
                     if (!a.available && b.available) return 1;
                     return a.rank - b.rank;
-                  })
-                  .map((s) => (
-                    <InterviewCard key={s.id} school={s} t={t} lang={lang} />
-                  ))}
-              </div>
-
-              {filteredInterviews.length === 0 && (
-                <div className="py-12 text-center text-stone-400">
-                  <p className="text-xs">{lang === "zh" ? "没有匹配的学校" : "No matching schools"}</p>
-                </div>
-              )}
+                  });
+                  return sorted.length === 0 ? (
+                    <div className="py-12 text-center text-stone-400">
+                      <p className="text-xs">{lang === "zh" ? "没有匹配的学校" : "No matching schools"}</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {sorted.map((s) => <InterviewCard key={s.id} school={s} t={t} lang={lang} />)}
+                    </div>
+                  );
+                }
+                // Grouped view: applicant_requests → school_contacts → required → none
+                const groups: { method: string; labelZh: string; labelEn: string; accent: string }[] = [
+                  { method: "applicant_requests", labelZh: "学生主动申请", labelEn: "You Request", accent: "text-amber-600" },
+                  { method: "school_contacts",    labelZh: "学校主动联系", labelEn: "School Contacts You", accent: "text-blue-600" },
+                  { method: "required",            labelZh: "必须参加",     labelEn: "Required", accent: "text-red-600" },
+                  { method: "none",                labelZh: "不提供面试",   labelEn: "Not Available", accent: "text-stone-400" },
+                ];
+                return (
+                  <div className="space-y-8">
+                    {groups.map(({ method, labelZh, labelEn, accent }) => {
+                      const group = filteredInterviews
+                        .filter(s => s.requestMethod === method)
+                        .sort((a, b) => a.rank - b.rank);
+                      if (group.length === 0) return null;
+                      return (
+                        <section key={method}>
+                          <div className="flex items-center gap-3 mb-3">
+                            <span className={`text-[11px] uppercase tracking-widest font-semibold ${accent}`}>
+                              {lang === "zh" ? labelZh : labelEn}
+                            </span>
+                            <span className="text-[10px] text-stone-400 bg-stone-100 px-1.5 py-0.5 rounded-full">{group.length}</span>
+                            <div className="flex-1 h-px bg-stone-100" />
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {group.map((s) => <InterviewCard key={s.id} school={s} t={t} lang={lang} />)}
+                          </div>
+                        </section>
+                      );
+                    })}
+                    {filteredInterviews.length === 0 && (
+                      <div className="py-12 text-center text-stone-400">
+                        <p className="text-xs">{lang === "zh" ? "没有匹配的学校" : "No matching schools"}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* Disclaimer */}
               <div className="mt-6 p-3 bg-stone-50 border border-stone-100 flex gap-2">
