@@ -107,6 +107,11 @@ const T: Record<Lang, Record<string, string>> = {
     interviewFilterAvailable: "提供面试",
     interviewFilterNone: "不提供面试",
     interviewFilterNearDeadline: "近期截止（30天内）",
+    interviewMethodFilterLabel: "申请方式",
+    interviewMethodFilterAll: "全部方式",
+    interviewMethodFilterSchool: "学校主动联系",
+    interviewMethodFilterApplicant: "学生主动申请",
+    interviewMethodFilterRequired: "必须参加",
     interviewSearchPlaceholder: "搜索学校名称",
     interviewNote: "面试信息仅供参考，请以各校官网最新政策为准。部分面试名额有限，建议尽早申请。",
     interviewCount: "所学校面试信息",
@@ -185,6 +190,11 @@ const T: Record<Lang, Record<string, string>> = {
     interviewFilterAvailable: "Available",
     interviewFilterNone: "Not Available",
     interviewFilterNearDeadline: "Deadline ≤30 Days",
+    interviewMethodFilterLabel: "Request Method",
+    interviewMethodFilterAll: "All Methods",
+    interviewMethodFilterSchool: "School Contacts You",
+    interviewMethodFilterApplicant: "You Request",
+    interviewMethodFilterRequired: "Required",
     interviewSearchPlaceholder: "Search school name",
     interviewNote: "Interview information is for reference only. Please verify the latest policies on each school's official website. Some interview slots are limited — apply early.",
     interviewCount: "schools with interview info",
@@ -1191,6 +1201,7 @@ export default function Home() {
   const [selectedSessions, setSelectedSessions] = useState<Set<string>>(new Set());
   const [interviewSearch, setInterviewSearch] = useState("");
   const [interviewFilter, setInterviewFilter] = useState<"all" | "available" | "none" | "near_deadline">("all");
+  const [interviewMethodFilter, setInterviewMethodFilter] = useState<"all" | "school_contacts" | "applicant_requests" | "required">("all");
 
   const t = T[lang] as typeof T["zh"];
 
@@ -1328,14 +1339,17 @@ export default function Home() {
         (interviewFilter === "available" && s.available) ||
         (interviewFilter === "none" && !s.available) ||
         (interviewFilter === "near_deadline" && isNearDeadline);
+      const matchMethod =
+        interviewMethodFilter === "all" ||
+        s.requestMethod === interviewMethodFilter;
       const q = interviewSearch.toLowerCase();
       const matchSearch =
         !q ||
         s.schoolName.toLowerCase().includes(q) ||
         (s.shortName?.toLowerCase().includes(q) ?? false);
-      return matchFilter && matchSearch;
+      return matchFilter && matchMethod && matchSearch;
     });
-  }, [interviewSearch, interviewFilter]);
+  }, [interviewSearch, interviewFilter, interviewMethodFilter]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -1499,29 +1513,59 @@ export default function Home() {
 
             {/* Interview filter */}
             {view === "interviews" && (
-              <div>
-                <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
-                  {lang === "zh" ? "面试状态" : "Status"}
-                </label>
-                <div className="space-y-0.5">
-                  {([
-                    { value: "all" as const, label: t.interviewFilterAll },
-                    { value: "available" as const, label: t.interviewFilterAvailable },
-                    { value: "near_deadline" as const, label: t.interviewFilterNearDeadline },
-                    { value: "none" as const, label: t.interviewFilterNone },
-                  ]).map((opt) => (
-                    <button
-                      key={opt.value}
-                      onClick={() => setInterviewFilter(opt.value)}
-                      className={`w-full text-left text-xs px-2 py-1.5 transition-colors ${
-                        interviewFilter === opt.value
-                          ? "bg-stone-900 text-white"
-                          : "text-stone-500 hover:bg-stone-50"
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
+              <div className="space-y-4">
+                {/* Status filter */}
+                <div>
+                  <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
+                    {lang === "zh" ? "面试状态" : "Status"}
+                  </label>
+                  <div className="space-y-0.5">
+                    {([
+                      { value: "all" as const, label: t.interviewFilterAll },
+                      { value: "available" as const, label: t.interviewFilterAvailable },
+                      { value: "near_deadline" as const, label: t.interviewFilterNearDeadline },
+                      { value: "none" as const, label: t.interviewFilterNone },
+                    ]).map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setInterviewFilter(opt.value)}
+                        className={`w-full text-left text-xs px-2 py-1.5 transition-colors ${
+                          interviewFilter === opt.value
+                            ? "bg-stone-900 text-white"
+                            : "text-stone-500 hover:bg-stone-50"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Method filter */}
+                <div>
+                  <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
+                    {t.interviewMethodFilterLabel}
+                  </label>
+                  <div className="space-y-0.5">
+                    {([
+                      { value: "all" as const, label: t.interviewMethodFilterAll },
+                      { value: "school_contacts" as const, label: t.interviewMethodFilterSchool },
+                      { value: "applicant_requests" as const, label: t.interviewMethodFilterApplicant },
+                      { value: "required" as const, label: t.interviewMethodFilterRequired },
+                    ]).map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setInterviewMethodFilter(opt.value)}
+                        className={`w-full text-left text-xs px-2 py-1.5 transition-colors ${
+                          interviewMethodFilter === opt.value
+                            ? "bg-stone-900 text-white"
+                            : "text-stone-500 hover:bg-stone-50"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
