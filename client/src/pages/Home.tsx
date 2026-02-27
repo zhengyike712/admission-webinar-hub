@@ -31,6 +31,10 @@ import {
   UserCheck,
   UserX,
   Info,
+  Share2,
+  Copy,
+  Check,
+  Twitter,
 } from "lucide-react";
 
 type ViewMode = "sessions" | "schools" | "interviews";
@@ -1190,6 +1194,101 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
   );
 }
 
+// ── Share Button ────────────────────────────────────────────
+function ShareButton({ lang }: { lang: Lang }) {
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [showQR, setShowQR] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const siteUrl = window.location.origin;
+  const siteTitle = lang === "zh" ? "景深留学 · 好信息，早知道" : "JingShen Study Abroad · Know More, Know Earlier";
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+        setShowQR(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  function copyLink() {
+    navigator.clipboard.writeText(siteUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(siteTitle)}&url=${encodeURIComponent(siteUrl)}`;
+  const wechatQRUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(siteUrl)}`;
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => { setOpen(v => !v); setShowQR(false); }}
+        className="flex items-center gap-1.5 text-[11px] text-stone-500 hover:text-stone-800 transition-colors border border-stone-200 px-2.5 py-1 hover:border-stone-400 bg-white"
+        title={lang === "zh" ? "分享本站" : "Share this site"}
+      >
+        <Share2 size={11} />
+        <span className="hidden sm:inline">{lang === "zh" ? "分享" : "Share"}</span>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-1 bg-white border border-stone-200 shadow-lg z-50 w-48 overflow-hidden">
+          {!showQR ? (
+            <>
+              {/* Copy link */}
+              <button
+                onClick={copyLink}
+                className="flex items-center gap-2.5 w-full px-3 py-2.5 text-xs text-stone-700 hover:bg-stone-50 transition-colors"
+              >
+                {copied ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                <span>{copied ? (lang === "zh" ? "已复制链接" : "Copied!") : (lang === "zh" ? "复制链接" : "Copy link")}</span>
+              </button>
+              <div className="h-px bg-stone-100" />
+              {/* WeChat QR */}
+              <button
+                onClick={() => setShowQR(true)}
+                className="flex items-center gap-2.5 w-full px-3 py-2.5 text-xs text-stone-700 hover:bg-stone-50 transition-colors"
+              >
+                <span className="text-[11px] font-bold text-green-600 w-3.5">微</span>
+                <span>{lang === "zh" ? "分享到微信" : "Share to WeChat"}</span>
+              </button>
+              <div className="h-px bg-stone-100" />
+              {/* Twitter/X */}
+              <button
+                onClick={() => { window.open(twitterUrl, "_blank"); setOpen(false); }}
+                className="flex items-center gap-2.5 w-full px-3 py-2.5 text-xs text-stone-700 hover:bg-stone-50 transition-colors"
+              >
+                <Twitter size={13} className="text-stone-500" />
+                <span>{lang === "zh" ? "分享到 X / Twitter" : "Share to X / Twitter"}</span>
+              </button>
+            </>
+          ) : (
+            <div className="p-3 flex flex-col items-center gap-2">
+              <p className="text-[10px] text-stone-500">{lang === "zh" ? "微信扫一扫分享" : "Scan with WeChat"}</p>
+              <img
+                src={wechatQRUrl}
+                alt="WeChat QR Code"
+                className="w-32 h-32 border border-stone-100"
+              />
+              <p className="text-[9px] text-stone-400 break-all text-center">{siteUrl}</p>
+              <button
+                onClick={() => setShowQR(false)}
+                className="text-[10px] text-stone-400 hover:text-stone-600 mt-1"
+              >
+                {lang === "zh" ? "返回" : "Back"}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main Page ─────────────────────────────────────────────────
 export default function Home() {
   const [view, setView] = useState<ViewMode>("interviews");
@@ -1367,31 +1466,9 @@ export default function Home() {
             <span className="text-sm font-bold tracking-tight text-stone-900">景深留学</span>
             <span className="hidden sm:block text-xs text-stone-400">{t.tagline}</span>
           </div>
-          <div className="flex items-center gap-3">
-            {/* Region tabs */}
-            <div className="hidden md:flex items-center gap-1">
-              {regionOptions.filter(r => r.value !== "All").map((r) => (
-                <button
-                  key={r.value}
-                  onClick={() => setRegionFilter(r.value)}
-                  className={`text-[10px] px-2 py-0.5 transition-colors ${
-                    regionFilter === r.value
-                      ? "bg-stone-900 text-white"
-                      : "border border-stone-200 text-stone-400 hover:border-stone-400 hover:text-stone-600"
-                  }`}
-                >
-                  {r.label}
-                </button>
-              ))}
-            </div>
-            {/* Language toggle */}
-            <button
-              onClick={() => setLang(lang === "zh" ? "en" : "zh")}
-              className="flex items-center gap-1 text-[11px] text-stone-400 hover:text-stone-700 transition-colors border border-stone-200 px-2 py-0.5 hover:border-stone-400"
-            >
-              <Globe size={10} />
-              {lang === "zh" ? "EN" : "中文"}
-            </button>
+          <div className="flex items-center gap-2">
+            {/* Share button */}
+            <ShareButton lang={lang} />
             <button
               className="sm:hidden text-stone-500"
               onClick={() => setMobileFilterOpen(true)}
