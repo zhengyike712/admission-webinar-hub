@@ -40,9 +40,9 @@ type Lang = "zh" | "en";
 const T: Record<Lang, Record<string, string>> = {
   zh: {
     tagline: "全球高校招生公开信息平台",
-    heroTitle: "招生 Virtual Info Session",
+    heroTitle: "好信息，早知道",
     heroDesc: "汇聚各校招生官（AO）主持的线上宣讲活动，一键直达官方报名入口",
-    mission: "好信息，早知道",
+    mission: "",
     tabSessions: "活动日程",
     tabSchools: "学校目录",
     tabInterviews: "面试入口",
@@ -1129,7 +1129,7 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
                   <circle cx="9" cy="9" r="4.5" stroke="#111" strokeWidth="1.2" />
                   <circle cx="9" cy="9" r="1.5" fill="#111" />
                 </svg>
-                <span className="text-sm font-bold text-stone-900">AdmitLens</span>
+                <span className="text-sm font-bold text-stone-900">景深留学</span>
               </div>
               <p className="text-xs text-stone-400">
                 {lang === "zh" ? "欢迎使用，这里是你了解顶尖大学招生的第一手窗口" : "Welcome — your direct window into top university admissions"}
@@ -1364,7 +1364,7 @@ export default function Home() {
               <circle cx="9" cy="9" r="4.5" stroke="#111" strokeWidth="1.2" />
               <circle cx="9" cy="9" r="1.5" fill="#111" />
             </svg>
-            <span className="text-sm font-bold tracking-tight text-stone-900">AdmitLens</span>
+            <span className="text-sm font-bold tracking-tight text-stone-900">景深留学</span>
             <span className="hidden sm:block text-xs text-stone-400">{t.tagline}</span>
           </div>
           <div className="flex items-center gap-3">
@@ -1820,7 +1820,7 @@ export default function Home() {
                   <circle cx="9" cy="9" r="4.5" stroke="#111" strokeWidth="1.2" />
                   <circle cx="9" cy="9" r="1.5" fill="#111" />
                 </svg>
-                <div className="text-sm font-bold text-stone-900">AdmitLens</div>
+                <div className="text-sm font-bold text-stone-900">景深留学</div>
               </div>
               <div className="text-[11px] text-stone-400 leading-relaxed">
                 {t.footerBrand}
