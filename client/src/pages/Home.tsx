@@ -1202,6 +1202,12 @@ function ShareButton({ lang }: { lang: Lang }) {
   const ref = useRef<HTMLDivElement>(null);
   const siteUrl = window.location.origin;
   const siteTitle = lang === "zh" ? "景深留学 · 好信息，早知道" : "JingShen Study Abroad · Know More, Know Earlier";
+  const siteDesc = lang === "zh"
+    ? "汇聙70+所美国顶尖院校面试政策和招生官线上宣讲活动，一站直达报名入口"
+    : "70+ US top university interview policies & info sessions in one place";
+
+  // 检测是否支持 Web Share API
+  const canNativeShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -1221,13 +1227,33 @@ function ShareButton({ lang }: { lang: Lang }) {
     });
   }
 
+  async function handleShareClick() {
+    // 移动端：优先调用系统原生分享菜单
+    if (canNativeShare) {
+      try {
+        await navigator.share({
+          title: siteTitle,
+          text: siteDesc,
+          url: siteUrl,
+        });
+        return;
+      } catch (err) {
+        // 用户取消分享或不支持，降级到自定义下拉菜单
+        if ((err as Error).name === "AbortError") return;
+      }
+    }
+    // 桌面端：展开自定义下拉菜单
+    setOpen(v => !v);
+    setShowQR(false);
+  }
+
   const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(siteTitle)}&url=${encodeURIComponent(siteUrl)}`;
   const wechatQRUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(siteUrl)}`;
 
   return (
     <div className="relative" ref={ref}>
       <button
-        onClick={() => { setOpen(v => !v); setShowQR(false); }}
+        onClick={handleShareClick}
         className="flex items-center gap-1.5 text-[11px] text-stone-500 hover:text-stone-800 transition-colors border border-stone-200 px-2.5 py-1 hover:border-stone-400 bg-white"
         title={lang === "zh" ? "分享本站" : "Share this site"}
       >
