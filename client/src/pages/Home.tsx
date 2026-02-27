@@ -109,6 +109,11 @@ const T: Record<Lang, Record<string, string>> = {
     interviewSearchPlaceholder: "搜索学校名称",
     interviewNote: "面试信息仅供参考，请以各校官网最新政策为准。部分面试名额有限，建议尽早申请。",
     interviewCount: "所学校面试信息",
+    interviewDeadlineLabel: "报名截止",
+    interviewAddDeadlineCal: "截止日提醒",
+    interviewDeadlineGoogleCal: "Google 日历",
+    interviewDeadlineICS: "Apple / Outlook (.ics)",
+    interviewDeadlineTitle: "面试报名截止",
   },
   en: {
     tagline: "Global University Admissions Info Hub",
@@ -181,6 +186,11 @@ const T: Record<Lang, Record<string, string>> = {
     interviewSearchPlaceholder: "Search school name",
     interviewNote: "Interview information is for reference only. Please verify the latest policies on each school's official website. Some interview slots are limited — apply early.",
     interviewCount: "schools with interview info",
+    interviewDeadlineLabel: "Deadline",
+    interviewAddDeadlineCal: "Add Deadline",
+    interviewDeadlineGoogleCal: "Google Calendar",
+    interviewDeadlineICS: "Apple / Outlook (.ics)",
+    interviewDeadlineTitle: "Interview Request Deadline",
   },
 } as const;
 
@@ -665,6 +675,101 @@ function SchoolCard({ school, t }: { school: School; t: typeof T["zh"] }) {
 }
 
 // ── Interview Card ──────────────────────────────────────────────
+function buildInterviewDeadlineICS(school: SchoolInterview, titleLabel: string): string {
+  const deadline = school.deadline!;
+  // All-day event on the deadline date
+  const dateCompact = deadline.replace(/-/g, "");
+  const title = `${titleLabel}: ${school.shortName || school.schoolName}`;
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//AdmitLens//EN",
+    "CALSCALE:GREGORIAN",
+    "BEGIN:VEVENT",
+    `DTSTART;VALUE=DATE:${dateCompact}`,
+    `DTEND;VALUE=DATE:${dateCompact}`,
+    `SUMMARY:${title.replace(/,/g, "\\,")}`,
+    `DESCRIPTION:${school.portalUrl}`,
+    `URL:${school.portalUrl}`,
+    `UID:interview-deadline-${school.id}@admitlens`,
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\r\n");
+}
+
+function buildInterviewDeadlineGoogleUrl(school: SchoolInterview, titleLabel: string): string {
+  const deadline = school.deadline!;
+  const dateCompact = deadline.replace(/-/g, "");
+  const title = `${titleLabel}: ${school.shortName || school.schoolName}`;
+  // For all-day events Google Calendar uses YYYYMMDD/YYYYMMDD (same day)
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: title,
+    dates: `${dateCompact}/${dateCompact}`,
+    details: school.portalUrl,
+    location: school.portalUrl,
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+function InterviewDeadlineCalButton({ school, t }: { school: SchoolInterview; t: typeof T["zh"] }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  function downloadICS() {
+    const ics = buildInterviewDeadlineICS(school, t.interviewDeadlineTitle);
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `interview-deadline-${school.id}.ics`;
+    link.click();
+    setOpen(false);
+  }
+
+  const googleUrl = buildInterviewDeadlineGoogleUrl(school, t.interviewDeadlineTitle);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1 text-[10px] text-amber-600 hover:text-amber-800 border border-amber-200 hover:border-amber-400 bg-amber-50 px-1.5 py-0.5 transition-colors"
+        title={t.interviewAddDeadlineCal}
+      >
+        <CalendarPlus size={9} />
+        {t.interviewAddDeadlineCal}
+        <ChevronDown size={8} className={`transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute bottom-full left-0 mb-1 bg-white border border-stone-200 shadow-md z-20 overflow-hidden min-w-[160px]">
+          <button
+            onClick={() => { window.open(googleUrl, "_blank"); setOpen(false); }}
+            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-stone-700 hover:bg-stone-50 transition-colors"
+          >
+            <span className="text-[11px] font-semibold text-red-500 w-4">G</span>
+            {t.interviewDeadlineGoogleCal}
+          </button>
+          <div className="h-px bg-stone-100" />
+          <button
+            onClick={downloadICS}
+            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-stone-700 hover:bg-stone-50 transition-colors"
+          >
+            <span className="text-[11px] font-semibold text-blue-500 w-4">↓</span>
+            {t.interviewDeadlineICS}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof T["zh"]; lang: Lang }) {
   const methodLabel = {
     school_contacts: t.interviewMethodSchool,
@@ -674,6 +779,23 @@ function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof
   }[school.requestMethod];
 
   const notes = lang === "zh" ? school.notesZh : school.notesEn;
+
+  // Format deadline for display
+  const deadlineDisplay = school.deadline
+    ? new Date(school.deadline + "T12:00:00Z").toLocaleDateString(lang === "zh" ? "zh-CN" : "en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : null;
+
+  // Determine if deadline is approaching (within 30 days)
+  const deadlineUrgent = school.deadline
+    ? (() => {
+        const diff = new Date(school.deadline + "T12:00:00Z").getTime() - Date.now();
+        return diff > 0 && diff < 30 * 86400000;
+      })()
+    : false;
 
   return (
     <div className={`bg-white border transition-colors duration-150 ${
@@ -735,6 +857,23 @@ function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof
           <div className="mb-2">
             <div className="text-[10px] uppercase tracking-widest text-stone-400 mb-0.5">{t.interviewTimingLabel}</div>
             <div className="text-[11px] text-stone-600 leading-relaxed">{school.timing}</div>
+          </div>
+        )}
+
+        {/* Deadline badge + calendar button */}
+        {school.available && school.requestMethod === "applicant_requests" && deadlineDisplay && (
+          <div className="mb-2 flex items-center gap-2 flex-wrap">
+            <div className={`flex items-center gap-1 text-[11px] px-1.5 py-0.5 border ${
+              deadlineUrgent
+                ? "bg-red-50 text-red-700 border-red-200"
+                : "bg-amber-50 text-amber-700 border-amber-200"
+            }`}>
+              <Clock size={9} />
+              <span className="font-medium">{t.interviewDeadlineLabel}:</span>
+              <span>{deadlineDisplay}</span>
+              {deadlineUrgent && <span className="ml-0.5 text-red-600 font-semibold">⚠</span>}
+            </div>
+            <InterviewDeadlineCalButton school={school} t={t} />
           </div>
         )}
 
@@ -958,10 +1097,12 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
     { icon: "🌍", title: "覆盖全球顶校", desc: "美国、英国、香港、澳大利亚顶尖院校，持续扩展中" },
     { icon: "🕐", title: "自动时区转换", desc: "活动时间自动转换为你的本地时区，无需手动换算" },
     { icon: "📅", title: "日历导出 · 支持批量", desc: "勾选多场活动一键批量导出 .ics，或单独添加至 Google / Apple / Outlook" },
+    { icon: "🤝", title: "面试入口", desc: "40+ 所美国顶尖院校面试政策，一键直达报名入口，支持截止日期日历提醒" },
   ] : [
     { icon: "🌍", title: "Global Coverage", desc: "US, UK, Hong Kong, Australia — and growing" },
     { icon: "🕐", title: "Auto Timezone", desc: "Event times are automatically converted to your local timezone" },
     { icon: "📅", title: "Calendar Export · Batch", desc: "Select multiple events and export as one .ics, or add individually to Google / Apple / Outlook" },
+    { icon: "🤝", title: "Interview Portal", desc: "40+ US schools' interview policies, direct signup links, and deadline calendar reminders" },
   ];
 
   return (
@@ -1004,8 +1145,8 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
               ))}
             </div>
           </div>
-          {/* Feature cards — 3 columns */}
-          <div className="grid grid-cols-3 gap-2 mb-5">
+          {/* Feature cards — 2x2 grid */}
+          <div className="grid grid-cols-2 gap-2 mb-5">
             {features.map((f) => (
               <div key={f.title} className="border border-stone-100 p-2.5 hover:border-stone-300 transition-colors">
                 <div className="text-base mb-1">{f.icon}</div>

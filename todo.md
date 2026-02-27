@@ -47,3 +47,10 @@
 
 - [x] 调研美国顶尖本科院校面试政策和报名入口链接（20 所学校：哈佛、耶鲁、普林斯顿、MIT、斯坦福、杜克、达特茅斯等）
 - [x] 将面试数据整合到网站，添加「面试入口」第三标签页（含搜索/筛选、卡片展示、直达报名链接）
+
+## 面试入口扩充（第二轮）
+
+- [x] 扩充面试学校数据至 40+ 所（新增 Tufts、Colby、Hamilton、Vassar、Swarthmore、Colgate、Wellesley、Pomona 等，共 42 所）
+- [x] 为主动申请面试的学校添加截止日期字段（deadline）
+- [x] InterviewCard 组件：展示截止日期，支持添加到 Google Calendar / 下载 .ics
+- [x] 更新 Onboarding 引导卡：加入「面试入口」功能介绍卡片（2x2 卡片布局）
