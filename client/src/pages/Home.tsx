@@ -106,6 +106,7 @@ const T: Record<Lang, Record<string, string>> = {
     interviewFilterAll: "全部",
     interviewFilterAvailable: "提供面试",
     interviewFilterNone: "不提供面试",
+    interviewFilterNearDeadline: "近期截止（30天内）",
     interviewSearchPlaceholder: "搜索学校名称",
     interviewNote: "面试信息仅供参考，请以各校官网最新政策为准。部分面试名额有限，建议尽早申请。",
     interviewCount: "所学校面试信息",
@@ -183,6 +184,7 @@ const T: Record<Lang, Record<string, string>> = {
     interviewFilterAll: "All",
     interviewFilterAvailable: "Available",
     interviewFilterNone: "Not Available",
+    interviewFilterNearDeadline: "Deadline ≤30 Days",
     interviewSearchPlaceholder: "Search school name",
     interviewNote: "Interview information is for reference only. Please verify the latest policies on each school's official website. Some interview slots are limited — apply early.",
     interviewCount: "schools with interview info",
@@ -1097,12 +1099,12 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
     { icon: "🌍", title: "覆盖全球顶校", desc: "美国、英国、香港、澳大利亚顶尖院校，持续扩展中" },
     { icon: "🕐", title: "自动时区转换", desc: "活动时间自动转换为你的本地时区，无需手动换算" },
     { icon: "📅", title: "日历导出 · 支持批量", desc: "勾选多场活动一键批量导出 .ics，或单独添加至 Google / Apple / Outlook" },
-    { icon: "🤝", title: "面试入口", desc: "40+ 所美国顶尖院校面试政策，一键直达报名入口，支持截止日期日历提醒" },
+    { icon: "🤝", title: "面试入口", desc: "70+ 所美国顶尖院校面试政策，一键直达报名入口，支持截止日期日历提醒" },
   ] : [
     { icon: "🌍", title: "Global Coverage", desc: "US, UK, Hong Kong, Australia — and growing" },
     { icon: "🕐", title: "Auto Timezone", desc: "Event times are automatically converted to your local timezone" },
     { icon: "📅", title: "Calendar Export · Batch", desc: "Select multiple events and export as one .ics, or add individually to Google / Apple / Outlook" },
-    { icon: "🤝", title: "Interview Portal", desc: "40+ US schools' interview policies, direct signup links, and deadline calendar reminders" },
+    { icon: "🤝", title: "Interview Portal", desc: "70+ US schools' interview policies, direct signup links, and deadline calendar reminders" },
   ];
 
   return (
@@ -1180,7 +1182,7 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
 
 // ── Main Page ─────────────────────────────────────────────────
 export default function Home() {
-  const [view, setView] = useState<ViewMode>("sessions");
+  const [view, setView] = useState<ViewMode>("interviews");
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<SessionType | "All">("All");
   const [regionFilter, setRegionFilter] = useState<Region | "All">("All");
@@ -1188,7 +1190,7 @@ export default function Home() {
   const [lang, setLang] = useState<Lang>("zh");
   const [selectedSessions, setSelectedSessions] = useState<Set<string>>(new Set());
   const [interviewSearch, setInterviewSearch] = useState("");
-  const [interviewFilter, setInterviewFilter] = useState<"all" | "available" | "none">("all");
+  const [interviewFilter, setInterviewFilter] = useState<"all" | "available" | "none" | "near_deadline">("all");
 
   const t = T[lang] as typeof T["zh"];
 
@@ -1315,10 +1317,17 @@ export default function Home() {
 
   const filteredInterviews = useMemo(() => {
     return interviewData.filter((s) => {
+      const isNearDeadline = s.deadline
+        ? (() => {
+            const diff = new Date(s.deadline + "T12:00:00Z").getTime() - Date.now();
+            return diff > 0 && diff < 30 * 86400000;
+          })()
+        : false;
       const matchFilter =
         interviewFilter === "all" ||
         (interviewFilter === "available" && s.available) ||
-        (interviewFilter === "none" && !s.available);
+        (interviewFilter === "none" && !s.available) ||
+        (interviewFilter === "near_deadline" && isNearDeadline);
       const q = interviewSearch.toLowerCase();
       const matchSearch =
         !q ||
@@ -1394,6 +1403,16 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex">
             <button
+              onClick={() => setView("interviews")}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                view === "interviews"
+                  ? "border-stone-900 text-stone-900"
+                  : "border-transparent text-stone-400 hover:text-stone-600"
+              }`}
+            >
+              {t.tabInterviews}
+            </button>
+            <button
               onClick={() => setView("sessions")}
               className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 view === "sessions"
@@ -1412,16 +1431,6 @@ export default function Home() {
               }`}
             >
               {t.tabSchools}
-            </button>
-            <button
-              onClick={() => setView("interviews")}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                view === "interviews"
-                  ? "border-stone-900 text-stone-900"
-                  : "border-transparent text-stone-400 hover:text-stone-600"
-              }`}
-            >
-              {t.tabInterviews}
             </button>
           </div>
         </div>
@@ -1498,6 +1507,7 @@ export default function Home() {
                   {([
                     { value: "all" as const, label: t.interviewFilterAll },
                     { value: "available" as const, label: t.interviewFilterAvailable },
+                    { value: "near_deadline" as const, label: t.interviewFilterNearDeadline },
                     { value: "none" as const, label: t.interviewFilterNone },
                   ]).map((opt) => (
                     <button
@@ -1631,7 +1641,7 @@ export default function Home() {
               </div>
 
               {/* Stats bar */}
-              <div className="flex gap-4 mb-4 p-3 bg-stone-50 border border-stone-100">
+              <div className="flex gap-4 mb-4 p-3 bg-stone-50 border border-stone-100 flex-wrap">
                 <div className="flex items-center gap-1.5 text-xs">
                   <UserCheck size={12} className="text-green-600" />
                   <span className="text-stone-600 font-medium">{interviewData.filter(s => s.available).length}</span>
@@ -1642,6 +1652,22 @@ export default function Home() {
                   <span className="text-stone-600 font-medium">{interviewData.filter(s => !s.available).length}</span>
                   <span className="text-stone-400">{lang === "zh" ? "不提供" : "no interview"}</span>
                 </div>
+                {(() => {
+                  const nearCount = interviewData.filter(s => s.deadline && (() => {
+                    const diff = new Date(s.deadline + "T12:00:00Z").getTime() - Date.now();
+                    return diff > 0 && diff < 30 * 86400000;
+                  })()).length;
+                  return nearCount > 0 ? (
+                    <button
+                      onClick={() => setInterviewFilter("near_deadline")}
+                      className="flex items-center gap-1.5 text-xs cursor-pointer hover:opacity-80 transition-opacity"
+                    >
+                      <Clock size={12} className="text-red-500" />
+                      <span className="text-red-600 font-semibold">{nearCount}</span>
+                      <span className="text-red-500">{lang === "zh" ? "近期截止" : "deadline soon"}</span>
+                    </button>
+                  ) : null;
+                })()}
               </div>
 
               {/* Cards grid */}
