@@ -1124,11 +1124,7 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
           <div className="flex items-start justify-between mb-5">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                  <circle cx="9" cy="9" r="8" stroke="#111" strokeWidth="1.2" />
-                  <circle cx="9" cy="9" r="4.5" stroke="#111" strokeWidth="1.2" />
-                  <circle cx="9" cy="9" r="1.5" fill="#111" />
-                </svg>
+                <img src="https://d2xsxph8kpxj0f.cloudfront.net/310419663030279744/F6apVxHHK9H6xisJa5W5pf/jingshen-favicon-UDWygFdTBAmck6gTynjCG9.webp" alt="景深留学" className="w-4 h-4 rounded-sm object-cover" />
                 <span className="text-sm font-bold text-stone-900">景深留学</span>
               </div>
               <p className="text-xs text-stone-400">
@@ -1359,11 +1355,7 @@ export default function Home() {
       <header className="border-b border-stone-200 sticky top-0 z-50 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-12 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <circle cx="9" cy="9" r="8" stroke="#111" strokeWidth="1.2" />
-              <circle cx="9" cy="9" r="4.5" stroke="#111" strokeWidth="1.2" />
-              <circle cx="9" cy="9" r="1.5" fill="#111" />
-            </svg>
+            <img src="https://d2xsxph8kpxj0f.cloudfront.net/310419663030279744/F6apVxHHK9H6xisJa5W5pf/jingshen-favicon-UDWygFdTBAmck6gTynjCG9.webp" alt="景深留学" className="w-5 h-5 rounded-sm object-cover" />
             <span className="text-sm font-bold tracking-tight text-stone-900">景深留学</span>
             <span className="hidden sm:block text-xs text-stone-400">{t.tagline}</span>
           </div>
@@ -1815,11 +1807,7 @@ export default function Home() {
             {/* Brand */}
             <div className="shrink-0 max-w-xs">
               <div className="flex items-center gap-2 mb-2">
-                <svg width="14" height="14" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <circle cx="9" cy="9" r="8" stroke="#111" strokeWidth="1.2" />
-                  <circle cx="9" cy="9" r="4.5" stroke="#111" strokeWidth="1.2" />
-                  <circle cx="9" cy="9" r="1.5" fill="#111" />
-                </svg>
+                <img src="https://d2xsxph8kpxj0f.cloudfront.net/310419663030279744/F6apVxHHK9H6xisJa5W5pf/jingshen-favicon-UDWygFdTBAmck6gTynjCG9.webp" alt="景深留学" className="w-4 h-4 rounded-sm object-cover" />
                 <div className="text-sm font-bold text-stone-900">景深留学</div>
               </div>
               <div className="text-[11px] text-stone-400 leading-relaxed">
