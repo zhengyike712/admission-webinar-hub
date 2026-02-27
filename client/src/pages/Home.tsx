@@ -143,6 +143,8 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingStart: "开始探索",
     onboardingMotto: "好信息，早知道",
     onboardingDismiss: "不再显示",
+    mobileFilterBtn: "筛选",
+    mobileFilterTitle: "筛选",
   },
   en: {
     tagline: "Global University Admissions Info Hub",
@@ -245,6 +247,8 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingStart: "Start Exploring",
     onboardingMotto: "Better info. Earlier.",
     onboardingDismiss: "Don't show again",
+    mobileFilterBtn: "Filter",
+    mobileFilterTitle: "Filter",
   },
   hi: {
     tagline: "विश्वविद्यालय प्रवेश सूचना केंद्र",
@@ -347,6 +351,8 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingStart: "अन्वेषण शुरू करें",
     onboardingMotto: "अच्छी जानकारी। पहले।",
     onboardingDismiss: "फिर नहीं दिखाएं",
+    mobileFilterBtn: "फ़िल्टर",
+    mobileFilterTitle: "फ़िल्टर",
   },
 } as const;
 
@@ -1701,6 +1707,19 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ── Mobile Filter Bar ── */}
+      <div className="sm:hidden border-b border-stone-100 bg-white">
+        <div className="max-w-6xl mx-auto px-4 py-2">
+          <button
+            onClick={() => setMobileFilterOpen(true)}
+            className="flex items-center gap-2 text-xs text-stone-600 border border-stone-200 px-3 py-1.5 hover:border-stone-400 hover:text-stone-900 transition-colors"
+          >
+            <SlidersHorizontal size={12} />
+            <span>{t.mobileFilterBtn}</span>
+          </button>
+        </div>
+      </div>
+
       {/* ── Layout ── */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex gap-8">
 
@@ -1717,7 +1736,7 @@ export default function Home() {
           `}
         >
           <div className="flex items-center justify-between mb-4 sm:hidden">
-            <span className="text-sm font-medium text-stone-900">{lang === "zh" ? "筛选" : "Filter"}</span>
+            <span className="text-sm font-medium text-stone-900">{t.mobileFilterTitle}</span>
             <button onClick={() => setMobileFilterOpen(false)}>
               <X size={16} className="text-stone-400" />
             </button>
