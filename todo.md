@@ -110,3 +110,9 @@
 - [x] 在 Tab 栏下方添加「筛选」条形触发按钮（sm:hidden，三语言支持）
 - [x] 侧边栏遮罩层已存在（点击关闭）
 - [x] 侧边栏标题「筛选」文字接入 t.mobileFilterTitle（修复印地语硬编码）
+
+## 语言持久化 + OG 标签 + 截止日期核实
+
+- [x] 语言偏好 localStorage 持久化（刷新后恢复语言选择）
+- [x] 添加 Open Graph meta 标签（og:title, og:image, og:description, og:locale, twitter:card）
+- [x] 自动化截止日期核实：后端爬虫脚本 + 管理员触发 tRPC 接口 + 前端展示核实状态

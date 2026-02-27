@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `interview_verifications` (\n  `id` varchar(128) NOT NULL,\n  `schoolName` varchar(256) NOT NULL,\n  `portalUrl` text NOT NULL,\n  `verifiedDeadline` varchar(16),\n  `rawDeadlineText` text,\n  `matches` boolean,\n  `status` enum('ok','changed','not_found','error') NOT NULL DEFAULT 'ok',\n  `errorMessage` text,\n  `rawContent` text,\n  `lastVerifiedAt` timestamp NOT NULL DEFAULT (now()),\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  `updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `interview_verifications_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 28x4cWX34ZKHd6B.9c35f7d5c3f8 --database F6apVxHHK9H6xisJa5W5pf --execute CREATE TABLE IF NOT EXISTS `interview_verifications` (\n  `id` varchar(128) NOT NULL,\n  `schoolName` varchar(256) NOT NULL,\n  `portalUrl` text NOT NULL,\n  `verifiedDeadline` varchar(16),\n  `rawDeadlineText` text,\n  `matches` boolean,\n  `status` enum('ok','changed','not_found','error') NOT NULL DEFAULT 'ok',\n  `errorMessage` text,\n  `rawContent` text,\n  `lastVerifiedAt` timestamp NOT NULL DEFAULT (now()),\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  `updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `interview_verifications_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 578
+}

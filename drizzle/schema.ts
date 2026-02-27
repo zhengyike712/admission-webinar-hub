@@ -92,3 +92,31 @@ export const subscribers = mysqlTable("subscribers", {
 
 export type Subscriber = typeof subscribers.$inferSelect;
 export type InsertSubscriber = typeof subscribers.$inferInsert;
+
+/**
+ * interview_verifications table — stores the latest verification result
+ * for each school's interview deadline, updated by the deadline crawler.
+ */
+export const interviewVerifications = mysqlTable("interview_verifications", {
+  id: varchar("id", { length: 128 }).primaryKey(), // matches SchoolInterview.id
+  schoolName: varchar("schoolName", { length: 256 }).notNull(),
+  portalUrl: text("portalUrl").notNull(),
+  /** Verified deadline (YYYY-MM-DD), null if not found on page */
+  verifiedDeadline: varchar("verifiedDeadline", { length: 16 }),
+  /** Raw deadline text extracted from the page */
+  rawDeadlineText: text("rawDeadlineText"),
+  /** Whether the deadline matches the static data */
+  matches: boolean("matches"),
+  /** Verification status */
+  status: mysqlEnum("status", ["ok", "changed", "not_found", "error"]).notNull().default("ok"),
+  /** Error message if status is 'error' */
+  errorMessage: text("errorMessage"),
+  /** Truncated page content for debugging */
+  rawContent: text("rawContent"),
+  lastVerifiedAt: timestamp("lastVerifiedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type InterviewVerification = typeof interviewVerifications.$inferSelect;
+export type InsertInterviewVerification = typeof interviewVerifications.$inferInsert;
