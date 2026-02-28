@@ -1513,9 +1513,12 @@ export default function Home() {
   const [interviewMethodFilter, setInterviewMethodFilter] = useState<"all" | "school_contacts" | "applicant_requests" | "required">("all");
 
    const t = T[lang] as typeof T["zh"];
-  // ── document.title 随语言切换动态更新 ──
+  // ── document.title 和 html lang 随语言切换动态更新 ──
   useEffect(() => {
     document.title = t.siteTitle;
+    // 更新 <html lang> 属性，让屏幕阅读器和搜索引擎正确识别当前语言
+    const langMap: Record<Lang, string> = { zh: "zh-CN", en: "en", hi: "hi" };
+    document.documentElement.lang = langMap[lang];
   }, [lang, t.siteTitle]);
   // Fetch sessions from DB (falls back to static data if unavailable)
   const { data: dbData } = trpc.sessions.list.useQuery(

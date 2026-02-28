@@ -158,3 +158,7 @@
 ## 分享弹窗国际化
 
 - [x] 分享弹窗「复制链接」「微信」「X/Twitter」按鈕文案接入 T 对象，补充三语言翻试
+
+## html lang 属性动态化
+
+- [x] 主组件 useEffect 同步更新 document.documentElement.lang（zh/en/hi）
