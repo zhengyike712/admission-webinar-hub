@@ -14,6 +14,7 @@ import {
 } from "@/data/schools";
 import { interviewData, type SchoolInterview } from "@/data/interviews";
 import { trpc } from "@/lib/trpc";
+import { Streamdown } from "streamdown";
 import { Input } from "@/components/ui/input";
 import {
   Search,
@@ -716,12 +717,58 @@ function isExpiredSession(session: (typeof allSessions)[0]): boolean {
 }
 
 // ── Session Card (scheduled / fixed-date) ────────────────────
-function ScheduledSessionCard({ session, t, isSelected, onToggle }: { session: (typeof allSessions)[0]; t: typeof T["zh"]; isSelected?: boolean; onToggle?: (id: string) => void }) {
+function ScheduledSessionCard({ session, t, isSelected, onToggle, lang }: { session: (typeof allSessions)[0]; t: typeof T["zh"]; isSelected?: boolean; onToggle?: (id: string) => void; lang?: Lang }) {
   const school = schoolsMap[session.schoolId];
   const urgency = getUrgency(session);
   const nextDate = getNextDate(session);
   const expired = isExpiredSession(session);
   const localTime = session.time ? convertToLocalTime(session.time, session.dates?.[0]) : null;
+  const [showPrep, setShowPrep] = useState(false);
+  const [prepContent, setPrepContent] = useState<string | null>(null);
+  const [prepLoading, setPrepLoading] = useState(false);
+  const [prepError, setPrepError] = useState<"rate_limit" | "error" | null>(null);
+  const [prepResetAt, setPrepResetAt] = useState<number | null>(null);
+  const utils = trpc.useUtils();
+
+  const generatePrep = trpc.aiPrep.generate.useMutation({
+    onSuccess: (data) => {
+      const raw = data.content;
+      setPrepContent(typeof raw === "string" ? raw : JSON.stringify(raw));
+      setPrepLoading(false);
+      setPrepError(null);
+    },
+    onError: (err) => {
+      setPrepLoading(false);
+      try {
+        const parsed = JSON.parse(err.message);
+        if (parsed.reason === "rate_limit") {
+          setPrepError("rate_limit");
+          setPrepResetAt(parsed.resetAt);
+        } else {
+          setPrepError("error");
+        }
+      } catch {
+        setPrepError("error");
+      }
+    },
+  });
+
+  const handlePrepClick = () => {
+    if (prepContent) {
+      setShowPrep((v) => !v);
+      return;
+    }
+    setShowPrep(true);
+    setPrepLoading(true);
+    generatePrep.mutate({
+      sessionId: session.id,
+      schoolName: school?.name || "",
+      sessionTitle: session.title,
+      sessionType: session.type,
+      sessionDescription: session.description,
+      lang: (lang || "zh") as "zh" | "en" | "hi",
+    });
+  };
 
   return (
     <div className={`bg-white border transition-colors duration-150 relative ${
@@ -833,13 +880,65 @@ function ScheduledSessionCard({ session, t, isSelected, onToggle }: { session: (
             <ArrowUpRight size={10} />
           </a>
           <AddToCalendarButton session={session} school={school} compact t={t} />
+          {/* AI Prep button */}
+          <button
+            onClick={handlePrepClick}
+            className={`flex items-center gap-1 text-[10px] font-medium transition-colors duration-150 whitespace-nowrap ${
+              showPrep
+                ? "text-blue-600"
+                : "text-stone-400 hover:text-blue-600"
+            }`}
+          >
+            <span className="text-[9px]">✦</span>
+            {lang === "en" ? "AI Prep" : "AI 预习"}
+          </button>
         </div>
       </div>
+      {/* AI Prep panel */}
+      {showPrep && (
+        <div className="border-t border-blue-100 bg-blue-50/60 px-4 py-3">
+          {prepLoading && (
+            <div className="flex items-center gap-2 text-[11px] text-stone-500 py-2">
+              <svg className="animate-spin w-3 h-3 text-blue-500" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+              </svg>
+              {lang === "en" ? "Generating briefing…" : "AI 正在生成预习材料…"}
+            </div>
+          )}
+          {prepError === "rate_limit" && (
+            <div className="text-[11px] text-stone-600 py-2">
+              <p className="font-semibold text-amber-700 mb-1">
+                {lang === "en" ? "Daily limit reached (3/day free)" : "今日免费次数已用完（3次/天）"}
+              </p>
+              <p className="text-stone-500">
+                {lang === "en"
+                  ? "Pro plan coming soon — unlimited AI prep for all sessions."
+                  : "Pro 计划即将上线，无限次 AI 预习。"}
+              </p>
+              {prepResetAt && (
+                <p className="text-stone-400 mt-1">
+                  {lang === "en" ? "Resets at" : "重置时间"}: {new Date(prepResetAt).toLocaleString()}
+                </p>
+              )}
+            </div>
+          )}
+          {prepError === "error" && (
+            <p className="text-[11px] text-red-500 py-2">
+              {lang === "en" ? "Failed to generate. Please try again." : "生成失败，请稍后重试。"}
+            </p>
+          )}
+          {prepContent && (
+            <div className="text-[12px] leading-relaxed">
+              <Streamdown>{prepContent}</Streamdown>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
-
-// ── Rolling Entry Row ────────────────────────────────────────
+// ── Rolling Entry Roww ────────────────────────────────────────
 function RollingRow({ session, t }: { session: (typeof allSessions)[0]; t: typeof T["zh"] }) {
   const school = schoolsMap[session.schoolId];
   return (
@@ -925,6 +1024,74 @@ function SchoolCard({ school, t }: { school: School; t: typeof T["zh"] }) {
           <ExternalLink size={12} />
         </a>
       </div>
+    </div>
+  );
+}
+
+// ── Interview Prep Tools ──────────────────────────────────────
+const PREP_TOOLS: Record<string, { name: string; url: string; desc_zh: string; desc_en: string; color: string }[]> = {
+  default: [
+    { name: "Interview Warmup", url: "https://grow.google/certificates/interview-warmup/", desc_zh: "Google 官方面试练习工具，适合 behavioral 问题", desc_en: "Google's official practice tool, great for behavioral questions", color: "#4285F4" },
+    { name: "Yoodli", url: "https://app.yoodli.ai", desc_zh: "AI 实时反馈语言表达和流畅度", desc_en: "AI-powered speech coach with real-time feedback", color: "#7C3AED" },
+    { name: "Speeko", url: "https://www.speeko.co", desc_zh: "Public speaking 训练，提升表达自信", desc_en: "Public speaking trainer to build confidence", color: "#059669" },
+  ],
+  technical: [
+    { name: "Pramp", url: "https://www.pramp.com", desc_zh: "免费 peer-to-peer 技术面试练习", desc_en: "Free peer-to-peer technical interview practice", color: "#2563EB" },
+    { name: "Interview Warmup", url: "https://grow.google/certificates/interview-warmup/", desc_zh: "Google 官方面试练习工具", desc_en: "Google's official interview practice tool", color: "#4285F4" },
+    { name: "LeetCode", url: "https://leetcode.com", desc_zh: "算法题练习，适合技术面试备考", desc_en: "Algorithm practice for technical interviews", color: "#F97316" },
+  ],
+};
+
+const SCHOOL_PREP_STYLE: Record<string, "technical" | "default"> = {
+  "MIT": "technical",
+  "Caltech": "technical",
+  "Carnegie Mellon": "technical",
+  "Georgia Tech": "technical",
+};
+
+function InterviewPrepTools({ school, lang, t }: { school: SchoolInterview; lang: Lang; t: typeof T["zh"] }) {
+  const [open, setOpen] = useState(false);
+  const style = SCHOOL_PREP_STYLE[school.shortName || school.schoolName] || "default";
+  const tools = PREP_TOOLS[style];
+  return (
+    <div className="mt-3 border-t border-stone-100 pt-2">
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="flex items-center gap-1.5 text-[10px] text-stone-400 hover:text-blue-600 transition-colors w-full text-left"
+      >
+        <span className="text-[9px]">✦</span>
+        <span>{lang === "en" ? "Interview Prep Tools" : "备考工具"}</span>
+        <ChevronDown size={9} className={`ml-auto transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="mt-2 flex flex-col gap-1.5">
+          {tools.map((tool) => (
+            <a
+              key={tool.name}
+              href={tool.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-start gap-2 p-2 border border-stone-100 hover:border-stone-300 bg-stone-50 hover:bg-white transition-colors group"
+            >
+              <span
+                className="shrink-0 w-4 h-4 rounded-sm flex items-center justify-center text-[8px] font-bold text-white mt-0.5"
+                style={{ backgroundColor: tool.color }}
+              >
+                {tool.name[0]}
+              </span>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1">
+                  <span className="text-[11px] font-medium text-stone-800">{tool.name}</span>
+                  <ExternalLink size={8} className="text-stone-300 group-hover:text-stone-500 shrink-0" />
+                </div>
+                <p className="text-[10px] text-stone-400 leading-snug">
+                  {lang === "en" ? tool.desc_en : tool.desc_zh}
+                </p>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -1167,6 +1334,8 @@ function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof
             </a>
           </div>
         )}
+        {/* Prep Tools — only for schools with available interviews */}
+        {school.available && <InterviewPrepTools school={school} lang={lang} t={t} />}
       </div>
     </div>
   );
@@ -1954,6 +2123,32 @@ export default function Home() {
             },
           },
           {
+            id: "chrome",
+            name: "Chrome",
+            color: "bg-yellow-500",
+            icon: <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" fill="white" /><path d="M12 8a4 4 0 014 4h6a10 10 0 10-10 10V12" stroke="white" strokeWidth="1.5" strokeLinecap="round" /></svg>,
+            desc: zh ? "浏览器扩展 · 即将上线" : "Browser extension · Coming soon",
+            detail: {
+              title: zh ? "Chrome 扩展（即将上线）" : "Chrome Extension (Coming Soon)",
+              steps: zh
+                ? [
+                    "在任意网页上唤起景深留学侧边栏，无需切换标签页",
+                    "浏览学校官网时自动识别并匹配对应的 Info Session 和面试信息",
+                    "AI 跨页面跨标签页跟随分析，自动记笔并同步到 Notion/飞书",
+                    "支持在 ChatGPT / Perplexity 等 AI 工具内直接唤起景深留学数据面板",
+                  ]
+                : [
+                    "Summon AdmitLens sidebar on any webpage, no tab switching needed",
+                    "Auto-detect and match Info Sessions and interview info when browsing school sites",
+                    "AI cross-page analysis, auto note-taking synced to Notion/Feishu",
+                    "Invoke AdmitLens data panel directly inside ChatGPT / Perplexity",
+                  ],
+              code: `// 即将上线，欢迎预登记体验
+// Coming soon — join the waitlist below`,
+              externalHref: "/#waitlist",
+            },
+          },
+          {
             id: "api",
             name: "API",
             color: "bg-stone-700",
@@ -2430,7 +2625,7 @@ export default function Home() {
                       if (!db) return -1;
                       return da.getTime() - db.getTime();
                     })
-                    .map((s) => <ScheduledSessionCard key={s.id} session={s} t={t} isSelected={selectedSessions.has(s.id)} onToggle={toggleSelect} />)
+                    .map((s) => <ScheduledSessionCard key={s.id} session={s} t={t} lang={lang} isSelected={selectedSessions.has(s.id)} onToggle={toggleSelect} />)
                 ) : (
                   <div className="py-12 text-center text-stone-400">
                     <p className="text-xs">{t.noFixed}</p>
