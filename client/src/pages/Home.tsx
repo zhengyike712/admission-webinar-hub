@@ -150,6 +150,8 @@ const T: Record<Lang, Record<string, string>> = {
     siteDesc: "汇聚 70+ 所美国顶尖院校面试政策和招生官线上宣讲活动，一站直达报名入口",
     shareBtn: "分享",
     shareLabel: "分享本站",
+    onboardingSubtitle: "你了解顶尖大学招生的第一手窗口",
+    footerCopyright: "© 2026 景深留学。所有信息均来自各校官网。",
   },
   en: {
     tagline: "Global University Admissions Info Hub",
@@ -259,6 +261,8 @@ const T: Record<Lang, Record<string, string>> = {
     siteDesc: "70+ US top university interview policies & info sessions in one place",
     shareBtn: "Share",
     shareLabel: "Share this site",
+    onboardingSubtitle: "Your direct window into top university admissions",
+    footerCopyright: "© 2026 AdmitLens. All information sourced from official university websites.",
   },
   hi: {
     tagline: "विश्वविद्यालय प्रवेश सूचना केंद्र",
@@ -368,6 +372,8 @@ const T: Record<Lang, Record<string, string>> = {
     siteDesc: "70+ अमेरिकी विश्वविद्यालयों की इंटरव्यू नीति और वर्चुअल इन्फो सेशन एक जगह",
     shareBtn: "शेयर",
     shareLabel: "इस साइट को शेयर करें",
+    onboardingSubtitle: "शीर्ष विश्वविद्यालय प्रवेश की सीधी जानकारी",
+    footerCopyright: "© 2026 AdmitLens. सभी जानकारी विश्वविद्यालयों की आधिकारिक वेबसाइटों से ली गई है।",
   },
 } as const;
 
@@ -1284,7 +1290,7 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
                 <span className="text-sm font-bold text-stone-900">{t.brandName}</span>
               </div>
               <p className="text-xs text-stone-400">
-                {t.onboardingWelcome}
+                {t.onboardingSubtitle}
               </p>
             </div>
             <button onClick={dismiss} className="text-stone-300 hover:text-stone-600 transition-colors mt-0.5">
@@ -1479,8 +1485,11 @@ export default function Home() {
   const [interviewFilter, setInterviewFilter] = useState<"all" | "available" | "none" | "near_deadline">("all");
   const [interviewMethodFilter, setInterviewMethodFilter] = useState<"all" | "school_contacts" | "applicant_requests" | "required">("all");
 
-  const t = T[lang] as typeof T["zh"];
-
+   const t = T[lang] as typeof T["zh"];
+  // ── document.title 随语言切换动态更新 ──
+  useEffect(() => {
+    document.title = t.siteTitle;
+  }, [lang, t.siteTitle]);
   // Fetch sessions from DB (falls back to static data if unavailable)
   const { data: dbData } = trpc.sessions.list.useQuery(
     { region: "All" },
@@ -2145,6 +2154,9 @@ export default function Home() {
           <div className="border-t border-stone-100 pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[11px] text-stone-400">
             <span>{t.footerDisclaimer}</span>
             <span className="text-stone-300">{t.footerMotto}</span>
+          </div>
+          <div className="mt-3 text-[10px] text-stone-300 text-center sm:text-left">
+            {t.footerCopyright}
           </div>
         </div>
       </footer>
