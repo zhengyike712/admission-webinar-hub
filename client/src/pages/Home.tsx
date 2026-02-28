@@ -2762,8 +2762,8 @@ message = client.messages.create(
         </div>
       </div>
 
-      {/* ── View Toggle ── */}
-      <div className="hidden sm:block border-b border-stone-200 bg-white sticky top-12 z-40">
+      {/* ── View Toggle — mobile only (sm:hidden), desktop uses 3-column layout ── */}
+      <div className="sm:hidden border-b border-stone-200 bg-white sticky top-12 z-40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex">
             <button
@@ -2978,8 +2978,144 @@ message = client.messages.create(
           />
         )}
 
-        {/* ── Content ── */}
+        {/* ── Content: 3-column on desktop ── */}
         <main className="flex-1 min-w-0">
+          {/* Desktop: 3-column side-by-side */}
+          <div className="hidden sm:grid grid-cols-3 gap-4">
+
+            {/* Column 1: Interviews */}
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-[11px] uppercase tracking-widest text-stone-800 font-semibold">{t.tabInterviews}</span>
+                <div className="flex-1 h-px bg-stone-100" />
+              </div>
+              {/* Interview search */}
+              <div className="relative mb-3">
+                <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-300" />
+                <Input
+                  placeholder={t.interviewSearchPlaceholder}
+                  value={interviewSearch}
+                  onChange={(e) => setInterviewSearch(e.target.value)}
+                  className="pl-8 h-7 text-xs border-stone-200 rounded-none focus-visible:ring-0 focus-visible:border-stone-900"
+                />
+              </div>
+              {/* Interview content */}
+              {(() => {
+                const isFiltered = interviewFilter !== "all" || interviewMethodFilter !== "all" || interviewSearch.trim() !== "";
+                if (isFiltered) {
+                  const sorted = [...filteredInterviews].sort((a, b) => {
+                    if (a.available && !b.available) return -1;
+                    if (!a.available && b.available) return 1;
+                    return a.rank - b.rank;
+                  });
+                  return sorted.length === 0 ? (
+                    <div className="py-8 text-center text-stone-400"><p className="text-xs">{t.noMatchSchool}</p></div>
+                  ) : (
+                    <div className="border border-stone-100">
+                      {sorted.map((s) => <InterviewCard key={s.id} school={s} t={t} lang={lang} onTypeClick={(type) => setInterviewSearch(type)} />)}
+                    </div>
+                  );
+                }
+                const groups: { method: string; label: string; accent: string; defaultCollapsed?: boolean; limitCount?: number }[] = [
+                  { method: "applicant_requests", label: t.interviewMethodFilterApplicant, accent: "text-amber-600", limitCount: 8 },
+                  { method: "school_contacts",    label: t.interviewMethodFilterSchool,    accent: "text-blue-600", defaultCollapsed: true },
+                  { method: "required",            label: t.interviewMethodFilterRequired,  accent: "text-red-600" },
+                ];
+                return (
+                  <div className="space-y-6">
+                    {groups.map(({ method, label, accent, defaultCollapsed, limitCount }) => {
+                      const group = filteredInterviews.filter(s => s.requestMethod === method).sort((a, b) => a.rank - b.rank);
+                      if (group.length === 0) return null;
+                      return (
+                        <InterviewGroup key={method} method={method} label={label} accent={accent} group={group} t={t} lang={lang} defaultCollapsed={defaultCollapsed} limitCount={limitCount} onTypeClick={(type) => setInterviewSearch(type)} />
+                      );
+                    })}
+                    {filteredInterviews.length === 0 && <div className="py-8 text-center text-stone-400"><p className="text-xs">{t.noMatchSchool}</p></div>}
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Column 2: Sessions */}
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-[11px] uppercase tracking-widest text-stone-800 font-semibold">{t.tabSessions}</span>
+                <div className="flex-1 h-px bg-stone-100" />
+              </div>
+              {/* Session search */}
+              <div className="relative mb-3">
+                <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-300" />
+                <Input
+                  placeholder={t.searchPlaceholder}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-8 h-7 text-xs border-stone-200 rounded-none focus-visible:ring-0 focus-visible:border-stone-900"
+                />
+              </div>
+              {/* Batch bar */}
+              {selectedSessions.size > 0 && (
+                <div className="flex items-center justify-between gap-2 mb-2 px-3 py-2 bg-stone-900 text-white">
+                  <span className="text-xs font-medium">{t.batchSelectedTpl.replace("{n}", String(selectedSessions.size)).replace("{plural}", selectedSessions.size > 1 ? "s" : "")}</span>
+                  <div className="flex items-center gap-2">
+                    <button onClick={clearSelection} className="text-[11px] text-stone-400 hover:text-white transition-colors">{t.batchClear}</button>
+                    <button onClick={exportBatchICS} className="flex items-center gap-1 text-[11px] px-2 py-0.5 bg-white text-stone-900 font-semibold hover:bg-stone-100 transition-colors"><CalendarPlus size={10} />{t.batchExport}</button>
+                  </div>
+                </div>
+              )}
+              {filteredSessions.filter((s) => !s.isRolling).length > 0 ? (
+                <div className="border border-stone-100">
+                  {filteredSessions.filter((s) => !s.isRolling).slice().sort((a, b) => {
+                    const aExp = isExpiredSession(a), bExp = isExpiredSession(b);
+                    if (aExp && !bExp) return 1; if (!aExp && bExp) return -1;
+                    const da = getNextDate(a), db = getNextDate(b);
+                    if (!da && !db) return 0; if (!da) return 1; if (!db) return -1;
+                    return da.getTime() - db.getTime();
+                  }).map((s) => <ScheduledSessionCard key={s.id} session={s} t={t} lang={lang} isSelected={selectedSessions.has(s.id)} onToggle={toggleSelect} onView={(school) => { if (school?.type) trackSchoolType(school.type); if (school?.region) trackRegion(school.region); if (s.type) trackSessionType(s.type); }} />)}
+                </div>
+              ) : (
+                <div className="py-8 text-center text-stone-400"><p className="text-xs">{t.noFixed}</p></div>
+              )}
+            </div>
+
+            {/* Column 3: Schools */}
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-[11px] uppercase tracking-widest text-stone-800 font-semibold">{t.tabSchools}</span>
+                <div className="flex-1 h-px bg-stone-100" />
+              </div>
+              {/* School search */}
+              <div className="relative mb-3">
+                <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-300" />
+                <Input
+                  placeholder={t.searchPlaceholder}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-8 h-7 text-xs border-stone-200 rounded-none focus-visible:ring-0 focus-visible:border-stone-900"
+                />
+              </div>
+              <div className="space-y-4">
+                {(["US", "UK", "HK", "AU"] as Region[]).map((region) => {
+                  const regionSchools = filteredSchools.filter((s) => s.region === region);
+                  if (regionSchools.length === 0) return null;
+                  const regionLabel = regionOptions.find(r => r.value === region)?.label || region;
+                  return (
+                    <section key={region}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-[10px] uppercase tracking-widest text-stone-400 font-medium">{regionLabel}</span>
+                        <div className="flex-1 h-px bg-stone-100" />
+                      </div>
+                      <div className="border border-stone-100">
+                        {regionSchools.sort((a, b) => a.rank - b.rank).map((s) => <SchoolCard key={s.id} school={s} t={t} />)}
+                      </div>
+                    </section>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile: single-column with tab switching */}
+          <div className="sm:hidden">
           {view === "sessions" ? (
             <div className="flex gap-6">
               {/* Left: scheduled sessions */}
@@ -3163,6 +3299,7 @@ message = client.messages.create(
               })}
             </div>
           )}
+          </div>{/* end sm:hidden */}
         </main>
       </div>
 
