@@ -17,7 +17,6 @@ import {
 } from "@/data/schools";
 import { interviewData, type SchoolInterview } from "@/data/interviews";
 import { trpc } from "@/lib/trpc";
-import { Streamdown } from "streamdown";
 import { Input } from "@/components/ui/input";
 import {
   Search,
@@ -768,53 +767,6 @@ function ScheduledSessionCard({ session, t, isSelected, onToggle, lang, onView }
   const nextDate = getNextDate(session);
   const expired = isExpiredSession(session);
   const localTime = session.time ? convertToLocalTime(session.time, session.dates?.[0]) : null;
-  const [showPrep, setShowPrep] = useState(false);
-  const [prepContent, setPrepContent] = useState<string | null>(null);
-  const [prepLoading, setPrepLoading] = useState(false);
-  const [prepError, setPrepError] = useState<"rate_limit" | "error" | null>(null);
-  const [prepResetAt, setPrepResetAt] = useState<number | null>(null);
-  const utils = trpc.useUtils();
-
-  const generatePrep = trpc.aiPrep.generate.useMutation({
-    onSuccess: (data) => {
-      const raw = data.content;
-      setPrepContent(typeof raw === "string" ? raw : JSON.stringify(raw));
-      setPrepLoading(false);
-      setPrepError(null);
-    },
-    onError: (err) => {
-      setPrepLoading(false);
-      try {
-        const parsed = JSON.parse(err.message);
-        if (parsed.reason === "rate_limit") {
-          setPrepError("rate_limit");
-          setPrepResetAt(parsed.resetAt);
-        } else {
-          setPrepError("error");
-        }
-      } catch {
-        setPrepError("error");
-      }
-    },
-  });
-
-  const handlePrepClick = () => {
-    if (prepContent) {
-      setShowPrep((v) => !v);
-      return;
-    }
-    setShowPrep(true);
-    setPrepLoading(true);
-    generatePrep.mutate({
-      sessionId: session.id,
-      schoolName: school?.name || "",
-      sessionTitle: session.title,
-      sessionType: session.type,
-      sessionDescription: session.description,
-      lang: (lang || "zh") as "zh" | "en" | "hi",
-    });
-  };
-
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -909,53 +861,14 @@ function ScheduledSessionCard({ session, t, isSelected, onToggle, lang, onView }
             </div>
           )}
 
-          {/* Calendar + AI Prep */}
+          {/* Calendar */}
           <div className="flex items-center gap-3 flex-wrap">
             <AddToCalendarButton session={session} school={school} compact t={t} />
-            <button
-              onClick={handlePrepClick}
-              className={`flex items-center gap-1 text-[10px] font-medium transition-colors duration-150 ${
-                showPrep ? "text-blue-600" : "text-stone-400 hover:text-blue-600"
-              }`}
-            >
-              <span className="text-[9px]">✶</span>
-              {lang === "en" ? "AI Prep" : "AI 预习"}
-            </button>
           </div>
 
-          {/* AI Prep panel */}
-          {showPrep && (
-            <div className="mt-2 border-t border-blue-100 pt-2">
-              {prepLoading && (
-                <div className="flex items-center gap-2 text-[11px] text-stone-500 py-1">
-                  <svg className="animate-spin w-3 h-3 text-blue-500" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-                  </svg>
-                  {lang === "en" ? "Generating briefing…" : "AI 正在生成预习材料…"}
-                </div>
-              )}
-              {prepError === "rate_limit" && (
-                <div className="text-[11px] text-stone-600 py-1">
-                  <p className="font-semibold text-amber-700 mb-1">
-                    {lang === "en" ? "Daily limit reached (3/day free)" : "今日免费次数已用完（3次/天）"}
-                  </p>
-                  <p className="text-stone-500">
-                    {lang === "en" ? "Pro plan coming soon." : "Pro 计划即将上线。"}
-                  </p>
-                </div>
-              )}
-              {prepError === "error" && (
-                <p className="text-[11px] text-red-500 py-1">
-                  {lang === "en" ? "Failed to generate. Please try again." : "生成失败，请稍后重试。"}
-                </p>
-              )}
-              {prepContent && (
-                <div className="text-[12px] leading-relaxed">
-                  <Streamdown>{prepContent}</Streamdown>
-                </div>
-              )}
-            </div>
+          {/* Description */}
+          {session.description && (
+            <p className="mt-2 text-[11px] text-stone-500 leading-relaxed">{session.description}</p>
           )}
         </div>
       )}
