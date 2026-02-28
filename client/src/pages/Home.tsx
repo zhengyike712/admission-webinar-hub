@@ -815,95 +815,92 @@ function ScheduledSessionCard({ session, t, isSelected, onToggle, lang, onView }
     });
   };
 
+  const [expanded, setExpanded] = useState(false);
+
   return (
-    <div className={`bg-white border transition-colors duration-150 relative ${
-      expired
-        ? "border-stone-100 opacity-40 hover:opacity-60"
-        : isSelected
-        ? "border-blue-500 ring-1 ring-blue-300"
-        : urgency === "imminent"
-        ? "border-red-400 hover:border-red-500"
-        : urgency === "soon"
-        ? "border-orange-300 hover:border-orange-400"
-        : "border-stone-200 hover:border-stone-400"
+    <div className={`border-b border-stone-100 last:border-b-0 ${
+      expired ? "opacity-40" : ""
     }`}>
-      {urgency === "imminent" && (
-        <div className="absolute -top-px left-0 right-0 h-0.5 bg-red-500" />
-      )}
-      <div className="flex items-stretch">
+      {/* Row — always visible */}
+      <div className="flex items-center gap-2 py-2 px-1">
         {/* Checkbox */}
         {onToggle && (
           <div
-            className="shrink-0 flex items-center justify-center w-8 cursor-pointer"
+            className="shrink-0 flex items-center justify-center w-5 cursor-pointer"
             onClick={(e) => { e.preventDefault(); onToggle(session.id); }}
           >
-            <div className={`w-4 h-4 border-2 flex items-center justify-center transition-colors ${
+            <div className={`w-3.5 h-3.5 border-2 flex items-center justify-center transition-colors ${
               isSelected ? "bg-blue-600 border-blue-600" : "border-stone-300 bg-white"
             }`}>
               {isSelected && (
-                <svg viewBox="0 0 10 8" className="w-2.5 h-2 fill-none stroke-white stroke-2">
+                <svg viewBox="0 0 10 8" className="w-2 h-1.5 fill-none stroke-white stroke-2">
                   <polyline points="1,4 4,7 9,1" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )}
             </div>
           </div>
         )}
-        {/* Date column */}
-        <div className={`shrink-0 w-16 flex flex-col items-center justify-center py-4 border-r ${
-          urgency === "imminent" ? "border-red-200 bg-red-50" :
-          urgency === "soon" ? "border-orange-200 bg-orange-50" :
-          "border-stone-100 bg-stone-50"
-        }`}>
-          {nextDate ? (
-            <>
-              <span className={`text-xl font-bold leading-none ${
-                urgency === "imminent" ? "text-red-600" :
-                urgency === "soon" ? "text-orange-600" :
-                "text-stone-700"
-              }`}>
-                {nextDate.getDate()}
-              </span>
-              <span className="text-[10px] text-stone-400 mt-0.5">
-                {nextDate.toLocaleDateString("zh-CN", { month: "short" })}
-              </span>
-            </>
-          ) : (
-            <Calendar size={14} className="text-stone-300" />
-          )}
-        </div>
 
-        {/* Info column */}
-        <div className="flex-1 min-w-0 px-3 py-3 flex flex-col gap-1 justify-center">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <span
-              className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
-              style={{ backgroundColor: school?.color || "#2563eb" }}
-            />
-            <span className="text-[11px] text-stone-500 font-medium">
-              {school?.shortName || school?.name}
+        {/* Date badge */}
+        {nextDate && (
+          <span className={`shrink-0 text-[11px] font-bold w-8 text-center leading-none ${
+            urgency === "imminent" ? "text-red-500" :
+            urgency === "soon" ? "text-orange-500" :
+            "text-stone-400"
+          }`}>
+            {nextDate.getDate()}
+            <span className="block text-[9px] font-normal">
+              {nextDate.toLocaleDateString("en", { month: "short" })}
             </span>
-            {school?.region && school.region !== "US" && (
-              <span className="text-[10px] px-1 py-0.5 bg-stone-100 text-stone-400 rounded">
-                {school.region}
-              </span>
-            )}
-            {urgency === "imminent" && (
-              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 bg-red-500 text-white font-semibold rounded-sm animate-pulse">
-                <span className="inline-block w-1 h-1 rounded-full bg-white" />
-                {t.imminent}
-              </span>
-            )}
-            {urgency === "soon" && (
-              <span className="text-[10px] px-1.5 py-0.5 bg-orange-100 text-orange-600 font-semibold rounded-sm border border-orange-200">
-                {t.soon}
-              </span>
-            )}
-          </div>
-          <h3 className="text-xs font-semibold text-stone-900 leading-snug">
+          </span>
+        )}
+
+        {/* Expand button: school + title */}
+        <button
+          onClick={() => setExpanded(v => !v)}
+          className="flex items-center gap-2 min-w-0 flex-1 text-left hover:opacity-70 transition-opacity cursor-pointer"
+        >
+          <span
+            className="shrink-0 w-1.5 h-1.5 rounded-full"
+            style={{ backgroundColor: school?.color || "#2563eb" }}
+          />
+          <span className="text-xs text-stone-800 font-medium truncate min-w-0">
+            <span className="text-stone-400 mr-1">{school?.shortName || school?.name}</span>
             {session.title}
-          </h3>
+          </span>
+          {urgency === "imminent" && (
+            <span className="shrink-0 text-[9px] px-1 py-0.5 bg-red-500 text-white font-semibold rounded-sm animate-pulse">{t.imminent}</span>
+          )}
+          {urgency === "soon" && (
+            <span className="shrink-0 text-[9px] px-1 py-0.5 bg-orange-100 text-orange-600 font-semibold rounded-sm border border-orange-200">{t.soon}</span>
+          )}
+          <ChevronDown
+            size={12}
+            className={`shrink-0 text-stone-300 transition-transform duration-150 ${
+              expanded ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+
+        {/* Register CTA — always visible */}
+        <a
+          href={session.registrationUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => { e.stopPropagation(); onView?.(school); }}
+          className="shrink-0 flex items-center gap-0.5 text-[11px] px-2 py-0.5 border border-stone-300 text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-colors duration-150"
+        >
+          {t.register}
+          <ArrowUpRight size={10} />
+        </a>
+      </div>
+
+      {/* Expanded details */}
+      {expanded && (
+        <div className="px-4 pb-3 pt-1 border-t border-stone-50 bg-stone-50/60">
+          {/* Time */}
           {session.time && (
-            <div className="flex items-center gap-1.5 text-[11px] text-stone-400">
+            <div className="flex items-center gap-1.5 text-[11px] text-stone-400 mb-2">
               <Clock size={9} />
               <span>{session.time}</span>
               {localTime && (
@@ -911,72 +908,53 @@ function ScheduledSessionCard({ session, t, isSelected, onToggle, lang, onView }
               )}
             </div>
           )}
-        </div>
 
-        {/* CTA column */}
-        <div className="shrink-0 flex flex-col gap-1.5 items-end justify-center px-3 py-3">
-          <a
-            href={session.registrationUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => onView?.(school)}
-            className="flex items-center gap-1 px-3 py-1.5 bg-stone-900 text-white hover:bg-stone-700 text-[11px] font-medium transition-colors duration-150 whitespace-nowrap"
-          >
-            {t.register}
-            <ArrowUpRight size={10} />
-          </a>
-          <AddToCalendarButton session={session} school={school} compact t={t} />
-          {/* AI Prep button */}
-          <button
-            onClick={handlePrepClick}
-            className={`flex items-center gap-1 text-[10px] font-medium transition-colors duration-150 whitespace-nowrap ${
-              showPrep
-                ? "text-blue-600"
-                : "text-stone-400 hover:text-blue-600"
-            }`}
-          >
-            <span className="text-[9px]">✦</span>
-            {lang === "en" ? "AI Prep" : "AI 预习"}
-          </button>
-        </div>
-      </div>
-      {/* AI Prep panel */}
-      {showPrep && (
-        <div className="border-t border-blue-100 bg-blue-50/60 px-4 py-3">
-          {prepLoading && (
-            <div className="flex items-center gap-2 text-[11px] text-stone-500 py-2">
-              <svg className="animate-spin w-3 h-3 text-blue-500" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-              </svg>
-              {lang === "en" ? "Generating briefing…" : "AI 正在生成预习材料…"}
-            </div>
-          )}
-          {prepError === "rate_limit" && (
-            <div className="text-[11px] text-stone-600 py-2">
-              <p className="font-semibold text-amber-700 mb-1">
-                {lang === "en" ? "Daily limit reached (3/day free)" : "今日免费次数已用完（3次/天）"}
-              </p>
-              <p className="text-stone-500">
-                {lang === "en"
-                  ? "Pro plan coming soon — unlimited AI prep for all sessions."
-                  : "Pro 计划即将上线，无限次 AI 预习。"}
-              </p>
-              {prepResetAt && (
-                <p className="text-stone-400 mt-1">
-                  {lang === "en" ? "Resets at" : "重置时间"}: {new Date(prepResetAt).toLocaleString()}
+          {/* Calendar + AI Prep */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <AddToCalendarButton session={session} school={school} compact t={t} />
+            <button
+              onClick={handlePrepClick}
+              className={`flex items-center gap-1 text-[10px] font-medium transition-colors duration-150 ${
+                showPrep ? "text-blue-600" : "text-stone-400 hover:text-blue-600"
+              }`}
+            >
+              <span className="text-[9px]">✶</span>
+              {lang === "en" ? "AI Prep" : "AI 预习"}
+            </button>
+          </div>
+
+          {/* AI Prep panel */}
+          {showPrep && (
+            <div className="mt-2 border-t border-blue-100 pt-2">
+              {prepLoading && (
+                <div className="flex items-center gap-2 text-[11px] text-stone-500 py-1">
+                  <svg className="animate-spin w-3 h-3 text-blue-500" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                  </svg>
+                  {lang === "en" ? "Generating briefing…" : "AI 正在生成预习材料…"}
+                </div>
+              )}
+              {prepError === "rate_limit" && (
+                <div className="text-[11px] text-stone-600 py-1">
+                  <p className="font-semibold text-amber-700 mb-1">
+                    {lang === "en" ? "Daily limit reached (3/day free)" : "今日免费次数已用完（3次/天）"}
+                  </p>
+                  <p className="text-stone-500">
+                    {lang === "en" ? "Pro plan coming soon." : "Pro 计划即将上线。"}
+                  </p>
+                </div>
+              )}
+              {prepError === "error" && (
+                <p className="text-[11px] text-red-500 py-1">
+                  {lang === "en" ? "Failed to generate. Please try again." : "生成失败，请稍后重试。"}
                 </p>
               )}
-            </div>
-          )}
-          {prepError === "error" && (
-            <p className="text-[11px] text-red-500 py-2">
-              {lang === "en" ? "Failed to generate. Please try again." : "生成失败，请稍后重试。"}
-            </p>
-          )}
-          {prepContent && (
-            <div className="text-[12px] leading-relaxed">
-              <Streamdown>{prepContent}</Streamdown>
+              {prepContent && (
+                <div className="text-[12px] leading-relaxed">
+                  <Streamdown>{prepContent}</Streamdown>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -1238,7 +1216,7 @@ function InterviewDeadlineCalButton({ school, t }: { school: SchoolInterview; t:
   );
 }
 
-function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof T["zh"]; lang: Lang }) {
+function InterviewCard({ school, t, lang, onTypeClick }: { school: SchoolInterview; t: typeof T["zh"]; lang: Lang; onTypeClick?: (type: string) => void }) {
   const [expanded, setExpanded] = useState(false);
 
   const methodLabel = {
@@ -1289,13 +1267,23 @@ function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof
             {school.shortName || school.schoolName}
           </span>
 
-          {/* Types — hidden on very small screens */}
+          {/* Types — hidden on very small screens, clickable to filter */}
           {school.available && school.types.length > 0 && (
             <span className="hidden sm:flex items-center gap-1 shrink-0">
               {school.types.slice(0, 2).map((type) => (
-                <span key={type} className="text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded">
-                  {type}
-                </span>
+                onTypeClick ? (
+                  <button
+                    key={type}
+                    onClick={(e) => { e.stopPropagation(); onTypeClick(type); }}
+                    className="text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded hover:bg-blue-100 hover:text-blue-700 transition-colors cursor-pointer"
+                  >
+                    {type}
+                  </button>
+                ) : (
+                  <span key={type} className="text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded">
+                    {type}
+                  </span>
+                )
               ))}
               {school.types.length > 2 && (
                 <span className="text-[10px] text-stone-400">+{school.types.length - 2}</span>
@@ -1386,7 +1374,7 @@ function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof
 }
 // ── InterviewGroup ───────────────────────────────────────────────
 function InterviewGroup({
-  method, label, accent, group, t, lang, defaultCollapsed, limitCount,
+  method, label, accent, group, t, lang, defaultCollapsed, limitCount, onTypeClick,
 }: {
   method: string;
   label: string;
@@ -1396,6 +1384,7 @@ function InterviewGroup({
   lang: Lang;
   defaultCollapsed?: boolean;
   limitCount?: number;
+  onTypeClick?: (type: string) => void;
 }) {
   const [collapsed, setCollapsed] = useState(!!defaultCollapsed);
   const [expanded, setExpanded] = useState(false);
@@ -1421,7 +1410,7 @@ function InterviewGroup({
       {!collapsed && (
         <>
           <div className="border border-stone-100 divide-y-0">
-            {displayGroup.map((s) => <InterviewCard key={s.id} school={s} t={t} lang={lang} />)}
+            {displayGroup.map((s) => <InterviewCard key={s.id} school={s} t={t} lang={lang} onTypeClick={onTypeClick} />)}
           </div>
           {hasMore && !expanded && (
             <button
@@ -2977,13 +2966,14 @@ message = client.messages.create(
           {view === "sessions" ? (
             <div className="flex gap-6">
               {/* Left: scheduled sessions */}
-              <div className="flex-1 min-w-0 space-y-3">
-                <div className="flex items-center gap-3 mb-1">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-2">
                   <span className="text-[11px] uppercase tracking-widest text-stone-400 font-medium">{t.upcoming}</span>
                   <div className="flex-1 h-px bg-stone-100" />
                 </div>
                 {filteredSessions.filter((s) => !s.isRolling).length > 0 ? (
-                  filteredSessions
+                  <div className="border border-stone-100">
+                  {filteredSessions
                     .filter((s) => !s.isRolling)
                     .slice()
                     .sort((a, b) => {
@@ -2999,7 +2989,8 @@ message = client.messages.create(
                       if (!db) return -1;
                       return da.getTime() - db.getTime();
                     })
-                    .map((s) => <ScheduledSessionCard key={s.id} session={s} t={t} lang={lang} isSelected={selectedSessions.has(s.id)} onToggle={toggleSelect} onView={(school) => { if (school?.type) trackSchoolType(school.type); if (school?.region) trackRegion(school.region); if (s.type) trackSessionType(s.type); }} />)
+                    .map((s) => <ScheduledSessionCard key={s.id} session={s} t={t} lang={lang} isSelected={selectedSessions.has(s.id)} onToggle={toggleSelect} onView={(school) => { if (school?.type) trackSchoolType(school.type); if (school?.region) trackRegion(school.region); if (s.type) trackSessionType(s.type); }} />)}
+                  </div>
                 ) : (
                   <div className="py-12 text-center text-stone-400">
                     <p className="text-xs">{t.noFixed}</p>
@@ -3056,7 +3047,7 @@ message = client.messages.create(
                     </div>
                   ) : (
                     <div className="border border-stone-100">
-                      {sorted.map((s) => <InterviewCard key={s.id} school={s} t={t} lang={lang} />)}
+                      {sorted.map((s) => <InterviewCard key={s.id} school={s} t={t} lang={lang} onTypeClick={(type) => setInterviewSearch(type)} />)}
                     </div>
                   );
                 }
@@ -3066,7 +3057,7 @@ message = client.messages.create(
                   { method: "applicant_requests", label: t.interviewMethodFilterApplicant, accent: "text-amber-600", limitCount: 8 },
                   { method: "school_contacts",    label: t.interviewMethodFilterSchool,    accent: "text-blue-600", defaultCollapsed: true },
                   { method: "required",            label: t.interviewMethodFilterRequired,  accent: "text-red-600" },
-                  { method: "none",                label: t.interviewFilterNone,            accent: "text-stone-400", defaultCollapsed: true },
+                  // "none" group hidden — not actionable for users
                 ];
                 return (
                   <div className="space-y-8">
@@ -3086,6 +3077,7 @@ message = client.messages.create(
                           lang={lang}
                           defaultCollapsed={defaultCollapsed}
                           limitCount={limitCount}
+                          onTypeClick={(type) => setInterviewSearch(type)}
                         />
                       );
                     })}
