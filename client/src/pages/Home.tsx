@@ -161,6 +161,13 @@ const T: Record<Lang, Record<string, string>> = {
     shareTwitter: "分享到 X / Twitter",
     shareWeChatScan: "微信扫一扫分享",
     shareBack: "返回",
+    howLabel: "申请方式：",
+    interviewStatusLabel: "面试状态",
+    interviewTotalTpl: "共 {n} 所学校面试信息",
+    offerInterview: "提供面试",
+    noInterview: "不提供",
+    deadlineSoon: "近期截止",
+    noMatchSchool: "没有匹配的学校",
   },
   en: {
     tagline: "Global University Admissions Info Hub",
@@ -281,6 +288,13 @@ const T: Record<Lang, Record<string, string>> = {
     shareTwitter: "Share to X / Twitter",
     shareWeChatScan: "Scan with WeChat",
     shareBack: "Back",
+    howLabel: "How: ",
+    interviewStatusLabel: "Status",
+    interviewTotalTpl: "{n} schools with interview info",
+    offerInterview: "offer interviews",
+    noInterview: "no interview",
+    deadlineSoon: "deadline soon",
+    noMatchSchool: "No matching schools",
   },
   hi: {
     tagline: "विश्वविद्यालय प्रवेश सूचना केंद्र",
@@ -401,6 +415,13 @@ const T: Record<Lang, Record<string, string>> = {
     shareTwitter: "X / Twitter पर शेयर करें",
     shareWeChatScan: "WeChat से स्कैन करें",
     shareBack: "वापस",
+    howLabel: "तरीका: ",
+    interviewStatusLabel: "स्थिति",
+    interviewTotalTpl: "{n} विश्वविद्यालयों की इंटरव्यू जानकारी",
+    offerInterview: "इंटरव्यू उपलब्ध",
+    noInterview: "उपलब्ध नहीं",
+    deadlineSoon: "अंतिम तारीख नजदीक",
+    noMatchSchool: "कोई मिलान वाला विश्वविद्यालय नहीं",
   },
 } as const;
 
@@ -1057,7 +1078,7 @@ function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof
         {/* Method */}
         {school.available && methodLabel && (
           <div className="mb-2 text-[11px] text-stone-500">
-            <span className="text-stone-400">{lang === "zh" ? "申请方式：" : "How: "}</span>
+                <span className="text-stone-400">{t.howLabel}</span>
             {methodLabel}
           </div>
         )}
@@ -1513,13 +1534,31 @@ export default function Home() {
   const [interviewMethodFilter, setInterviewMethodFilter] = useState<"all" | "school_contacts" | "applicant_requests" | "required">("all");
 
    const t = T[lang] as typeof T["zh"];
-  // ── document.title 和 html lang 随语言切换动态更新 ──
+  // ── document.title、html lang 、meta description 随语言切换动态更新 ──
   useEffect(() => {
+    // 更新标题栏标题
     document.title = t.siteTitle;
-    // 更新 <html lang> 属性，让屏幕阅读器和搜索引擎正确识别当前语言
+    // 更新 <html lang>，让屏幕阅读器和搜索引擎正确识别当前语言
     const langMap: Record<Lang, string> = { zh: "zh-CN", en: "en", hi: "hi" };
     document.documentElement.lang = langMap[lang];
-  }, [lang, t.siteTitle]);
+    // 更新 <meta name="description">
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute("content", t.siteDesc);
+    // 更新 og:description
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute("content", t.siteDesc);
+    // 更新 og:title
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute("content", t.siteTitle);
+    // 更新 og:locale
+    const ogLocale = document.querySelector('meta[property="og:locale"]');
+    if (ogLocale) ogLocale.setAttribute("content", langMap[lang] === "zh-CN" ? "zh_CN" : langMap[lang] === "en" ? "en_US" : "hi_IN");
+    // 更新 twitter:title 和 twitter:description
+    const twTitle = document.querySelector('meta[name="twitter:title"]');
+    if (twTitle) twTitle.setAttribute("content", t.siteTitle);
+    const twDesc = document.querySelector('meta[name="twitter:description"]');
+    if (twDesc) twDesc.setAttribute("content", t.siteDesc);
+  }, [lang, t.siteTitle, t.siteDesc]);
   // Fetch sessions from DB (falls back to static data if unavailable)
   const { data: dbData } = trpc.sessions.list.useQuery(
     { region: "All" },
@@ -1844,7 +1883,7 @@ export default function Home() {
                 {/* Status filter */}
                 <div>
                   <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
-                    {lang === "zh" ? "面试状态" : "Status"}
+                    {t.interviewStatusLabel}
                   </label>
                   <div className="space-y-0.5">
                     {([
@@ -2006,7 +2045,7 @@ export default function Home() {
               {/* Header */}
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-[11px] uppercase tracking-widest text-stone-400 font-medium">
-                  {lang === "zh" ? `共 ${filteredInterviews.length} 所学校面试信息` : `${filteredInterviews.length} ${t.interviewCount}`}
+                  {t.interviewTotalTpl.replace("{n}", String(filteredInterviews.length))}
                 </span>
                 <div className="flex-1 h-px bg-stone-100" />
               </div>
@@ -2016,12 +2055,12 @@ export default function Home() {
                 <div className="flex items-center gap-1.5 text-xs">
                   <UserCheck size={12} className="text-green-600" />
                   <span className="text-stone-600 font-medium">{interviewData.filter(s => s.available).length}</span>
-                  <span className="text-stone-400">{lang === "zh" ? "提供面试" : "offer interviews"}</span>
+                  <span className="text-stone-400">{t.offerInterview}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs">
                   <UserX size={12} className="text-stone-300" />
                   <span className="text-stone-600 font-medium">{interviewData.filter(s => !s.available).length}</span>
-                  <span className="text-stone-400">{lang === "zh" ? "不提供" : "no interview"}</span>
+                  <span className="text-stone-400">{t.noInterview}</span>
                 </div>
                 {(() => {
                   const nearCount = interviewData.filter(s => s.deadline && (() => {
@@ -2035,7 +2074,7 @@ export default function Home() {
                     >
                       <Clock size={12} className="text-red-500" />
                       <span className="text-red-600 font-semibold">{nearCount}</span>
-                      <span className="text-red-500">{lang === "zh" ? "近期截止" : "deadline soon"}</span>
+                      <span className="text-red-500">{t.deadlineSoon}</span>
                     </button>
                   ) : null;
                 })()}
@@ -2053,7 +2092,7 @@ export default function Home() {
                   });
                   return sorted.length === 0 ? (
                     <div className="py-12 text-center text-stone-400">
-                      <p className="text-xs">{lang === "zh" ? "没有匹配的学校" : "No matching schools"}</p>
+                      <p className="text-xs">{t.noMatchSchool}</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -2079,7 +2118,7 @@ export default function Home() {
                         <section key={method}>
                           <div className="flex items-center gap-3 mb-3">
                             <span className={`text-[11px] uppercase tracking-widest font-semibold ${accent}`}>
-                              {lang === "zh" ? labelZh : labelEn}
+                              {lang === "zh" ? labelZh : labelEn /* group label stays bilingual by design */}
                             </span>
                             <span className="text-[10px] text-stone-400 bg-stone-100 px-1.5 py-0.5 rounded-full">{group.length}</span>
                             <div className="flex-1 h-px bg-stone-100" />
@@ -2092,7 +2131,7 @@ export default function Home() {
                     })}
                     {filteredInterviews.length === 0 && (
                       <div className="py-12 text-center text-stone-400">
-                        <p className="text-xs">{lang === "zh" ? "没有匹配的学校" : "No matching schools"}</p>
+                        <p className="text-xs">{t.noMatchSchool}</p>
                       </div>
                     )}
                   </div>

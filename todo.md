@@ -162,3 +162,8 @@
 ## html lang 属性动态化
 
 - [x] 主组件 useEffect 同步更新 document.documentElement.lang（zh/en/hi）
+
+## 硬编码扫描与 meta 动态化
+
+- [x] 扫描并修复所有残余 lang === "zh" 硬编码文案
+- [x] useEffect 动态更新 meta[name="description"] content
