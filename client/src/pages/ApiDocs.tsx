@@ -417,6 +417,109 @@ curl "${baseUrl}${endpointPath}?upcoming=true&limit=5"`;
           </div>
         </section>
 
+        {/* Claude Integration Section */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded bg-orange-500 flex items-center justify-center">
+              <span className="text-white text-[10px] font-bold">C</span>
+            </div>
+            <h2 className="text-base font-semibold text-stone-800">
+              {lang === "zh" ? "Claude 工具集成" : "Claude Tool Integration"}
+            </h2>
+            <span className="text-[10px] px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full font-medium">
+              {lang === "zh" ? "AI Native" : "AI Native"}
+            </span>
+          </div>
+          <p className="text-xs text-stone-500 leading-relaxed">
+            {lang === "zh"
+              ? "AdmitLens 支持三种方式与 Claude 集成，无需 API Key，免费使用。"
+              : "AdmitLens supports three integration methods with Claude. No API key required, free to use."}
+          </p>
+
+          {/* Three methods */}
+          <div className="space-y-3">
+            {/* Method 1: Claude.ai Projects */}
+            <div className="border border-stone-200 rounded-lg p-4 bg-stone-50">
+              <h3 className="text-xs font-semibold text-stone-700 mb-2">
+                {lang === "zh" ? "方式一：Claude.ai Projects（推荐）" : "Option 1: Claude.ai Projects (Recommended)"}
+              </h3>
+              <ol className="text-xs text-stone-500 space-y-1 list-decimal list-inside">
+                {(lang === "zh"
+                  ? ["打开 claude.ai，创建或进入一个 Project", "点击 Settings → Tools → Add Tool", "选择 MCP Server，输入以下 URL", "保存后，在该 Project 的对话中即可调用 AdmitLens 数据"]
+                  : ["Open claude.ai, create or enter a Project", "Click Settings → Tools → Add Tool", "Select MCP Server, enter the URL below", "After saving, AdmitLens data is available in all conversations in this Project"]
+                ).map((step, i) => <li key={i}>{step}</li>)}
+              </ol>
+              <div className="mt-3 bg-stone-900 rounded p-3 font-mono text-xs text-green-400">
+                {`MCP Server URL: ${SITE_ORIGIN}/mcp`}
+              </div>
+            </div>
+
+            {/* Method 2: Claude Desktop */}
+            <div className="border border-stone-200 rounded-lg p-4 bg-stone-50">
+              <h3 className="text-xs font-semibold text-stone-700 mb-2">
+                {lang === "zh" ? "方式二：Claude Desktop" : "Option 2: Claude Desktop"}
+              </h3>
+              <p className="text-xs text-stone-500 mb-2">
+                {lang === "zh"
+                  ? "在 claude_desktop_config.json 中添加以下配置："
+                  : "Add the following to your claude_desktop_config.json:"}
+              </p>
+              <div className="bg-stone-900 rounded p-3 font-mono text-xs text-green-400 whitespace-pre">{`{
+  "mcpServers": {
+    "admitlens": {
+      "url": "${SITE_ORIGIN}/mcp"
+    }
+  }
+}`}</div>
+            </div>
+
+            {/* Method 3: Claude API */}
+            <div className="border border-stone-200 rounded-lg p-4 bg-stone-50">
+              <h3 className="text-xs font-semibold text-stone-700 mb-2">
+                {lang === "zh" ? "方式三：Claude API tool_use（开发者）" : "Option 3: Claude API tool_use (Developers)"}
+              </h3>
+              <p className="text-xs text-stone-500 mb-2">
+                {lang === "zh"
+                  ? "在 API 请求中直接传入工具定义，无需注册，任何调用 Claude API 的应用均可使用："
+                  : "Pass tool definitions directly in API requests. No registration needed — any app calling the Claude API can use this:"}
+              </p>
+              <div className="bg-stone-900 rounded p-3 font-mono text-xs text-green-400 whitespace-pre overflow-x-auto">{`import anthropic
+
+client = anthropic.Anthropic()
+message = client.messages.create(
+    model="claude-opus-4-5",
+    max_tokens=1024,
+    tools=[{
+        "name": "getSessions",
+        "description": "Find upcoming university admissions info sessions",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "school": {"type": "string", "description": "e.g. MIT, Stanford"},
+                "upcoming": {"type": "boolean"},
+                "limit": {"type": "integer", "default": 5}
+            }
+        }
+    }],
+    messages=[{"role": "user", "content": "Find MIT info sessions"}]
+)
+# Tool call result automatically fetches from:
+# ${SITE_ORIGIN}/api/public/sessions?school=MIT&upcoming=true`}</div>
+              <div className="mt-2 flex items-center gap-2">
+                <a
+                  href={`${SITE_ORIGIN}/openapi.json`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors"
+                >
+                  <ExternalLink size={11} />
+                  {lang === "zh" ? "下载 OpenAPI Schema (openapi.json)" : "Download OpenAPI Schema (openapi.json)"}
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Footer CTA */}
         <div className="border-t border-stone-200 pt-8 flex items-center justify-between">
           <a href="/notion-template" className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1.5 transition-colors">

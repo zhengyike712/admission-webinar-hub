@@ -1,0 +1,404 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AdmitLens (景深留学) API",
+    "description": "Real-time database of university admissions info sessions and interview policies. Covers 100+ top universities across the US, UK, Hong Kong, and Australia. All data is sourced directly from official university admissions websites and updated daily.\n\nUse this API to:\n- Find upcoming info sessions for specific schools\n- Check interview availability and application methods\n- Get registration links directly to official portals\n- Filter by region, session type, or school name",
+    "version": "1.0.0",
+    "contact": {
+      "name": "AdmitLens",
+      "url": "https://admissionhub-f6apvxhh.manus.space",
+      "email": "api@admitlens.com"
+    },
+    "license": {
+      "name": "Free for non-commercial use",
+      "url": "https://admissionhub-f6apvxhh.manus.space/api-docs"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://admissionhub-f6apvxhh.manus.space",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/api/public/sessions": {
+      "get": {
+        "operationId": "getSessions",
+        "summary": "List upcoming info sessions",
+        "description": "Returns a list of university admissions info sessions. Filter by school name, upcoming-only, or limit results. Each session includes title, dates, time, registration URL, and session type.",
+        "parameters": [
+          {
+            "name": "school",
+            "in": "query",
+            "description": "Filter by school name (partial match, case-insensitive). Examples: 'MIT', 'Harvard', 'Yale'",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "MIT"
+            }
+          },
+          {
+            "name": "upcoming",
+            "in": "query",
+            "description": "If 'true', only return sessions with future dates",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["true", "false"],
+              "default": "false"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of results to return (default: 50, max: 200)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Filter by session type",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "General Info Session",
+                "Up Close / Specialty",
+                "Multi-College Session",
+                "Regional Session",
+                "Student Forum",
+                "Financial Aid Session",
+                "International Student Session"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of info sessions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sessions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Session"
+                      }
+                    },
+                    "total": {
+                      "type": "integer",
+                      "description": "Total number of sessions returned"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Last data update timestamp (UTC)"
+                    }
+                  }
+                },
+                "example": {
+                  "sessions": [
+                    {
+                      "id": "mit-general-2025",
+                      "schoolId": "MIT",
+                      "schoolName": "Massachusetts Institute of Technology",
+                      "title": "MIT Virtual Information Session",
+                      "type": "General Info Session",
+                      "dates": ["2025-03-15", "2025-04-12"],
+                      "time": "11:00 AM ET",
+                      "duration": "60 minutes",
+                      "description": "Join MIT admissions officers for an overview of the application process.",
+                      "registrationUrl": "https://mit.edu/admissions/events",
+                      "isRolling": false,
+                      "region": "US"
+                    }
+                  ],
+                  "total": 1,
+                  "updatedAt": "2025-02-28T02:00:00Z"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (100 requests/day for free tier)"
+          }
+        }
+      }
+    },
+    "/api/public/schools": {
+      "get": {
+        "operationId": "getSchools",
+        "summary": "List schools with info session coverage",
+        "description": "Returns all schools in the AdmitLens database with their basic info and coverage status.",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter by region",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["US", "UK", "HK", "AU"]
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Filter by school type",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["national", "liberal", "research", "comprehensive"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of schools",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "schools": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/School"
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/interviews": {
+      "get": {
+        "operationId": "getInterviews",
+        "summary": "Get interview policies for universities",
+        "description": "Returns interview availability and application methods for universities. Indicates whether students can proactively request interviews, whether schools initiate contact, or whether interviews are required.",
+        "parameters": [
+          {
+            "name": "school",
+            "in": "query",
+            "description": "Filter by school name (partial match)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "available",
+            "in": "query",
+            "description": "If 'true', only return schools that offer interviews",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["true", "false"]
+            }
+          },
+          {
+            "name": "requestMethod",
+            "in": "query",
+            "description": "Filter by how interviews are initiated",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["applicant_requests", "school_initiates", "required", "none"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of interview policies",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "interviews": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Interview"
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Session": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique session identifier"
+          },
+          "schoolId": {
+            "type": "string",
+            "description": "School identifier"
+          },
+          "schoolName": {
+            "type": "string",
+            "description": "Full school name"
+          },
+          "title": {
+            "type": "string",
+            "description": "Session title"
+          },
+          "type": {
+            "type": "string",
+            "description": "Session type",
+            "enum": [
+              "General Info Session",
+              "Up Close / Specialty",
+              "Multi-College Session",
+              "Regional Session",
+              "Student Forum",
+              "Financial Aid Session",
+              "International Student Session"
+            ]
+          },
+          "dates": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "List of session dates in YYYY-MM-DD format"
+          },
+          "time": {
+            "type": "string",
+            "description": "Session time with timezone (e.g., '11:00 AM ET')"
+          },
+          "duration": {
+            "type": "string",
+            "description": "Session duration (e.g., '60 minutes')"
+          },
+          "description": {
+            "type": "string",
+            "description": "Session description"
+          },
+          "registrationUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Official registration URL on the university's website"
+          },
+          "isRolling": {
+            "type": "boolean",
+            "description": "If true, registration is open year-round with flexible dates"
+          },
+          "region": {
+            "type": "string",
+            "enum": ["US", "UK", "HK", "AU"],
+            "description": "Geographic region of the university"
+          }
+        }
+      },
+      "School": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "shortName": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["national", "liberal", "research", "comprehensive"]
+          },
+          "region": {
+            "type": "string",
+            "enum": ["US", "UK", "HK", "AU"]
+          },
+          "website": {
+            "type": "string",
+            "format": "uri"
+          },
+          "admissionsUrl": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "Interview": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "schoolName": {
+            "type": "string"
+          },
+          "shortName": {
+            "type": "string"
+          },
+          "available": {
+            "type": "boolean",
+            "description": "Whether the school offers interviews"
+          },
+          "requestMethod": {
+            "type": "string",
+            "enum": ["applicant_requests", "school_initiates", "required", "none"],
+            "description": "How interviews are initiated: applicant_requests (student proactively applies), school_initiates (school contacts student), required (mandatory), none (not offered)"
+          },
+          "types": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Interview formats offered (e.g., ['Alumni', 'Virtual'])"
+          },
+          "timing": {
+            "type": "string",
+            "description": "When interviews typically occur in the application cycle"
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date",
+            "description": "Application deadline for requesting an interview (if applicable)"
+          },
+          "portalUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Direct link to the interview application portal"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Additional notes about the interview process"
+          }
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Full API documentation with examples",
+    "url": "https://admissionhub-f6apvxhh.manus.space/api-docs"
+  }
+}

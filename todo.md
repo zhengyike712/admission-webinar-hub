@@ -231,3 +231,15 @@
 - [x] session 卡片：添加「AI 预习」按鈕，展开面板显示话题摘要+建议提问+词汇表
 - [x] 面试卡片：每所学校添加「备考工具」入口（按面试风格分类，默认折叠）
 - [x] 集成中心浮层：新增 Chrome 扩展标签页（即将上线展示）
+
+## OpenAPI Schema + ChatGPT Actions + Claude
+
+- [ ] 生成 openapi.json 并部署到 /openapi.json 路由
+- [ ] llms.txt 添加 OpenAPI schema 链接
+- [ ] 注册 ChatGPT Actions（GPT Builder）
+- [ ] 调研 Claude Tool Use / MCP 注册机制
+
+## Claude 工具集成文档
+
+- [x] 集成中心浮层添加 Claude 标签页（MCP 配置 + API tool_use 代码示例）
+- [x] /api-docs 页面添加 Claude 集成专区（三种方式 + Python 代码示例 + openapi.json 下载链接）

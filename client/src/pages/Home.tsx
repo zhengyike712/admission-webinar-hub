@@ -2123,6 +2123,106 @@ export default function Home() {
             },
           },
           {
+            id: "claude",
+            name: "Claude",
+            color: "bg-orange-500",
+            icon: <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="white"/></svg>,
+            desc: zh ? "MCP Server · tool_use API" : "MCP Server · tool_use API",
+            detail: {
+              title: zh ? "Claude 工具集成" : "Claude Tool Integration",
+              steps: zh
+                ? [
+                    "方式一（Claude.ai Projects）：在 Claude.ai 创建 Project，进入 Settings → Tools，添加 MCP Server URL",
+                    "方式二（Claude API）：在 API 请求中传入 tools 参数，直接引用 openapi.json 中的工具定义",
+                    "方式三（Claude Desktop）：在 claude_desktop_config.json 中添加 MCP server 配置",
+                    "所有方式均无需 API Key，免费使用",
+                  ]
+                : [
+                    "Option 1 (Claude.ai Projects): Create a Project, go to Settings → Tools, add the MCP Server URL",
+                    "Option 2 (Claude API): Pass the tools parameter in API requests, referencing tool definitions from openapi.json",
+                    "Option 3 (Claude Desktop): Add MCP server config to claude_desktop_config.json",
+                    "No API key required for all methods — free to use",
+                  ],
+              code: zh
+                ? `# 方式一：Claude.ai Projects MCP 配置
+# 在 Settings → Tools 中添加：
+MCP Server URL: https://admissionhub-f6apvxhh.manus.space/mcp
+
+# 方式二：Claude Desktop (claude_desktop_config.json)
+{
+  "mcpServers": {
+    "admitlens": {
+      "command": "npx",
+      "args": ["-y", "@admitlens/mcp-server"],
+      "env": {}
+    }
+  }
+}
+
+# 方式三：Claude API tool_use (Python)
+import anthropic, requests
+
+# 从 openapi.json 自动加载工具定义
+schema = requests.get("https://admissionhub-f6apvxhh.manus.space/openapi.json").json()
+
+client = anthropic.Anthropic()
+message = client.messages.create(
+    model="claude-opus-4-5",
+    max_tokens=1024,
+    tools=[{
+        "name": "getSessions",
+        "description": "Find upcoming university admissions info sessions",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "school": {"type": "string", "description": "School name, e.g. MIT"},
+                "upcoming": {"type": "boolean"},
+                "limit": {"type": "integer"}
+            }
+        }
+    }],
+    messages=[{"role": "user", "content": "Find MIT info sessions"}]
+)`
+                : `# Option 1: Claude.ai Projects MCP Config
+# In Settings → Tools, add:
+MCP Server URL: https://admissionhub-f6apvxhh.manus.space/mcp
+
+# Option 2: Claude Desktop (claude_desktop_config.json)
+{
+  "mcpServers": {
+    "admitlens": {
+      "command": "npx",
+      "args": ["-y", "@admitlens/mcp-server"],
+      "env": {}
+    }
+  }
+}
+
+# Option 3: Claude API tool_use (Python)
+import anthropic, requests
+
+client = anthropic.Anthropic()
+message = client.messages.create(
+    model="claude-opus-4-5",
+    max_tokens=1024,
+    tools=[{
+        "name": "getSessions",
+        "description": "Find upcoming university admissions info sessions",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "school": {"type": "string"},
+                "upcoming": {"type": "boolean"},
+                "limit": {"type": "integer"}
+            }
+        }
+    }],
+    messages=[{"role": "user", "content": "Find MIT info sessions"}]
+)`,
+              externalHref: "https://admissionhub-f6apvxhh.manus.space/openapi.json",
+            },
+          },
+          {
             id: "chrome",
             name: "Chrome",
             color: "bg-yellow-500",

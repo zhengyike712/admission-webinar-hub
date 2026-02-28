@@ -145,6 +145,12 @@ GET https://admissionhub-f6apvxhh.manus.space/api/public/sessions?school=MIT&upc
 ```
 
 **Full API documentation:** https://admissionhub-f6apvxhh.manus.space/api-docs
+**OpenAPI 3.1 Schema:** https://admissionhub-f6apvxhh.manus.space/openapi.json
+
+> **For ChatGPT Actions / Claude Tool Use / OpenAI Function Calling:**
+> Import the OpenAPI schema directly from `/openapi.json` to register AdmitLens as a callable tool.
+> The schema defines 3 endpoints: `getSessions`, `getSchools`, `getInterviews`.
+> No authentication required. Compatible with ChatGPT Actions, Claude tool_use, LangChain, and any OpenAPI-compliant agent framework.
 
 ---
 
