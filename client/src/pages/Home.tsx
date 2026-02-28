@@ -136,8 +136,8 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingAo3Detail: "部分院校会记录出席情况。直接参与官方活动，是向学校传递真实兴趣最直接的方式",
     onboardingF1Title: "覆盖全球顶校",
     onboardingF1Desc: "美国、英国、香港、澳大利亚顶尖院校，持续扩展中",
-    onboardingF2Title: "自动时区转换",
-    onboardingF2Desc: "活动时间自动转换为你的本地时区，无需手动换算",
+    onboardingF2Title: "集成到你的工作流",
+    onboardingF2Desc: "支持嵌入 Notion / 飞书 / Obsidian，让招生信息成为申请规划的一部分",
     onboardingF3Title: "日历导出 · 支持批量",
     onboardingF3Desc: "勾选多场活动一键批量导出 .ics，或单独添加至 Google / Apple / Outlook",
     onboardingF4Title: "面试入口",
@@ -285,8 +285,8 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingAo3Detail: "Some schools track attendance. Engaging directly with official events is the most authentic way to signal genuine interest",
     onboardingF1Title: "Global Coverage",
     onboardingF1Desc: "US, UK, Hong Kong, Australia — and growing",
-    onboardingF2Title: "Auto Timezone",
-    onboardingF2Desc: "Event times are automatically converted to your local timezone",
+    onboardingF2Title: "Integrate into Your Workflow",
+    onboardingF2Desc: "Embed into Notion / Feishu / Obsidian and make admissions info part of your application planning",
     onboardingF3Title: "Calendar Export · Batch",
     onboardingF3Desc: "Select multiple events and export as one .ics, or add individually to Google / Apple / Outlook",
     onboardingF4Title: "Interview Portal",
@@ -434,8 +434,8 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingAo3Detail: "कुछ विश्वविद्यालय उपस्थिति रिकॉर्ड करते हैं। सीधे आधिकारिक कार्यक्रमों में भाग लेना वास्तविक रुचि दिखाने का सर्वोत्तम तरीका है",
     onboardingF1Title: "वैश्विक कवरेज",
     onboardingF1Desc: "अमेरिका, यूके, हांगकांग, ऑस्ट्रेलिया — और बढ़ता हुआ",
-    onboardingF2Title: "स्वचालित समय क्षेत्र",
-    onboardingF2Desc: "कार्यक्रम समय स्वचालित रूप से आपके स्थानीय समय क्षेत्र में बदलता है",
+    onboardingF2Title: "अपने वर्कफ्लो में जोड़ें",
+    onboardingF2Desc: "Notion / Feishu / Obsidian में एम्बेड करें और प्रवेश जानकारी को अपनी योजना का हिस्सा बनाएं",
     onboardingF3Title: "कैलेंडर एक्सपोर्ट · बैच",
     onboardingF3Desc: "कई कार्यक्रम चुनें और .ics निर्यात करें, या Google / Apple / Outlook में अलग से जोड़ें",
     onboardingF4Title: "इंटरव्यू पोर्टल",
@@ -1610,7 +1610,7 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
 
   const features = [
     { icon: "🌍", title: t.onboardingF1Title, desc: t.onboardingF1Desc },
-    { icon: "🕐", title: t.onboardingF2Title, desc: t.onboardingF2Desc },
+    { icon: "🔗", title: t.onboardingF2Title, desc: t.onboardingF2Desc },
     { icon: "📅", title: t.onboardingF3Title, desc: t.onboardingF3Desc },
     { icon: "🤝", title: t.onboardingF4Title, desc: t.onboardingF4Desc },
     {
@@ -2584,7 +2584,7 @@ message = client.messages.create(
               <div className="text-[10px] text-stone-400 leading-relaxed">{t.onboardingF1Desc}</div>
             </div>
             <div className="border border-stone-100 p-3">
-              <div className="text-base mb-1">🕐</div>
+              <div className="text-base mb-1">🔗</div>
               <div className="text-xs font-semibold text-stone-900 mb-0.5">{t.onboardingF2Title}</div>
               <div className="text-[10px] text-stone-400 leading-relaxed">{t.onboardingF2Desc}</div>
             </div>
@@ -3225,35 +3225,7 @@ message = client.messages.create(
                 ))}
               </div>
             </div>
-            {/* Integration Hub */}
-            <div>
-              <div className="text-[11px] uppercase tracking-widest text-stone-400 mb-2">{t.footerIntegrationsTitle}</div>
-              <button
-                onClick={() => setShowIntegrationHub(true)}
-                className="group flex flex-col gap-1.5 p-2.5 border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all duration-150 cursor-pointer w-full text-left"
-              >
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-medium text-stone-700 group-hover:text-stone-900 transition-colors">
-                    {lang === "zh" ? "集成中心" : lang === "hi" ? "इंटीग्रेशन हब" : "Integration Hub"}
-                  </span>
-                  <span className="text-[9px] px-1 py-0.5 bg-stone-900 text-white font-medium">{t.footerNotionNew}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  {[
-                    { color: "bg-stone-900", icon: <svg width="7" height="7" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="white" strokeWidth="2.5" /><path d="M8 8h8M8 12h5M8 16h6" stroke="white" strokeWidth="2.5" strokeLinecap="round" /></svg> },
-                    { color: "bg-sky-500", icon: <svg width="7" height="7" viewBox="0 0 24 24" fill="none"><path d="M12 4L4 8l8 4 8-4-8-4z" fill="white" /></svg> },
-                    { color: "bg-purple-700", icon: <svg width="7" height="7" viewBox="0 0 24 24" fill="none"><polygon points="12,2 20,7 20,17 12,22 4,17 4,7" stroke="white" strokeWidth="2.5" fill="none" /></svg> },
-                    { color: "bg-teal-600", icon: <svg width="7" height="7" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1" fill="white" /><rect x="13" y="4" width="7" height="7" rx="1" fill="white" opacity="0.6" /></svg> },
-                    { color: "bg-violet-600", icon: <span className="text-white font-bold" style={{fontSize: "5px", lineHeight: 1}}>W</span> },
-                  ].map((p, i) => (
-                    <div key={i} className={`w-4 h-4 rounded ${p.color} flex items-center justify-center`}>{p.icon}</div>
-                  ))}
-                  <span className="text-[10px] text-stone-400 ml-0.5">
-                    {lang === "zh" ? "点击查看全部 →" : lang === "hi" ? "सभी देखें →" : "View all →"}
-                  </span>
-                </div>
-              </button>
-            </div>
+
           </div>
           <div className="border-t border-stone-100 pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[11px] text-stone-400">
             <span>{t.footerDisclaimer}</span>
