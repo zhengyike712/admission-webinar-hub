@@ -1171,8 +1171,64 @@ function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof
     </div>
   );
 }
+// ── InterviewGroup ───────────────────────────────────────────────
+function InterviewGroup({
+  method, label, accent, group, t, lang, defaultCollapsed, limitCount,
+}: {
+  method: string;
+  label: string;
+  accent: string;
+  group: SchoolInterview[];
+  t: typeof T["zh"];
+  lang: Lang;
+  defaultCollapsed?: boolean;
+  limitCount?: number;
+}) {
+  const [collapsed, setCollapsed] = useState(!!defaultCollapsed);
+  const [expanded, setExpanded] = useState(false);
 
-// ── Email Subscribe ───────────────────────────────────────────
+  const displayGroup = (!limitCount || expanded) ? group : group.slice(0, limitCount);
+  const hasMore = !!limitCount && group.length > limitCount;
+
+  return (
+    <section key={method}>
+      <button
+        onClick={() => setCollapsed(v => !v)}
+        className="flex items-center gap-3 mb-3 w-full text-left group"
+      >
+        <span className={`text-[11px] uppercase tracking-widest font-semibold ${accent}`}>{label}</span>
+        <span className="text-[10px] text-stone-400 bg-stone-100 px-1.5 py-0.5 rounded-full">{group.length}</span>
+        <div className="flex-1 h-px bg-stone-100" />
+        <span className="text-[10px] text-stone-400 group-hover:text-stone-600 transition-colors shrink-0">
+          {collapsed
+            ? (lang === "zh" ? "展开 ▼" : lang === "hi" ? "विस्तार ▼" : "Show ▼")
+            : (lang === "zh" ? "收起 ▲" : lang === "hi" ? "छुपाएं ▲" : "Hide ▲")}
+        </span>
+      </button>
+      {!collapsed && (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {displayGroup.map((s) => <InterviewCard key={s.id} school={s} t={t} lang={lang} />)}
+          </div>
+          {hasMore && !expanded && (
+            <button
+              onClick={() => setExpanded(true)}
+              className="mt-3 text-xs text-stone-500 hover:text-stone-800 border border-stone-200 hover:border-stone-400 px-4 py-1.5 rounded-full transition-colors"
+            >
+              {lang === "zh"
+                ? `展开全部 ${group.length} 所…`
+                : lang === "hi"
+                ? `सभी ${group.length} दिखाएं…`
+                : `Show all ${group.length}…`}
+            </button>
+          )}
+        </>
+      )}
+    </section>
+  );
+}
+
+// ── Email Subscribe ───────────────────────────────────────────────
 function EmailSubscribe({ t }: { t: typeof T["zh"] }) {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -2160,32 +2216,32 @@ export default function Home() {
                   );
                 }
                 // Grouped view: applicant_requests → school_contacts → required → none
-                const groups: { method: string; label: string; accent: string }[] = [
-                  { method: "applicant_requests", label: t.interviewMethodFilterApplicant, accent: "text-amber-600" },
-                  { method: "school_contacts",    label: t.interviewMethodFilterSchool,    accent: "text-blue-600" },
+                // "none" and "school_contacts" default collapsed; "applicant_requests" shows 8 with expand
+                const groups: { method: string; label: string; accent: string; defaultCollapsed?: boolean; limitCount?: number }[] = [
+                  { method: "applicant_requests", label: t.interviewMethodFilterApplicant, accent: "text-amber-600", limitCount: 8 },
+                  { method: "school_contacts",    label: t.interviewMethodFilterSchool,    accent: "text-blue-600", defaultCollapsed: true },
                   { method: "required",            label: t.interviewMethodFilterRequired,  accent: "text-red-600" },
-                  { method: "none",                label: t.interviewFilterNone,            accent: "text-stone-400" },
+                  { method: "none",                label: t.interviewFilterNone,            accent: "text-stone-400", defaultCollapsed: true },
                 ];
                 return (
                   <div className="space-y-8">
-                    {groups.map(({ method, label, accent }) => {
+                    {groups.map(({ method, label, accent, defaultCollapsed, limitCount }) => {
                       const group = filteredInterviews
                         .filter(s => s.requestMethod === method)
                         .sort((a, b) => a.rank - b.rank);
                       if (group.length === 0) return null;
                       return (
-                        <section key={method}>
-                          <div className="flex items-center gap-3 mb-3">
-                            <span className={`text-[11px] uppercase tracking-widest font-semibold ${accent}`}>
-                              {label}
-                            </span>
-                            <span className="text-[10px] text-stone-400 bg-stone-100 px-1.5 py-0.5 rounded-full">{group.length}</span>
-                            <div className="flex-1 h-px bg-stone-100" />
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {group.map((s) => <InterviewCard key={s.id} school={s} t={t} lang={lang} />)}
-                          </div>
-                        </section>
+                        <InterviewGroup
+                          key={method}
+                          method={method}
+                          label={label}
+                          accent={accent}
+                          group={group}
+                          t={t}
+                          lang={lang}
+                          defaultCollapsed={defaultCollapsed}
+                          limitCount={limitCount}
+                        />
                       );
                     })}
                     {filteredInterviews.length === 0 && (

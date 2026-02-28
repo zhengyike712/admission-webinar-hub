@@ -19,7 +19,7 @@ const NOTION_TEMPLATE_URL =
   "https://www.notion.so/templates/college-application-tracker";
 
 type Lang = "zh" | "en" | "hi";
-type IntegrationTab = "notion" | "obsidian" | "anytype" | "api";
+type IntegrationTab = "notion" | "obsidian" | "anytype" | "feishu" | "api";
 
 const T = {
   zh: {
@@ -28,7 +28,22 @@ const T = {
     tabNotion: "Notion",
     tabObsidian: "Obsidian",
     tabAnytype: "Anytype",
+    tabFeishu: "飞书 / wolai",
     tabApi: "API",
+    // Feishu / wolai
+    feishuHeroTitle: "在飞书 / wolai 中嵌入景深留学",
+    feishuHeroDesc: "将实时招生 Info Session 数据嵌入飞书多维表格、wolai 或 FlowUs 的页面，无需切换标签页。",
+    feishuStep1: "第一步：复制嵌入链接",
+    feishuStep1Desc: "使用下方链接生成器，根据你的需求调整语言、学校和显示数量，然后复制生成的链接。",
+    feishuStep2Feishu: "飞书文档嵌入方法",
+    feishuStep2FeishuDesc: "在飞书文档中，输入 / 打开命令菜单，选择「嵌入网页」，粘贴链接后回车即可。或者在多维表格的「URL」字段中粘贴链接，选择「卡片预览」模式。",
+    feishuStep2Wolai: "wolai 嵌入方法",
+    feishuStep2WolaiDesc: "在 wolai 页面中，输入 /embed 或点击 + 号选择「嵌入网页」，粘贴链接后确认。wolai 支持完整 iframe 渲染，可以看到实时更新的活动列表。",
+    feishuStep2FlowUs: "FlowUs 嵌入方法",
+    feishuStep2FlowUsDesc: "在 FlowUs 页面中，输入 /嵌入 或从菜单选择「嵌入」，粘贴链接后确认。FlowUs 同样支持 iframe 嵌入。",
+    feishuNote: "提示：飞书文档的「嵌入网页」功能需要在飞书企业版或个人版中开启。如果无法嵌入，可以使用「超链接」功能，将链接添加为卡片形式展示。",
+    feishuApiTitle: "进阶：直接调用 API 填充多维表格",
+    feishuApiDesc: "如果你使用飞书多维表格管理申请信息，可以通过飞书自动化或脚本定期调用景深留学 API，将最新活动数据自动写入多维表格。",
     // Notion
     notionHeroTitle: "将景深留学嵌入你的 Notion",
     notionHeroDesc: "把招生 Info Session 日历直接放进你的申请追踪 Notion 页面，无需切换标签页。",
@@ -100,7 +115,22 @@ const T = {
     tabNotion: "Notion",
     tabObsidian: "Obsidian",
     tabAnytype: "Anytype",
+    tabFeishu: "Feishu / wolai",
     tabApi: "API",
+    // Feishu / wolai
+    feishuHeroTitle: "Embed AdmitLens in Feishu / wolai",
+    feishuHeroDesc: "Embed real-time Info Session data into Feishu Docs, wolai, or FlowUs pages — no tab switching needed.",
+    feishuStep1: "Step 1: Copy the Embed Link",
+    feishuStep1Desc: "Use the link builder below to customize language, school, and session count, then copy the generated link.",
+    feishuStep2Feishu: "Feishu Docs Embed Method",
+    feishuStep2FeishuDesc: "In a Feishu Doc, type / to open the command menu, select \"Embed Webpage\", paste the link, and press Enter. Or paste the link in a URL field in Feishu Base and select \"Card Preview\" mode.",
+    feishuStep2Wolai: "wolai Embed Method",
+    feishuStep2WolaiDesc: "In a wolai page, type /embed or click + and select \"Embed Webpage\", paste the link and confirm. wolai supports full iframe rendering with live updates.",
+    feishuStep2FlowUs: "FlowUs Embed Method",
+    feishuStep2FlowUsDesc: "In a FlowUs page, type /embed or select \"Embed\" from the menu, paste the link and confirm. FlowUs also supports iframe embedding.",
+    feishuNote: "Note: Feishu's \"Embed Webpage\" feature requires Feishu Enterprise or Personal edition. If embedding is unavailable, use the \"Hyperlink\" feature to add the link as a card.",
+    feishuApiTitle: "Advanced: Call the API to Populate Feishu Base",
+    feishuApiDesc: "If you manage applications in Feishu Base, you can use Feishu Automation or scripts to periodically call the AdmitLens API and write the latest session data directly into your spreadsheet.",
     // Notion
     notionHeroTitle: "Embed AdmitLens in Your Notion",
     notionHeroDesc: "Put your college admissions Info Session calendar directly inside your Notion application tracker.",
@@ -172,7 +202,22 @@ const T = {
     tabNotion: "Notion",
     tabObsidian: "Obsidian",
     tabAnytype: "Anytype",
+    tabFeishu: "Feishu / wolai",
     tabApi: "API",
+    // Feishu / wolai
+    feishuHeroTitle: "Feishu / wolai में AdmitLens एम्बेड करें",
+    feishuHeroDesc: "रियल-टाइम Info Session डेटा को Feishu Docs, wolai, या FlowUs पेज में एम्बेड करें।",
+    feishuStep1: "चरण 1: एम्बेड लिंक कॉपी करें",
+    feishuStep1Desc: "नीचे के लिंक बिल्डर का उपयोग करके भाषा, स्कूल और सत्र संख्या कस्टमाइज़ करें, फिर लिंक कॉपी करें।",
+    feishuStep2Feishu: "Feishu Docs एम्बेड विधि",
+    feishuStep2FeishuDesc: "Feishu Doc में / टाइप करें, \"Embed Webpage\" चुनें, लिंक पेस्ट करें और Enter दबाएं।",
+    feishuStep2Wolai: "wolai एम्बेड विधि",
+    feishuStep2WolaiDesc: "wolai पेज में /embed टाइप करें या + क्लिक करके \"Embed Webpage\" चुनें, लिंक पेस्ट करें।",
+    feishuStep2FlowUs: "FlowUs एम्बेड विधि",
+    feishuStep2FlowUsDesc: "FlowUs पेज में /embed टाइप करें या मेनू से \"Embed\" चुनें, लिंक पेस्ट करें।",
+    feishuNote: "नोट: Feishu की एम्बेड सुविधा के लिए Enterprise या Personal संस्करण आवश्यक है।",
+    feishuApiTitle: "उन्नत: Feishu Base में API डेटा भरें",
+    feishuApiDesc: "Feishu Automation का उपयोग करके AdmitLens API को नियमित रूप से कॉल करें और नवीनतम सत्र डेटा स्वचालित रूप से लिखें।",
     // Notion
     notionHeroTitle: "AdmitLens को Notion में एम्बेड करें",
     notionHeroDesc: "अपने कॉलेज प्रवेश Info Session कैलेंडर को सीधे अपने Notion ट्रैकर में रखें।",
@@ -383,6 +428,7 @@ container.innerHTML = \`<iframe src="${embedUrl}" width="100%" height="400" fram
     { id: "notion", label: t.tabNotion, icon: <Layers size={14} /> },
     { id: "obsidian", label: t.tabObsidian, icon: <BookOpen size={14} /> },
     { id: "anytype", label: t.tabAnytype, icon: <FileText size={14} /> },
+    { id: "feishu", label: t.tabFeishu, icon: <Zap size={14} /> },
     { id: "api", label: t.tabApi, icon: <Code2 size={14} /> },
   ];
 
@@ -533,6 +579,77 @@ container.innerHTML = \`<iframe src="${embedUrl}" width="100%" height="400" fram
               <h2 className="text-base font-semibold text-stone-800 mb-3">{t.obsidianAltTitle}</h2>
               <p className="text-sm text-stone-500 mb-4">{t.obsidianAltDesc}</p>
               <CodeBlock code={obsidianDataviewCode} label={t.obsidianCopyCode} />
+            </section>
+          </div>
+        )}
+
+        {/* ── Feishu / wolai Tab ── */}
+        {activeTab === "feishu" && (
+          <div className="space-y-10">
+            <div>
+              <h2 className="text-xl font-bold text-stone-900 mb-2">{t.feishuHeroTitle}</h2>
+              <p className="text-stone-500 text-sm">{t.feishuHeroDesc}</p>
+            </div>
+
+            <section>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="w-6 h-6 rounded-full bg-sky-500 text-white text-xs font-bold flex items-center justify-center">1</span>
+                <h2 className="text-base font-semibold text-stone-800">{t.feishuStep1}</h2>
+              </div>
+              <p className="text-sm text-stone-500 mb-4 ml-8">{t.feishuStep1Desc}</p>
+              <div className="ml-8">
+                <EmbedBuilder t={t} lang={lang} />
+              </div>
+            </section>
+
+            <section>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="w-6 h-6 rounded-full bg-sky-500 text-white text-xs font-bold flex items-center justify-center">2</span>
+                <h2 className="text-base font-semibold text-stone-800">
+                  {lang === "zh" ? "选择你的工具" : lang === "hi" ? "अपना टूल चुनें" : "Choose Your Tool"}
+                </h2>
+              </div>
+              <div className="ml-8 space-y-4">
+                {/* Feishu */}
+                <div className="border border-stone-200 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded">
+                      {lang === "zh" ? "飞书文档" : "Feishu Docs"}
+                    </span>
+                  </div>
+                  <p className="text-sm text-stone-600">{t.feishuStep2FeishuDesc}</p>
+                </div>
+                {/* wolai */}
+                <div className="border border-stone-200 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-bold text-violet-600 bg-violet-50 px-2 py-0.5 rounded">wolai</span>
+                  </div>
+                  <p className="text-sm text-stone-600">{t.feishuStep2WolaiDesc}</p>
+                </div>
+                {/* FlowUs */}
+                <div className="border border-stone-200 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">FlowUs</span>
+                  </div>
+                  <p className="text-sm text-stone-600">{t.feishuStep2FlowUsDesc}</p>
+                </div>
+              </div>
+            </section>
+
+            <section className="border border-sky-100 rounded-lg p-4 bg-sky-50">
+              <p className="text-sm text-sky-800">{t.feishuNote}</p>
+            </section>
+
+            <section>
+              <h2 className="text-base font-semibold text-stone-800 mb-2">{t.feishuApiTitle}</h2>
+              <p className="text-sm text-stone-500 mb-4">{t.feishuApiDesc}</p>
+              <CodeBlock code={`GET ${SITE_ORIGIN}/api/public/sessions?upcoming=true&limit=10&lang=${lang}`} label={lang === "zh" ? "复制 API 链接" : "Copy API URL"} />
+              <div className="mt-3">
+                <a href="/api-docs" className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                  {lang === "zh" ? "查看完整 API 文档" : lang === "hi" ? "पूर्ण दस्तावेज़ देखें" : "View Full API Docs"}
+                  <ExternalLink size={13} />
+                </a>
+              </div>
             </section>
           </div>
         )}
