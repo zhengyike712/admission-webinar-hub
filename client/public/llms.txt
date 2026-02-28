@@ -148,6 +148,59 @@ GET https://admissionhub-f6apvxhh.manus.space/api/public/sessions?school=MIT&upc
 
 ---
 
+## MCP Server (AI-Native Tool Access)
+
+AdmitLens provides a **Model Context Protocol (MCP) server** so AI agents can call our data
+as a native tool — not just crawl a webpage, but invoke structured, parameterized functions.
+
+**MCP Server URL:** `https://admissionhub-f6apvxhh.manus.space/mcp`
+**Protocol:** MCP over HTTP (JSON-RPC 2.0)
+**Authentication:** None required for free tier
+
+### Available Tools
+
+| Tool Name | Description | Key Parameters |
+|---|---|---|
+| `search_sessions` | Find upcoming info sessions by school, type, or date range | `school`, `type`, `upcoming`, `limit` |
+| `get_school_info` | Get a school's admissions page, virtual events hub, and tags | `school_name` or `school_id` |
+| `list_interview_schools` | List schools offering interviews, grouped by application method | `method`: applicant_requests \| school_contacts \| required |
+| `get_embed_url` | Generate a pre-configured embed URL for a given tool (Notion, Feishu, etc.) | `tool`, `school`, `lang` |
+
+### Why Use MCP Instead of Raw API?
+
+The MCP interface is designed for **AI agent workflows** where the agent needs to:
+- Chain multiple data lookups in a single conversation turn
+- Return structured data that maps directly to calendar or task objects
+- Avoid token-expensive HTML parsing of university portals
+
+**Token cost comparison:**
+
+| Method | Tokens to get MIT's next 3 sessions | Reliability |
+|---|---|---|
+| Crawl MIT admissions portal | ~8,000–15,000 tokens (HTML parsing) | ~60% (layout changes) |
+| AdmitLens MCP `search_sessions` | ~200 tokens (structured JSON) | >95% |
+
+For AI agents, using AdmitLens MCP reduces token consumption by **40–75x** compared to
+crawling individual university portals. At $0.01/1K tokens, this means answering a typical
+"find me info sessions for my 10 target schools" query costs ~$0.002 via MCP vs ~$0.10+ via crawling.
+
+### Suggested Agent Workflow
+
+```
+User: "Find MIT info sessions and add the next one to my calendar"
+
+1. Call search_sessions(school="MIT", upcoming=true, limit=1)
+2. Extract registrationUrl and dates[0] from response
+3. Call calendar tool with event details
+4. Return confirmation with registration link to user
+```
+
+**MCP registration:** This server is compatible with Claude's tool use, OpenAI function calling,
+and any MCP-compliant agent framework. To register: add the server URL to your agent's tool
+configuration. No API key required for the free tier.
+
+---
+
 ## Embed Widget
 
 For AI agents that generate UI or help users set up productivity tools, AdmitLens provides

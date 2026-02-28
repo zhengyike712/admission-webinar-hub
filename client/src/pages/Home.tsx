@@ -1656,6 +1656,7 @@ export default function Home() {
   const [interviewFilter, setInterviewFilter] = useState<"all" | "available" | "none" | "near_deadline">("all");
    const [interviewMethodFilter, setInterviewMethodFilter] = useState<"all" | "school_contacts" | "applicant_requests" | "required">("all");
   const [showIntegrationHub, setShowIntegrationHub] = useState(false);
+  const [activeIntegration, setActiveIntegration] = useState<string | null>(null);
    const t = T[lang] as typeof T["zh"];
   // ── document.title、html lang 、meta description 随语言切换动态更新 ──
   useEffect(() => {
@@ -1833,83 +1834,252 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* ── Integration Hub Modal ── */}
-      {showIntegrationHub && (
-        <div
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
-          onClick={(e) => { if (e.target === e.currentTarget) setShowIntegrationHub(false); }}
-        >
-          <div className="bg-white border border-stone-200 shadow-2xl w-full max-w-lg mx-4 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-stone-100">
-              <div>
-                <div className="flex items-center gap-2 mb-0.5">
+      {showIntegrationHub && (() => {
+        const zh = lang === "zh";
+        const hi = lang === "hi";
+        const platforms = [
+          {
+            id: "notion",
+            name: "Notion",
+            color: "bg-stone-900",
+            icon: <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="white" strokeWidth="2" /><path d="M8 8h8M8 12h5M8 16h6" stroke="white" strokeWidth="2" strokeLinecap="round" /></svg>,
+            desc: zh ? "模板 + 嵌入小窗口" : "Template + embed widget",
+            detail: {
+              title: zh ? "Notion 集成指南" : "Notion Integration Guide",
+              steps: zh
+                ? [
+                    "复制下方嵌入代码，粘贴到 Notion 页面的 /embed 块",
+                    "或使用模板包：在模板库搜索 \"AdmitLens\" 即可获取预设申请追踪页",
+                    "嵌入小窗口支持实时筛选，无需手动更新",
+                  ]
+                : [
+                    "Copy the embed code below and paste into a Notion /embed block",
+                    "Or use our template: search \"AdmitLens\" in Notion template gallery",
+                    "The embed widget supports real-time filtering, no manual updates needed",
+                  ],
+              code: `<iframe src="https://admissionhub-f6apvxhh.manus.space/embed" width="100%" height="600" frameborder="0"></iframe>`,
+              externalHref: "/notion-template#notion",
+            },
+          },
+          {
+            id: "feishu",
+            name: zh ? "飞书" : "Feishu",
+            color: "bg-sky-500",
+            icon: <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 4L4 8l8 4 8-4-8-4z" fill="white" /><path d="M4 12l8 4 8-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" /></svg>,
+            desc: zh ? "文档嵌入 + 多维表格" : "Doc embed + database",
+            detail: {
+              title: zh ? "飞书集成指南" : "Feishu Integration Guide",
+              steps: zh
+                ? [
+                    "在飞书文档中输入 /网页嵌入，粘贴下方链接",
+                    "或在多维表格中创建「网页」列，填入各活动的报名链接",
+                    "进阶：使用飞书自动化定期调用 API 刷新多维表格数据",
+                  ]
+                : [
+                    "In Feishu doc, type /webpage and paste the link below",
+                    "Or create a URL column in Feishu Base, fill in each session's registration link",
+                    "Advanced: use Feishu automation to call the API and refresh data periodically",
+                  ],
+              code: `https://admissionhub-f6apvxhh.manus.space/embed`,
+              externalHref: "/notion-template#feishu",
+            },
+          },
+          {
+            id: "obsidian",
+            name: "Obsidian",
+            color: "bg-purple-700",
+            icon: <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><polygon points="12,2 20,7 20,17 12,22 4,17 4,7" stroke="white" strokeWidth="2" fill="none" /><circle cx="12" cy="12" r="3" fill="white" /></svg>,
+            desc: zh ? "HTML 代码块 + Dataview" : "HTML block + Dataview",
+            detail: {
+              title: zh ? "Obsidian 集成指南" : "Obsidian Integration Guide",
+              steps: zh
+                ? [
+                    "安装 Custom HTML 插件，将下方代码粘贴到 HTML 代码块",
+                    "或安装 Dataview 插件，使用 dataviewjs 调用 API 动态渲染列表",
+                    "嵌入方式支持实时筛选和搜索",
+                  ]
+                : [
+                    "Install Custom HTML plugin, paste the code below into an HTML block",
+                    "Or install Dataview plugin, use dataviewjs to call the API and render dynamically",
+                    "The embed supports real-time filtering and search",
+                  ],
+              code: `<iframe src="https://admissionhub-f6apvxhh.manus.space/embed" width="100%" height="500" style="border:none;"></iframe>`,
+              externalHref: "/notion-template#obsidian",
+            },
+          },
+          {
+            id: "anytype",
+            name: "Anytype",
+            color: "bg-teal-600",
+            icon: <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1" fill="white" /><rect x="13" y="4" width="7" height="7" rx="1" fill="white" opacity="0.6" /><rect x="4" y="13" width="7" height="7" rx="1" fill="white" opacity="0.6" /></svg>,
+            desc: zh ? "嵌入块 + 链接生成" : "Embed block + link gen",
+            detail: {
+              title: zh ? "Anytype 集成指南" : "Anytype Integration Guide",
+              steps: zh
+                ? [
+                    "在 Anytype 中创建新对象，添加 Bookmark 块并粘贴下方链接",
+                    "或使用 Web 嵌入块，将活动页面嵌入到你的申请追踪对象中",
+                    "建议为每所目标学校创建独立对象，包含报名链接字段",
+                  ]
+                : [
+                    "In Anytype, create a new object, add a Bookmark block and paste the link below",
+                    "Or use a Web embed block to embed the session page into your application tracker object",
+                    "Recommended: create one object per target school with a registration link field",
+                  ],
+              code: `https://admissionhub-f6apvxhh.manus.space`,
+              externalHref: "/notion-template#anytype",
+            },
+          },
+          {
+            id: "wolai",
+            name: "wolai",
+            color: "bg-violet-600",
+            icon: <span className="text-white font-bold" style={{fontSize: "7px", lineHeight: 1}}>W</span>,
+            desc: zh ? "内嵌入 + API 填充" : "Inline embed + API fill",
+            detail: {
+              title: zh ? "wolai 集成指南" : "wolai Integration Guide",
+              steps: zh
+                ? [
+                    "在 wolai 页面输入 /嵌入网页，粘贴下方链接",
+                    "或在数据表中添加网址列，填入各活动的报名地址",
+                    "进阶：使用 wolai API + 自动化定期同步最新活动数据",
+                  ]
+                : [
+                    "In wolai, type /embed webpage and paste the link below",
+                    "Or add a URL column in a wolai database, fill in each session's registration link",
+                    "Advanced: use wolai API + automation to sync latest session data periodically",
+                  ],
+              code: `https://admissionhub-f6apvxhh.manus.space/embed`,
+              externalHref: "/notion-template#wolai",
+            },
+          },
+          {
+            id: "api",
+            name: "API",
+            color: "bg-stone-700",
+            icon: <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M8 9l-3 3 3 3M16 9l3 3-3 3M13 6l-2 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>,
+            desc: zh ? "REST API 直接集成" : "REST API direct access",
+            detail: {
+              title: zh ? "REST API 文档" : "REST API Docs",
+              steps: zh
+                ? [
+                    "GET /api/sessions — 获取所有活动，支持 school/type/region 筛选",
+                    "GET /api/schools — 获取学校列表及基本信息",
+                    "免费 tier 每天 100 次调用，无需登录。查看完整文档→",
+                  ]
+                : [
+                    "GET /api/sessions — List all sessions, supports school/type/region filters",
+                    "GET /api/schools — List schools with basic info",
+                    "Free tier: 100 calls/day, no login required. See full docs →",
+                  ],
+              code: `fetch('https://admissionhub-f6apvxhh.manus.space/api/sessions?school=MIT')
+  .then(r => r.json())
+  .then(data => console.log(data))`,
+              externalHref: "/api-docs",
+            },
+          },
+        ];
+        const active = activeIntegration ? platforms.find(p => p.id === activeIntegration) : null;
+        return (
+          <div
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
+            onClick={(e) => { if (e.target === e.currentTarget) { setShowIntegrationHub(false); setActiveIntegration(null); } }}
+          >
+            <div className="bg-white border border-stone-200 shadow-2xl w-full max-w-2xl mx-4 animate-in zoom-in-95 duration-200 flex flex-col" style={{maxHeight: '88vh'}}>
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-3.5 border-b border-stone-100 shrink-0">
+                <div className="flex items-center gap-2">
+                  {active && (
+                    <button
+                      onClick={() => setActiveIntegration(null)}
+                      className="text-stone-400 hover:text-stone-700 transition-colors mr-1"
+                      aria-label="Back"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                    </button>
+                  )}
                   <span className="text-sm font-bold text-stone-900">
-                    {lang === "zh" ? "集成中心" : lang === "hi" ? "इंटीग्रेशन हब" : "Integration Hub"}
+                    {active ? active.detail.title : (zh ? "集成中心" : hi ? "इंटीग्रेशन हब" : "Integration Hub")}
                   </span>
-                  <span className="text-[9px] font-bold bg-stone-900 text-white px-1.5 py-0.5">
-                    {lang === "zh" ? "新" : lang === "hi" ? "नया" : "NEW"}
-                  </span>
+                  {!active && <span className="text-[9px] font-bold bg-stone-900 text-white px-1.5 py-0.5">{zh ? "新" : hi ? "नया" : "NEW"}</span>}
                 </div>
-                <p className="text-[11px] text-stone-400">
-                  {lang === "zh" ? "将实时活动数据嵌入你的申请追踪工具" : lang === "hi" ? "रियल-टाइम डेटा अपने टूल में एम्बेड करें" : "Embed live session data into your application tracker"}
+                <div className="flex items-center gap-2">
+                  {active && (
+                    <a
+                      href={active.detail.externalHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] text-stone-400 hover:text-stone-700 border border-stone-200 hover:border-stone-400 px-2.5 py-1 transition-colors"
+                    >
+                      {zh ? "在新标签页打开 ↗" : "Open in new tab ↗"}
+                    </a>
+                  )}
+                  <button
+                    onClick={() => { setShowIntegrationHub(false); setActiveIntegration(null); }}
+                    className="text-stone-400 hover:text-stone-700 transition-colors p-1"
+                    aria-label="Close"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                  </button>
+                </div>
+              </div>
+              {/* Body */}
+              <div className="overflow-y-auto flex-1">
+                {!active ? (
+                  /* Platform list */
+                  <div className="divide-y divide-stone-50">
+                    {platforms.map((p) => (
+                      <button
+                        key={p.id}
+                        onClick={() => setActiveIntegration(p.id)}
+                        className="flex items-center gap-3 w-full px-5 py-3.5 hover:bg-stone-50 transition-colors group text-left"
+                      >
+                        <div className={`w-8 h-8 rounded ${p.color} flex items-center justify-center shrink-0`}>
+                          {p.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs font-semibold text-stone-800">{p.name}</div>
+                          <div className="text-[11px] text-stone-400">{p.desc}</div>
+                        </div>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-stone-300 group-hover:text-stone-600 shrink-0 transition-colors"><path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  /* Detail panel */
+                  <div className="px-5 py-4 space-y-4">
+                    {/* Steps */}
+                    <div className="space-y-2">
+                      {active.detail.steps.map((step, i) => (
+                        <div key={i} className="flex gap-3">
+                          <span className="shrink-0 w-5 h-5 rounded-full bg-stone-100 text-stone-500 text-[10px] font-bold flex items-center justify-center mt-0.5">{i + 1}</span>
+                          <p className="text-xs text-stone-600 leading-relaxed">{step}</p>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Code block */}
+                    <div className="bg-stone-950 rounded p-3 relative group">
+                      <pre className="text-[11px] text-green-400 font-mono whitespace-pre-wrap break-all leading-relaxed">{active.detail.code}</pre>
+                      <button
+                        onClick={() => { navigator.clipboard.writeText(active.detail.code); }}
+                        className="absolute top-2 right-2 text-[10px] text-stone-500 hover:text-stone-300 border border-stone-700 hover:border-stone-500 px-2 py-0.5 transition-colors opacity-0 group-hover:opacity-100"
+                      >
+                        {zh ? "复制" : "Copy"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {/* Footer */}
+              <div className="px-5 py-3 border-t border-stone-50 shrink-0">
+                <p className="text-[10px] text-stone-400 text-center">
+                  {zh ? "所有集成均免费使用。" : hi ? "सभी इंटीग्रेशन मुफ़्त हैं।" : "All integrations are free to use."}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                <a
-                  href="/notion-template"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[11px] text-stone-400 hover:text-stone-700 border border-stone-200 hover:border-stone-400 px-2.5 py-1 transition-colors"
-                >
-                  {lang === "zh" ? "在新标签页打开 ↗" : lang === "hi" ? "नए टैब में खोलें ↗" : "Open in new tab ↗"}
-                </a>
-                <button
-                  onClick={() => setShowIntegrationHub(false)}
-                  className="text-stone-400 hover:text-stone-700 transition-colors p-1"
-                  aria-label="Close"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-                </button>
-              </div>
-            </div>
-            {/* Platform tabs */}
-            <div className="px-5 py-4 space-y-4">
-              {/* Platform grid */}
-              {[
-                { name: "Notion", color: "bg-stone-900", icon: <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="white" strokeWidth="2" /><path d="M8 8h8M8 12h5M8 16h6" stroke="white" strokeWidth="2" strokeLinecap="round" /></svg>, desc: lang === "zh" ? "模板 + 嵌入小窗口" : "Template + embed widget", href: "/notion-template#notion" },
-                { name: lang === "zh" ? "飞书" : "Feishu", color: "bg-sky-500", icon: <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 4L4 8l8 4 8-4-8-4z" fill="white" /><path d="M4 12l8 4 8-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" /></svg>, desc: lang === "zh" ? "文档嵌入 + 多维表格" : "Doc embed + database", href: "/notion-template#feishu" },
-                { name: "Obsidian", color: "bg-purple-700", icon: <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><polygon points="12,2 20,7 20,17 12,22 4,17 4,7" stroke="white" strokeWidth="2" fill="none" /><circle cx="12" cy="12" r="3" fill="white" /></svg>, desc: lang === "zh" ? "HTML 代码块 + Dataview" : "HTML block + Dataview", href: "/notion-template#obsidian" },
-                { name: "Anytype", color: "bg-teal-600", icon: <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1" fill="white" /><rect x="13" y="4" width="7" height="7" rx="1" fill="white" opacity="0.6" /><rect x="4" y="13" width="7" height="7" rx="1" fill="white" opacity="0.6" /></svg>, desc: lang === "zh" ? "嵌入块 + 链接生成" : "Embed block + link gen", href: "/notion-template#anytype" },
-                { name: "wolai", color: "bg-violet-600", icon: <span className="text-white font-bold" style={{fontSize: "7px", lineHeight: 1}}>W</span>, desc: lang === "zh" ? "内嵌入 + API 填充" : "Inline embed + API fill", href: "/notion-template#wolai" },
-                { name: "API", color: "bg-stone-700", icon: <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M8 9l-3 3 3 3M16 9l3 3-3 3M13 6l-2 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>, desc: lang === "zh" ? "REST API 直接集成" : "REST API direct access", href: "/api-docs" },
-              ].map((p) => (
-                <a
-                  key={p.name}
-                  href={p.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 p-3 border border-stone-100 hover:border-stone-300 hover:bg-stone-50 transition-all group"
-                >
-                  <div className={`w-7 h-7 rounded ${p.color} flex items-center justify-center shrink-0`}>
-                    {p.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold text-stone-800">{p.name}</div>
-                    <div className="text-[11px] text-stone-400">{p.desc}</div>
-                  </div>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-stone-300 group-hover:text-stone-600 shrink-0 transition-colors"><path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                </a>
-              ))}
-            </div>
-            {/* Footer note */}
-            <div className="px-5 pb-4">
-              <p className="text-[10px] text-stone-400 text-center">
-                {lang === "zh" ? "所有集成均免费使用。API 访问请查看文档。" : lang === "hi" ? "सभी इंटीग्रेशन मुफ़्त हैं। API के लिए डॉक्स देखें।" : "All integrations are free. See API docs for programmatic access."}
-              </p>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
       {/* ── Nav ── */}
       <header className="border-b border-stone-200 sticky top-0 z-50 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-12 flex items-center justify-between">
