@@ -68,7 +68,7 @@ const T: Record<Lang, Record<string, string>> = {
     upcoming: "即将开始",
     rolling: "全年开放报名",
     rollingNote: "滚动开放活动全年可选日期，点击报名后可在官网自行选择时间段。",
-    register: "报名",
+    register: "入口",
     viewSchedule: "查看日程",
     noFixed: "暂无固定日期活动",
     noMatch: "没有匹配的活动",
@@ -109,7 +109,7 @@ const T: Record<Lang, Record<string, string>> = {
     interviewMethodSchool: "学校主动联系",
     interviewMethodApplicant: "申请人主动申请",
     interviewMethodRequired: "申请必须",
-    interviewGoPortal: "前往报名入口",
+    interviewGoPortal: "入口",
     interviewLearnMore: "了解详情",
     interviewFilterAll: "全部",
     interviewFilterAvailable: "提供面试",
@@ -258,7 +258,7 @@ const T: Record<Lang, Record<string, string>> = {
     interviewMethodSchool: "School contacts applicant",
     interviewMethodApplicant: "Applicant requests",
     interviewMethodRequired: "Required",
-    interviewGoPortal: "Go to Portal",
+    interviewGoPortal: "Portal",
     interviewLearnMore: "Learn More",
     interviewFilterAll: "All",
     interviewFilterAvailable: "Available",
@@ -407,7 +407,7 @@ const T: Record<Lang, Record<string, string>> = {
     interviewMethodSchool: "विश्वविद्यालय संपर्क करता है",
     interviewMethodApplicant: "आवेदक अनुरोध करता है",
     interviewMethodRequired: "अनिवार्य",
-    interviewGoPortal: "पोर्टल पर जाएं",
+    interviewGoPortal: "Portal",
     interviewLearnMore: "अधिक जानें",
     interviewFilterAll: "सभी",
     interviewFilterAvailable: "उपलब्ध",
@@ -864,9 +864,9 @@ function ScheduledSessionCard({ session, t, isSelected, onToggle, lang, onView }
             className="shrink-0 w-1.5 h-1.5 rounded-full"
             style={{ backgroundColor: school?.color || "#2563eb" }}
           />
-          <span className="text-xs text-stone-800 font-medium truncate min-w-0">
-            <span className="text-stone-400 mr-1">{school?.shortName || school?.name}</span>
-            {session.title}
+          <span className="text-xs text-stone-800 font-medium min-w-0 flex items-baseline gap-1 overflow-hidden">
+            <span className="text-stone-500 shrink-0">{school?.shortName || school?.name}</span>
+            <span className="truncate text-stone-700">{session.title}</span>
           </span>
           {urgency === "imminent" && (
             <span className="shrink-0 text-[9px] px-1 py-0.5 bg-red-500 text-white font-semibold rounded-sm animate-pulse">{t.imminent}</span>
@@ -1288,19 +1288,15 @@ function InterviewCard({ school, t, lang, onTypeClick }: { school: SchoolIntervi
           {school.available && school.types.length > 0 && (
             <span className="hidden sm:flex items-center gap-1 shrink-0">
               {school.types.slice(0, 2).map((type) => (
-                onTypeClick ? (
-                  <button
-                    key={type}
-                    onClick={(e) => { e.stopPropagation(); onTypeClick(type); }}
-                    className="text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded hover:bg-blue-100 hover:text-blue-700 transition-colors cursor-pointer"
-                  >
-                    {type}
-                  </button>
-                ) : (
-                  <span key={type} className="text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded">
-                    {type}
-                  </span>
-                )
+                <span
+                  key={type}
+                  onClick={onTypeClick ? (e) => { e.stopPropagation(); onTypeClick(type); } : undefined}
+                  className={`text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded ${
+                    onTypeClick ? "hover:bg-blue-100 hover:text-blue-700 transition-colors cursor-pointer" : ""
+                  }`}
+                >
+                  {type}
+                </span>
               ))}
               {school.types.length > 2 && (
                 <span className="text-[10px] text-stone-400">+{school.types.length - 2}</span>
