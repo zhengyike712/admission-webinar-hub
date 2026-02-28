@@ -2788,7 +2788,7 @@ message = client.messages.create(
       </div>
 
       {/* ── Layout ── */}
-      <div className="hidden sm:block max-w-screen-2xl mx-auto px-4 sm:px-6 py-6">
+      <div className="hidden sm:block max-w-6xl mx-auto px-4 sm:px-6 py-6">
 
         {/* ── Filter Drawer (all screens) ── */}
         <aside
@@ -2947,8 +2947,8 @@ message = client.messages.create(
 
         {/* ── Content: 3-column on desktop ── */}
         <main className="w-full">
-          {/* Desktop: 3-column side-by-side (unequal widths) */}
-          <div className="hidden sm:grid gap-6" style={{ gridTemplateColumns: '2fr 1.5fr 1.5fr' }}>
+          {/* Desktop: 3-column side-by-side */}
+          <div className="hidden sm:grid grid-cols-3 gap-4">
 
             {/* Column 1: Interviews */}
             <div className="min-w-0">
