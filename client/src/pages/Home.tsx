@@ -1239,6 +1239,8 @@ function InterviewDeadlineCalButton({ school, t }: { school: SchoolInterview; t:
 }
 
 function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof T["zh"]; lang: Lang }) {
+  const [expanded, setExpanded] = useState(false);
+
   const methodLabel = {
     school_contacts: t.interviewMethodSchool,
     applicant_requests: t.interviewMethodApplicant,
@@ -1246,8 +1248,7 @@ function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof
     none: "",
   }[school.requestMethod];
 
-  const notes = lang === "zh" ? school.notesZh : school.notesEn; // hi falls back to en
-  // Format deadline for display
+  const notes = lang === "zh" ? school.notesZh : school.notesEn;
   const localeLang = lang === "zh" ? "zh-CN" : lang === "hi" ? "hi-IN" : "en-US";
   const deadlineDisplay = school.deadline
     ? new Date(school.deadline + "T12:00:00Z").toLocaleDateString(localeLang, {
@@ -1256,8 +1257,6 @@ function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof
         day: "numeric",
       })
     : null;
-
-  // Determine if deadline is approaching (within 30 days)
   const deadlineUrgent = school.deadline
     ? (() => {
         const diff = new Date(school.deadline + "T12:00:00Z").getTime() - Date.now();
@@ -1265,124 +1264,128 @@ function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof
       })()
     : false;
 
+  const hasDetails = !!(notes || (school.available && school.portalUrl && school.portalUrl !== "N/A") || (!school.available && school.portalUrl && school.portalUrl !== "N/A") || (school.available && school.requestMethod === "applicant_requests" && deadlineDisplay) || (school.available && school.timing && school.timing !== "N/A") || school.available);
+
   return (
-    <div className={`bg-white border transition-colors duration-150 ${
-      school.available
-        ? "border-stone-200 hover:border-stone-400"
-        : "border-stone-100 opacity-60"
+    <div className={`border-b border-stone-100 last:border-b-0 ${
+      school.available ? "" : "opacity-50"
     }`}>
-      <div className="p-4">
-        {/* Header */}
-        <div className="flex items-start justify-between gap-2 mb-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 mb-0.5">
-              {school.available ? (
-                <UserCheck size={12} className="text-green-600 shrink-0" />
-              ) : (
-                <UserX size={12} className="text-stone-300 shrink-0" />
+      {/* Row — always visible */}
+      <button
+        onClick={() => hasDetails && setExpanded(v => !v)}
+        className={`w-full flex items-center gap-3 py-2.5 px-1 text-left transition-colors duration-100 ${
+          hasDetails ? "hover:bg-stone-50 cursor-pointer" : "cursor-default"
+        }`}
+      >
+        {/* Status dot */}
+        <span className={`shrink-0 w-1.5 h-1.5 rounded-full ${
+          school.available ? "bg-green-500" : "bg-stone-300"
+        }`} />
+
+        {/* School name */}
+        <span className="text-sm text-stone-800 font-medium truncate min-w-0">
+          {school.shortName || school.schoolName}
+        </span>
+
+        {/* Types — hidden on very small screens */}
+        {school.available && school.types.length > 0 && (
+          <span className="hidden sm:flex items-center gap-1 shrink-0">
+            {school.types.slice(0, 2).map((type) => (
+              <span key={type} className="text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded">
+                {type}
+              </span>
+            ))}
+            {school.types.length > 2 && (
+              <span className="text-[10px] text-stone-400">+{school.types.length - 2}</span>
+            )}
+          </span>
+        )}
+
+        {/* Deadline urgent badge */}
+        {deadlineUrgent && (
+          <span className="shrink-0 text-[10px] text-red-600 font-medium">⚠ {deadlineDisplay}</span>
+        )}
+
+        {/* Expand chevron */}
+        {hasDetails && (
+          <ChevronDown
+            size={13}
+            className={`ml-auto shrink-0 text-stone-300 transition-transform duration-150 ${
+              expanded ? "rotate-180" : ""
+            }`}
+          />
+        )}
+      </button>
+
+      {/* Expanded details */}
+      {expanded && (
+        <div className="px-4 pb-3 pt-0.5 border-t border-stone-50 bg-stone-50/60">
+          {/* Method + Timing */}
+          {school.available && (methodLabel || (school.timing && school.timing !== "N/A")) && (
+            <div className="flex flex-wrap gap-x-4 gap-y-0.5 mb-2 mt-2">
+              {methodLabel && (
+                <span className="text-[11px] text-stone-500">
+                  <span className="text-stone-400">{t.howLabel}</span>{methodLabel}
+                </span>
               )}
-              <h3 className="text-sm font-semibold text-stone-900 truncate">
-                {school.shortName || school.schoolName}
-              </h3>
+              {school.timing && school.timing !== "N/A" && (
+                <span className="text-[11px] text-stone-500">{school.timing}</span>
+              )}
             </div>
-            {school.shortName && (
-              <p className="text-[11px] text-stone-400 truncate pl-4">{school.schoolName}</p>
+          )}
+
+          {/* Deadline */}
+          {school.available && school.requestMethod === "applicant_requests" && deadlineDisplay && (
+            <div className="flex items-center gap-2 mb-2">
+              <span className={`flex items-center gap-1 text-[11px] px-1.5 py-0.5 border ${
+                deadlineUrgent
+                  ? "bg-red-50 text-red-700 border-red-200"
+                  : "bg-amber-50 text-amber-700 border-amber-200"
+              }`}>
+                <Clock size={9} />
+                <span className="font-medium">{t.interviewDeadlineLabel}:</span>
+                <span>{deadlineDisplay}</span>
+                {deadlineUrgent && <span className="ml-0.5 font-semibold">⚠</span>}
+              </span>
+              <InterviewDeadlineCalButton school={school} t={t} />
+            </div>
+          )}
+
+          {/* Notes */}
+          {notes && (
+            <p className="text-[11px] text-stone-400 leading-relaxed mb-2">{notes}</p>
+          )}
+
+          {/* CTA links */}
+          <div className="flex gap-2 flex-wrap">
+            {school.available && school.portalUrl && school.portalUrl !== "N/A" && (
+              <a
+                href={school.portalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-[11px] text-stone-700 border border-stone-300 px-2.5 py-1 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-colors duration-150"
+              >
+                {t.interviewGoPortal}
+                <ArrowUpRight size={10} />
+              </a>
+            )}
+            {!school.available && school.portalUrl && school.portalUrl !== "N/A" && (
+              <a
+                href={school.portalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-[11px] text-stone-400 border border-stone-200 px-2.5 py-1 hover:border-stone-400 hover:text-stone-600 transition-colors duration-150"
+              >
+                {t.interviewLearnMore}
+                <ExternalLink size={10} />
+              </a>
             )}
           </div>
-          <span className={`shrink-0 text-[10px] px-1.5 py-0.5 font-medium ${
-            school.available
-              ? "bg-green-50 text-green-700 border border-green-200"
-              : "bg-stone-50 text-stone-400 border border-stone-200"
-          }`}>
-            {school.available ? t.interviewAvailable : t.interviewNotAvailable}
-          </span>
+
+          {/* Prep Tools */}
+          {school.available && <InterviewPrepTools school={school} lang={lang} t={t} />}
         </div>
-
-        {/* Interview types */}
-        {school.available && school.types.length > 0 && (
-          <div className="mb-2">
-            <div className="text-[10px] uppercase tracking-widest text-stone-400 mb-1">{t.interviewTypeLabel}</div>
-            <div className="flex flex-wrap gap-1">
-              {school.types.map((type) => (
-                <span key={type} className="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-100">
-                  {type}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Method */}
-        {school.available && methodLabel && (
-          <div className="mb-2 text-[11px] text-stone-500">
-                <span className="text-stone-400">{t.howLabel}</span>
-            {methodLabel}
-          </div>
-        )}
-
-        {/* Timing */}
-        {school.available && school.timing && school.timing !== "N/A" && (
-          <div className="mb-2">
-            <div className="text-[10px] uppercase tracking-widest text-stone-400 mb-0.5">{t.interviewTimingLabel}</div>
-            <div className="text-[11px] text-stone-600 leading-relaxed">{school.timing}</div>
-          </div>
-        )}
-
-        {/* Deadline badge + calendar button */}
-        {school.available && school.requestMethod === "applicant_requests" && deadlineDisplay && (
-          <div className="mb-2 flex items-center gap-2 flex-wrap">
-            <div className={`flex items-center gap-1 text-[11px] px-1.5 py-0.5 border ${
-              deadlineUrgent
-                ? "bg-red-50 text-red-700 border-red-200"
-                : "bg-amber-50 text-amber-700 border-amber-200"
-            }`}>
-              <Clock size={9} />
-              <span className="font-medium">{t.interviewDeadlineLabel}:</span>
-              <span>{deadlineDisplay}</span>
-              {deadlineUrgent && <span className="ml-0.5 text-red-600 font-semibold">⚠</span>}
-            </div>
-            <InterviewDeadlineCalButton school={school} t={t} />
-          </div>
-        )}
-
-        {/* Notes */}
-        {notes && (
-          <div className="flex gap-1.5 mt-2 pt-2 border-t border-stone-100">
-            <Info size={10} className="text-stone-300 shrink-0 mt-0.5" />
-            <p className="text-[10px] text-stone-400 leading-relaxed">{notes}</p>
-          </div>
-        )}
-
-        {/* CTA */}
-        {school.available && school.portalUrl && school.portalUrl !== "N/A" && (
-          <div className="mt-3">
-            <a
-              href={school.portalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-1 w-full py-1.5 border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white text-xs font-medium transition-colors duration-150"
-            >
-              {t.interviewGoPortal}
-              <ArrowUpRight size={10} />
-            </a>
-          </div>
-        )}
-        {!school.available && school.portalUrl && school.portalUrl !== "N/A" && (
-          <div className="mt-3">
-            <a
-              href={school.portalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-1 w-full py-1.5 border border-stone-200 text-stone-400 hover:border-stone-400 hover:text-stone-600 text-xs transition-colors duration-150"
-            >
-              {t.interviewLearnMore}
-              <ExternalLink size={10} />
-            </a>
-          </div>
-        )}
-        {/* Prep Tools — only for schools with available interviews */}
-        {school.available && <InterviewPrepTools school={school} lang={lang} t={t} />}
-      </div>
+      )}
     </div>
   );
 }
@@ -1422,7 +1425,7 @@ function InterviewGroup({
       </button>
       {!collapsed && (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="border border-stone-100 divide-y-0">
             {displayGroup.map((s) => <InterviewCard key={s.id} school={s} t={t} lang={lang} />)}
           </div>
           {hasMore && !expanded && (
@@ -3057,7 +3060,7 @@ message = client.messages.create(
                       <p className="text-xs">{t.noMatchSchool}</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="border border-stone-100">
                       {sorted.map((s) => <InterviewCard key={s.id} school={s} t={t} lang={lang} />)}
                     </div>
                   );
