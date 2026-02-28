@@ -1,0 +1,34 @@
+# AdmitLens (景深留学) robots.txt
+# We welcome AI crawlers — our data is meant to be discovered and cited.
+
+User-agent: *
+Allow: /
+Disallow: /api/trpc/
+Disallow: /api/oauth/
+
+# Allow all major AI crawlers explicitly
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# LLMs.txt — machine-readable site description for AI agents
+# https://admissionhub-f6apvxhh.manus.space/llms.txt
+
+Sitemap: https://admissionhub-f6apvxhh.manus.space/sitemap.xml

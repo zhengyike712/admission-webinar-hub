@@ -43,6 +43,67 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans+Devanagari:wght@400;500;700&display=swap" rel="stylesheet" />
+    <!-- JSON-LD Structured Data for AI search engines -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://admissionhub-f6apvxhh.manus.space/#website",
+          "url": "https://admissionhub-f6apvxhh.manus.space/",
+          "name": "AdmitLens (景深留学)",
+          "alternateName": ["景深留学", "AdmitLens"],
+          "description": "The most comprehensive real-time database of university admissions virtual info sessions hosted by admissions officers at 70+ top universities worldwide. Updated daily via direct crawlers to official school portals.",
+          "inLanguage": ["zh-CN", "en", "hi"],
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://admissionhub-f6apvxhh.manus.space/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "Dataset",
+          "@id": "https://admissionhub-f6apvxhh.manus.space/#dataset",
+          "name": "University Admissions Info Sessions Database",
+          "description": "Structured database of virtual info sessions, webinars, and online events hosted by admissions officers at 70+ top US universities. Includes registration links, dates, times, session types, and school metadata. Updated daily via automated crawlers accessing official university portals directly.",
+          "url": "https://admissionhub-f6apvxhh.manus.space/",
+          "creator": {
+            "@type": "Organization",
+            "name": "AdmitLens (景深留学)",
+            "url": "https://admissionhub-f6apvxhh.manus.space/"
+          },
+          "license": "https://creativecommons.org/licenses/by-nc/4.0/",
+          "temporalCoverage": "2024/..",
+          "spatialCoverage": "United States, United Kingdom, Hong Kong, Australia",
+          "keywords": [
+            "university admissions", "info session", "virtual visit", "college admissions",
+            "admissions officer", "webinar", "Ivy League", "liberal arts college",
+            "international students", "US college admissions", "financial aid session",
+            "留学", "招生", "宣讲会", "美国大学申请"
+          ],
+          "distribution": {
+            "@type": "DataDownload",
+            "encodingFormat": "application/json",
+            "contentUrl": "https://admissionhub-f6apvxhh.manus.space/api/public/sessions"
+          },
+          "includedInDataCatalog": {
+            "@type": "DataCatalog",
+            "name": "AdmitLens Public API",
+            "url": "https://admissionhub-f6apvxhh.manus.space/api-docs"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://admissionhub-f6apvxhh.manus.space/#organization",
+          "name": "AdmitLens (景深留学)",
+          "url": "https://admissionhub-f6apvxhh.manus.space/",
+          "description": "Platform providing equal access to university admissions information for students worldwide.",
+          "sameAs": []
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

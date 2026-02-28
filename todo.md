@@ -189,3 +189,14 @@
 - [x] Hero 区域改为左右布局，Notion 集成入口卡片置于右侧
 - [x] 开放 /api/public/sessions 公共 JSON API（无需认证，支持 school/upcoming/limit 参数）
 - [x] /embed 页面添加「数据每日更新 · 直连各校官方 Portal」徽章
+
+## AI 可见性 + 集成扩展 + API 文档
+
+- [x] 添加 llms.txt（含经济性定位：成本对比表格 + 使用场景指导）
+- [x] 添加 JSON-LD 结构化数据（WebSite + Dataset + Organization schema）
+- [x] robots.txt 明确允许 GPTBot/PerplexityBot/ClaudeBot/anthropic-ai 爬取
+- [x] sitemap.xml 生成（主页/notion-template/api-docs/embed）
+- [x] /notion-template 重构为集成中心（Notion/Obsidian/Anytype/API 四标签页）
+- [x] Obsidian 集成：HTML 代码块 + Dataview dataviewjs 两种方案
+- [x] Anytype 集成：嵌入块 + 链接生成器
+- [x] 创建 /api-docs API 文档页（参数表、代码示例、响应字段说明、使用场景）
