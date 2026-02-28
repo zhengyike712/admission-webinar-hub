@@ -172,6 +172,10 @@ const T: Record<Lang, Record<string, string>> = {
     footerNotionLink: "Notion 集成",
     footerNotionLinkSub: "嵌入 Info Session 小窗口",
     footerNotionNew: "新",
+    notionBannerText: "将景深留学嵌入你的 Notion 申请追踪页",
+    notionBannerCta: "获取 Notion 集成 →",
+    onboardingF5Title: "Notion 集成",
+    onboardingF5Desc: "将 Info Session 日历嵌入你的申请追踪页，一站管理",
   },
   en: {
     tagline: "Global University Admissions Info Hub",
@@ -303,6 +307,10 @@ const T: Record<Lang, Record<string, string>> = {
     footerNotionLink: "Notion Integration",
     footerNotionLinkSub: "Embed Info Session widget",
     footerNotionNew: "NEW",
+    notionBannerText: "Embed AdmitLens into your Notion application tracker",
+    notionBannerCta: "Get Notion Integration →",
+    onboardingF5Title: "Notion Integration",
+    onboardingF5Desc: "Embed the Info Session calendar into your application tracker",
   },
   hi: {
     tagline: "विश्वविद्यालय प्रवेश सूचना केंद्र",
@@ -434,6 +442,10 @@ const T: Record<Lang, Record<string, string>> = {
     footerNotionLink: "Notion एकीकरण",
     footerNotionLinkSub: "Info Session विजेट एम्बेड करें",
     footerNotionNew: "नया",
+    notionBannerText: "AdmitLens को अपने Notion आवेदन ट्रैकर में एम्बेड करें",
+    notionBannerCta: "Notion एकीकरण प्राप्त करें →",
+    onboardingF5Title: "Notion एकीकरण",
+    onboardingF5Desc: "Info Session कैलेंडर को अपने आवेदन ट्रैकर में एम्बेड करें",
   },
 } as const;
 
@@ -1333,6 +1345,7 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
     { icon: "🕐", title: t.onboardingF2Title, desc: t.onboardingF2Desc },
     { icon: "📅", title: t.onboardingF3Title, desc: t.onboardingF3Desc },
     { icon: "🤝", title: t.onboardingF4Title, desc: t.onboardingF4Desc },
+    { icon: "📝", title: t.onboardingF5Title, desc: t.onboardingF5Desc, href: "/notion-template" },
   ];
 
   return (
@@ -1375,15 +1388,31 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
               ))}
             </div>
           </div>
-          {/* Feature cards — 2x2 grid */}
+          {/* Feature cards — 2x2 grid + optional 5th card */}
           <div className="grid grid-cols-2 gap-2 mb-5">
-            {features.map((f) => (
-              <div key={f.title} className="border border-stone-100 p-2.5 hover:border-stone-300 transition-colors">
-                <div className="text-base mb-1">{f.icon}</div>
-                <div className="text-[11px] font-semibold text-stone-900 mb-0.5 leading-tight">{f.title}</div>
-                <div className="text-[10px] text-stone-400 leading-relaxed">{f.desc}</div>
-              </div>
-            ))}
+            {features.map((f) => {
+              const inner = (
+                <>
+                  <div className="text-base mb-1">{f.icon}</div>
+                  <div className="text-[11px] font-semibold text-stone-900 mb-0.5 leading-tight">{f.title}</div>
+                  <div className="text-[10px] text-stone-400 leading-relaxed">{f.desc}</div>
+                  {'href' in f && <div className="text-[10px] text-stone-500 font-medium mt-1">了解更多 →</div>}
+                </>
+              );
+              return 'href' in f ? (
+                <a
+                  key={f.title}
+                  href={(f as {href: string}).href}
+                  className="border border-stone-200 bg-stone-50 p-2.5 hover:border-stone-400 hover:bg-white transition-colors col-span-2"
+                >
+                  {inner}
+                </a>
+              ) : (
+                <div key={f.title} className="border border-stone-100 p-2.5 hover:border-stone-300 transition-colors">
+                  {inner}
+                </div>
+              );
+            })}
           </div>
           <button
             onClick={dismiss}
@@ -1777,6 +1806,24 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ── Notion Integration Banner ── */}
+      <div className="border-b border-stone-100 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <a
+            href="/notion-template"
+            className="group flex items-center justify-between py-2.5 gap-3 hover:opacity-80 transition-opacity"
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0 text-stone-500" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
+                <path d="M8 8h8M8 12h5M8 16h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+              <span className="text-[11px] text-stone-500 truncate">{t.notionBannerText}</span>
+            </div>
+            <span className="shrink-0 text-[11px] font-medium text-stone-900 group-hover:underline whitespace-nowrap">{t.notionBannerCta}</span>
+          </a>
+        </div>
+      </div>
       {/* ── View Toggle ── */}
       <div className="border-b border-stone-200 bg-white sticky top-12 z-40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">

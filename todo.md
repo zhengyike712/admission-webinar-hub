@@ -178,3 +178,8 @@
 ## 页脚 Notion 集成入口
 
 - [x] 页脚添加 Notion 集成入口链接（指向 /notion-template，三语言支持）
+
+## Notion 入口位置调整 + Onboarding 更新
+
+- [x] 将 Notion 集成入口移至 Hero 区域下方横幅（好信息，早知道 胖吧位置）
+- [x] Onboarding 弹窗加入 Notion 集成功能卡片（第五张）
