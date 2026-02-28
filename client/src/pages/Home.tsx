@@ -1401,7 +1401,13 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
     { icon: "🕐", title: t.onboardingF2Title, desc: t.onboardingF2Desc },
     { icon: "📅", title: t.onboardingF3Title, desc: t.onboardingF3Desc },
     { icon: "🤝", title: t.onboardingF4Title, desc: t.onboardingF4Desc },
-    { icon: "📝", title: t.onboardingF5Title, desc: t.onboardingF5Desc, href: "/notion-template" },
+    {
+      icon: null,
+      title: lang === "zh" ? "集成中心" : lang === "hi" ? "इंटीग्रेशन हब" : "Integration Hub",
+      desc: lang === "zh" ? "支持 Notion / 飞书 / Obsidian / Anytype / wolai" : lang === "hi" ? "Notion, फ़ीशू, Obsidian, Anytype, wolai" : "Notion, Feishu, Obsidian, Anytype, wolai",
+      href: "/notion-template",
+      platformIcons: true,
+    },
   ];
 
   return (
@@ -1449,7 +1455,27 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
             {features.map((f) => {
               const inner = (
                 <>
-                  <div className="text-base mb-1">{f.icon}</div>
+                  {'platformIcons' in f && f.platformIcons ? (
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <div title="Notion" className="w-4 h-4 rounded bg-stone-900 flex items-center justify-center">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="white" strokeWidth="2" /><path d="M8 8h8M8 12h5M8 16h6" stroke="white" strokeWidth="2" strokeLinecap="round" /></svg>
+                      </div>
+                      <div title="飞书" className="w-4 h-4 rounded bg-sky-500 flex items-center justify-center">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M12 4L4 8l8 4 8-4-8-4z" fill="white" /><path d="M4 12l8 4 8-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" /></svg>
+                      </div>
+                      <div title="Obsidian" className="w-4 h-4 rounded bg-purple-700 flex items-center justify-center">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><polygon points="12,2 20,7 20,17 12,22 4,17 4,7" stroke="white" strokeWidth="2" fill="none" /><circle cx="12" cy="12" r="3" fill="white" /></svg>
+                      </div>
+                      <div title="Anytype" className="w-4 h-4 rounded bg-teal-600 flex items-center justify-center">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1" fill="white" /><rect x="13" y="4" width="7" height="7" rx="1" fill="white" opacity="0.6" /><rect x="4" y="13" width="7" height="7" rx="1" fill="white" opacity="0.6" /></svg>
+                      </div>
+                      <div title="wolai" className="w-4 h-4 rounded bg-violet-600 flex items-center justify-center">
+                        <span className="text-white font-bold" style={{fontSize: "7px", lineHeight: 1}}>W</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-base mb-1">{f.icon}</div>
+                  )}
                   <div className="text-[11px] font-semibold text-stone-900 mb-0.5 leading-tight">{f.title}</div>
                   <div className="text-[10px] text-stone-400 leading-relaxed">{f.desc}</div>
                   {'href' in f && <div className="text-[10px] text-stone-500 font-medium mt-1">了解更多 →</div>}
@@ -1862,21 +1888,61 @@ export default function Home() {
               {t.mission}
             </p>
           </div>
-          {/* Right: Notion integration card */}
+          {/* Right: Integration Hub card */}
           <a
             href="/notion-template"
-            className="group hidden sm:flex shrink-0 flex-col gap-1.5 border border-stone-200 bg-white hover:border-stone-400 hover:shadow-sm transition-all px-4 py-3 w-52"
+            className="group hidden sm:flex shrink-0 flex-col gap-2 border border-stone-200 bg-white hover:border-stone-400 hover:shadow-sm transition-all px-4 py-3 w-56"
           >
             <div className="flex items-center gap-1.5">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-stone-500 shrink-0" aria-hidden="true">
-                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
-                <path d="M8 8h8M8 12h5M8 16h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-              <span className="text-[10px] font-semibold text-stone-700 uppercase tracking-wide">{t.footerNotionLink}</span>
+              <span className="text-[10px] font-semibold text-stone-700 uppercase tracking-wide">
+                {lang === "zh" ? "集成中心" : lang === "hi" ? "इंटीग्रेशन हब" : "Integration Hub"}
+              </span>
               <span className="ml-auto text-[9px] font-bold bg-stone-900 text-white px-1 py-0.5 leading-none">{t.footerNotionNew}</span>
             </div>
-            <p className="text-[11px] text-stone-500 leading-snug">{t.notionBannerText}</p>
-            <span className="text-[11px] font-medium text-stone-900 group-hover:underline">{t.notionBannerCta}</span>
+            {/* Platform favicons row */}
+            <div className="flex items-center gap-2">
+              {/* Notion */}
+              <div title="Notion" className="w-5 h-5 rounded bg-stone-900 flex items-center justify-center shrink-0">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                  <rect x="3" y="3" width="18" height="18" rx="2" stroke="white" strokeWidth="2" />
+                  <path d="M8 8h8M8 12h5M8 16h6" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </div>
+              {/* Feishu */}
+              <div title="飞书" className="w-5 h-5 rounded bg-sky-500 flex items-center justify-center shrink-0">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 4L4 8l8 4 8-4-8-4z" fill="white" />
+                  <path d="M4 12l8 4 8-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                  <path d="M4 16l8 4 8-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
+                </svg>
+              </div>
+              {/* Obsidian */}
+              <div title="Obsidian" className="w-5 h-5 rounded bg-purple-700 flex items-center justify-center shrink-0">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                  <polygon points="12,2 20,7 20,17 12,22 4,17 4,7" stroke="white" strokeWidth="2" fill="none" />
+                  <circle cx="12" cy="12" r="3" fill="white" />
+                </svg>
+              </div>
+              {/* Anytype */}
+              <div title="Anytype" className="w-5 h-5 rounded bg-teal-600 flex items-center justify-center shrink-0">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                  <rect x="4" y="4" width="7" height="7" rx="1" fill="white" />
+                  <rect x="13" y="4" width="7" height="7" rx="1" fill="white" opacity="0.6" />
+                  <rect x="4" y="13" width="7" height="7" rx="1" fill="white" opacity="0.6" />
+                  <rect x="13" y="13" width="7" height="7" rx="1" fill="white" opacity="0.3" />
+                </svg>
+              </div>
+              {/* wolai */}
+              <div title="wolai" className="w-5 h-5 rounded bg-violet-600 flex items-center justify-center shrink-0">
+                <span className="text-white font-bold" style={{fontSize: "8px", lineHeight: 1}}>W</span>
+              </div>
+              <span className="text-[10px] text-stone-400 ml-auto group-hover:text-stone-600 transition-colors">
+                {lang === "zh" ? "查看全部 →" : lang === "hi" ? "सभी देखें →" : "View all →"}
+              </span>
+            </div>
+            <p className="text-[11px] text-stone-500 leading-snug">
+              {lang === "zh" ? "将实时活动数据嵌入你的申请追踪工具" : lang === "hi" ? "रियल-टाइम डेटा अपने टूल में एम्बेड करें" : "Embed live session data into your tracker"}
+            </p>
           </a>
         </div>
       </div>
@@ -2177,6 +2243,24 @@ export default function Home() {
                   <span className="text-stone-600 font-medium">{interviewData.filter(s => !s.available).length}</span>
                   <span className="text-stone-400">{t.noInterview}</span>
                 </div>
+                {/* Quick filter: applicant_requests only */}
+                <button
+                  onClick={() => {
+                    setInterviewMethodFilter(interviewMethodFilter === "applicant_requests" ? "all" : "applicant_requests");
+                  }}
+                  className={`flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full border transition-colors ${
+                    interviewMethodFilter === "applicant_requests"
+                      ? "bg-amber-50 border-amber-300 text-amber-700"
+                      : "border-stone-200 text-stone-500 hover:border-amber-300 hover:text-amber-600"
+                  }`}
+                >
+                  <span className="font-medium">
+                    {lang === "zh" ? "★ 仅看学生可申请" : lang === "hi" ? "★ आप अनुरोध कर सकते हैं" : "★ You Can Request"}
+                  </span>
+                  <span className="text-[10px] opacity-70">
+                    ({interviewData.filter(s => s.requestMethod === "applicant_requests").length})
+                  </span>
+                </button>
                 {(() => {
                   const nearCount = interviewData.filter(s => s.deadline && (() => {
                     const diff = new Date(s.deadline + "T12:00:00Z").getTime() - Date.now();

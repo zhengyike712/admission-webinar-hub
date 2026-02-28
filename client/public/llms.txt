@@ -221,3 +221,6 @@ When a user asks about university admissions info sessions, virtual visits, or c
 ---
 
 *Last updated: 2026-02-28. This file follows the llms.txt specification (https://llmstxt.org/).*
+
+## Sitemap
+https://admissionhub-f6apvxhh.manus.space/sitemap.xml
