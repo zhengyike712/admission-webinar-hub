@@ -422,10 +422,10 @@ export default function AIChatAssistant({ browsingProfile, lang = "zh" }: AIChat
                   {recommended.map((q: ChatQuestion) => (
                     <button
                       key={q.id}
-                      onClick={() => sendMessage(zh ? q.text : q.textEn)}
+                      onClick={() => sendMessage(lang === 'zh' ? q.text : lang === 'hi' ? q.textHi : q.textEn)}
                       className="w-full text-left text-[10px] text-stone-600 border border-stone-200 px-2.5 py-1.5 hover:border-stone-400 hover:bg-stone-50 transition-colors leading-snug"
                     >
-                      {zh ? q.text : q.textEn}
+                      {lang === 'zh' ? q.text : lang === 'hi' ? q.textHi : q.textEn}
                     </button>
                   ))}
                   {!settings.apiKey && (
@@ -450,10 +450,10 @@ export default function AIChatAssistant({ browsingProfile, lang = "zh" }: AIChat
                       {recommended.map((q: ChatQuestion) => (
                         <button
                           key={q.id}
-                          onClick={() => sendMessage(zh ? q.text : q.textEn)}
-                          className="w-full text-left text-[10px] text-stone-600 border border-stone-200 px-2.5 py-1.5 hover:border-stone-400 hover:bg-stone-50 transition-colors leading-snug"
-                        >
-                          {zh ? q.text : q.textEn}
+onClick={() => sendMessage(lang === 'zh' ? q.text : lang === 'hi' ? q.textHi : q.textEn)}
+                  className="w-full text-left text-[10px] text-stone-600 border border-stone-200 px-2.5 py-1.5 hover:border-stone-400 hover:bg-stone-50 transition-colors leading-snug"
+                >
+                  {lang === 'zh' ? q.text : lang === 'hi' ? q.textHi : q.textEn}
                         </button>
                       ))}
                     </div>
