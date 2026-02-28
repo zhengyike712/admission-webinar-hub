@@ -155,6 +155,12 @@ const T: Record<Lang, Record<string, string>> = {
     batchSelectedTpl: "已选 {n} 场活动",
     batchClear: "清除选择",
     batchExport: "批量导出日历 (.ics)",
+    shareCopyLink: "复制链接",
+    shareCopied: "已复制链接",
+    shareWeChat: "分享到微信",
+    shareTwitter: "分享到 X / Twitter",
+    shareWeChatScan: "微信扫一扫分享",
+    shareBack: "返回",
   },
   en: {
     tagline: "Global University Admissions Info Hub",
@@ -269,6 +275,12 @@ const T: Record<Lang, Record<string, string>> = {
     batchSelectedTpl: "{n} event{plural} selected",
     batchClear: "Clear",
     batchExport: "Export to Calendar (.ics)",
+    shareCopyLink: "Copy link",
+    shareCopied: "Copied!",
+    shareWeChat: "Share to WeChat",
+    shareTwitter: "Share to X / Twitter",
+    shareWeChatScan: "Scan with WeChat",
+    shareBack: "Back",
   },
   hi: {
     tagline: "विश्वविद्यालय प्रवेश सूचना केंद्र",
@@ -383,6 +395,12 @@ const T: Record<Lang, Record<string, string>> = {
     batchSelectedTpl: "{n} कार्यक्रम चुने गए",
     batchClear: "साफ करें",
     batchExport: "कैलेंडर में निर्यात करें (.ics)",
+    shareCopyLink: "लिंक कॉपी करें",
+    shareCopied: "कॉपी हो गई!",
+    shareWeChat: "WeChat पर शेयर करें",
+    shareTwitter: "X / Twitter पर शेयर करें",
+    shareWeChatScan: "WeChat से स्कैन करें",
+    shareBack: "वापस",
   },
 } as const;
 
@@ -1433,7 +1451,7 @@ function ShareButton({ lang }: { lang: Lang }) {
                 className="flex items-center gap-2.5 w-full px-3 py-2.5 text-xs text-stone-700 hover:bg-stone-50 transition-colors"
               >
                 {copied ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
-                <span>{copied ? (lang === "zh" ? "已复制链接" : "Copied!") : (lang === "zh" ? "复制链接" : "Copy link")}</span>
+                <span>{copied ? t.shareCopied : t.shareCopyLink}</span>
               </button>
               <div className="h-px bg-stone-100" />
               {/* WeChat QR */}
@@ -1442,7 +1460,7 @@ function ShareButton({ lang }: { lang: Lang }) {
                 className="flex items-center gap-2.5 w-full px-3 py-2.5 text-xs text-stone-700 hover:bg-stone-50 transition-colors"
               >
                 <span className="text-[11px] font-bold text-green-600 w-3.5">微</span>
-                <span>{lang === "zh" ? "分享到微信" : "Share to WeChat"}</span>
+                <span>{t.shareWeChat}</span>
               </button>
               <div className="h-px bg-stone-100" />
               {/* Twitter/X */}
@@ -1451,12 +1469,12 @@ function ShareButton({ lang }: { lang: Lang }) {
                 className="flex items-center gap-2.5 w-full px-3 py-2.5 text-xs text-stone-700 hover:bg-stone-50 transition-colors"
               >
                 <Twitter size={13} className="text-stone-500" />
-                <span>{lang === "zh" ? "分享到 X / Twitter" : "Share to X / Twitter"}</span>
+                <span>{t.shareTwitter}</span>
               </button>
             </>
           ) : (
             <div className="p-3 flex flex-col items-center gap-2">
-              <p className="text-[10px] text-stone-500">{lang === "zh" ? "微信扫一扫分享" : "Scan with WeChat"}</p>
+              <p className="text-[10px] text-stone-500">{t.shareWeChatScan}</p>
               <img
                 src={wechatQRUrl}
                 alt="WeChat QR Code"
@@ -1467,7 +1485,7 @@ function ShareButton({ lang }: { lang: Lang }) {
                 onClick={() => setShowQR(false)}
                 className="text-[10px] text-stone-400 hover:text-stone-600 mt-1"
               >
-                {lang === "zh" ? "返回" : "Back"}
+                {t.shareBack}
               </button>
             </div>
           )}
