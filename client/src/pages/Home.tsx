@@ -2489,8 +2489,122 @@ message = client.messages.create(
           </button>
         </div>
       </div>
+      {/* ── Mobile-only: Simplified Landing ── */}
+      <div className="sm:hidden flex flex-col min-h-[calc(100vh-56px)] bg-white">
+        {/* Feature cards */}
+        <div className="px-4 pt-6 pb-4 space-y-3">
+          {/* AO intro card */}
+          <div className="border border-stone-900 bg-stone-50 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-lg">🎓</span>
+              <span className="text-sm font-bold text-stone-900">{t.onboardingAoTitle}</span>
+            </div>
+            <div className="space-y-2">
+              {[
+                { label: t.onboardingAo1Label, detail: t.onboardingAo1Detail },
+                { label: t.onboardingAo2Label, detail: t.onboardingAo2Detail },
+                { label: t.onboardingAo3Label, detail: t.onboardingAo3Detail },
+              ].map((p) => (
+                <div key={p.label} className="flex gap-2">
+                  <span className="mt-1 shrink-0 w-1.5 h-1.5 rounded-full bg-stone-900 inline-block" />
+                  <div>
+                    <span className="text-xs font-semibold text-stone-800">{p.label}</span>
+                    <span className="text-xs text-stone-400"> — {p.detail}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Feature grid */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="border border-stone-100 p-3">
+              <div className="text-base mb-1">🌍</div>
+              <div className="text-xs font-semibold text-stone-900 mb-0.5">{t.onboardingF1Title}</div>
+              <div className="text-[10px] text-stone-400 leading-relaxed">{t.onboardingF1Desc}</div>
+            </div>
+            <div className="border border-stone-100 p-3">
+              <div className="text-base mb-1">🕐</div>
+              <div className="text-xs font-semibold text-stone-900 mb-0.5">{t.onboardingF2Title}</div>
+              <div className="text-[10px] text-stone-400 leading-relaxed">{t.onboardingF2Desc}</div>
+            </div>
+            <div className="border border-stone-100 p-3">
+              <div className="text-base mb-1">📅</div>
+              <div className="text-xs font-semibold text-stone-900 mb-0.5">{t.onboardingF3Title}</div>
+              <div className="text-[10px] text-stone-400 leading-relaxed">{t.onboardingF3Desc}</div>
+            </div>
+            <div className="border border-stone-100 p-3">
+              <div className="text-base mb-1">🤝</div>
+              <div className="text-xs font-semibold text-stone-900 mb-0.5">{t.onboardingF4Title}</div>
+              <div className="text-[10px] text-stone-400 leading-relaxed">{t.onboardingF4Desc}</div>
+            </div>
+          </div>
+          {/* Integration Hub shortcut */}
+          <button
+            onClick={() => setShowIntegrationHub(true)}
+            className="w-full border border-stone-200 bg-stone-50 p-3 text-left hover:border-stone-400 transition-colors"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-1.5">
+                <div title="Notion" className="w-4 h-4 rounded bg-stone-900 flex items-center justify-center">
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="white" strokeWidth="2" /><path d="M8 8h8M8 12h5M8 16h6" stroke="white" strokeWidth="2" strokeLinecap="round" /></svg>
+                </div>
+                <div title="飞书" className="w-4 h-4 rounded bg-sky-500 flex items-center justify-center">
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M12 4L4 8l8 4 8-4-8-4z" fill="white" /><path d="M4 12l8 4 8-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" /></svg>
+                </div>
+                <div title="Obsidian" className="w-4 h-4 rounded bg-purple-700 flex items-center justify-center">
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><polygon points="12,2 20,7 20,17 12,22 4,17 4,7" stroke="white" strokeWidth="2" fill="none" /><circle cx="12" cy="12" r="3" fill="white" /></svg>
+                </div>
+                <div title="Anytype" className="w-4 h-4 rounded bg-teal-600 flex items-center justify-center">
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1" fill="white" /><rect x="13" y="4" width="7" height="7" rx="1" fill="white" opacity="0.6" /></svg>
+                </div>
+                <div title="wolai" className="w-4 h-4 rounded bg-violet-600 flex items-center justify-center">
+                  <span className="text-white font-bold" style={{fontSize: "7px", lineHeight: 1}}>W</span>
+                </div>
+              </div>
+              <span className="ml-auto text-[9px] font-bold bg-stone-900 text-white px-1 py-0.5 leading-none">{t.footerNotionNew}</span>
+            </div>
+            <div className="text-xs font-semibold text-stone-900 mb-0.5">
+              {lang === "zh" ? "集成中心" : "Integration Hub"}
+            </div>
+            <div className="text-[10px] text-stone-400">
+              {lang === "zh" ? "嵌入 Notion / 飞书 / Obsidian 等工具" : "Embed into Notion, Feishu, Obsidian & more"}
+            </div>
+          </button>
+        </div>
+        {/* Desktop CTA */}
+        <div className="mx-4 mb-6 border border-stone-200 bg-stone-50 p-4 flex items-start gap-3">
+          <div className="shrink-0 mt-0.5">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-stone-400">
+              <rect x="2" y="4" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M8 22h8M12 18v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </div>
+          <div>
+            <div className="text-xs font-semibold text-stone-800 mb-1">
+              {lang === "zh" ? "完整功能需在电脑端使用" : "Full features available on desktop"}
+            </div>
+            <div className="text-[10px] text-stone-400 leading-relaxed">
+              {lang === "zh"
+                ? "活动日程、筛选、AI 预习、面试备考等功能在电脑上体验最佳。将此页面发送到电脑来查看。"
+                : "Session calendar, filters, AI prep, interview tools and more are best experienced on desktop. Open this page on your computer."}
+            </div>
+            <button
+              onClick={() => {
+                navigator.clipboard?.writeText(window.location.href).then(() => {
+                  // show brief toast
+                });
+              }}
+              className="mt-2 flex items-center gap-1.5 text-[10px] text-stone-500 border border-stone-200 px-2.5 py-1 hover:border-stone-400 hover:text-stone-700 transition-colors"
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" strokeWidth="2" /></svg>
+              {lang === "zh" ? "复制链接" : "Copy link"}
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* ── View Toggle ── */}
-      <div className="border-b border-stone-200 bg-white sticky top-12 z-40">
+      <div className="hidden sm:block border-b border-stone-200 bg-white sticky top-12 z-40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex">
             <button
@@ -2528,7 +2642,7 @@ message = client.messages.create(
       </div>
 
       {/* ── Mobile Filter Bar ── */}
-      <div className="sm:hidden border-b border-stone-100 bg-white">
+      <div className="hidden border-b border-stone-100 bg-white">
         <div className="max-w-6xl mx-auto px-4 py-2">
           <button
             onClick={() => setMobileFilterOpen(true)}
@@ -2541,7 +2655,7 @@ message = client.messages.create(
       </div>
 
       {/* ── Layout ── */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex gap-8">
+      <div className="hidden sm:flex max-w-6xl mx-auto px-4 sm:px-6 py-6 gap-8">
 
         {/* ── Sidebar ── */}
         <aside
