@@ -15,6 +15,13 @@
       "when": 1772234238043,
       "tag": "0001_lean_emma_frost",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1772279638592,
+      "tag": "0002_quiet_darwin",
+      "breakpoints": true
     }
   ]
 }

@@ -120,3 +120,37 @@ export const interviewVerifications = mysqlTable("interview_verifications", {
 
 export type InterviewVerification = typeof interviewVerifications.$inferSelect;
 export type InsertInterviewVerification = typeof interviewVerifications.$inferInsert;
+
+/**
+ * chat_sessions table — one session per user (or anonymous client).
+ * Stores the browsing profile used for dynamic question recommendations.
+ */
+export const chatSessions = mysqlTable("chat_sessions", {
+  id: varchar("id", { length: 64 }).primaryKey(), // uuid
+  userId: int("userId"), // null for anonymous
+  /** JSON object tracking browsing behaviour: { schoolTypes, regions, sessionTypes } */
+  browsingProfile: json("browsingProfile").$type<{
+    schoolTypes: Record<string, number>;
+    regions: Record<string, number>;
+    sessionTypes: Record<string, number>;
+  }>(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ChatSession = typeof chatSessions.$inferSelect;
+export type InsertChatSession = typeof chatSessions.$inferInsert;
+
+/**
+ * chat_messages table — individual messages within a chat session.
+ */
+export const chatMessages = mysqlTable("chat_messages", {
+  id: int("id").autoincrement().primaryKey(),
+  sessionId: varchar("sessionId", { length: 64 }).notNull(),
+  role: mysqlEnum("role", ["user", "assistant"]).notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = typeof chatMessages.$inferInsert;

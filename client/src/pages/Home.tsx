@@ -4,6 +4,8 @@
 // Layout: left sidebar filter + right content
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import QRCode from "qrcode";
+import { useBrowsingTracker } from "@/hooks/useBrowsingTracker";
+import AIChatAssistant from "@/components/AIChatAssistant";
 import {
   allSchools,
   allSessions,
@@ -760,7 +762,7 @@ function isExpiredSession(session: (typeof allSessions)[0]): boolean {
 }
 
 // ── Session Card (scheduled / fixed-date) ────────────────────
-function ScheduledSessionCard({ session, t, isSelected, onToggle, lang }: { session: (typeof allSessions)[0]; t: typeof T["zh"]; isSelected?: boolean; onToggle?: (id: string) => void; lang?: Lang }) {
+function ScheduledSessionCard({ session, t, isSelected, onToggle, lang, onView }: { session: (typeof allSessions)[0]; t: typeof T["zh"]; isSelected?: boolean; onToggle?: (id: string) => void; lang?: Lang; onView?: (school: School | undefined) => void }) {
   const school = schoolsMap[session.schoolId];
   const urgency = getUrgency(session);
   const nextDate = getNextDate(session);
@@ -917,6 +919,7 @@ function ScheduledSessionCard({ session, t, isSelected, onToggle, lang }: { sess
             href={session.registrationUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => onView?.(school)}
             className="flex items-center gap-1 px-3 py-1.5 bg-stone-900 text-white hover:bg-stone-700 text-[11px] font-medium transition-colors duration-150 whitespace-nowrap"
           >
             {t.register}
@@ -1867,6 +1870,7 @@ export default function Home() {
   const [interviewSearch, setInterviewSearch] = useState("");
   const [interviewFilter, setInterviewFilter] = useState<"all" | "available" | "none" | "near_deadline">("all");
    const [interviewMethodFilter, setInterviewMethodFilter] = useState<"all" | "school_contacts" | "applicant_requests" | "required">("all");
+  const { profile: browsingProfile, trackSchoolType, trackRegion, trackSessionType } = useBrowsingTracker();
   const [showIntegrationHub, setShowIntegrationHub] = useState(false);
   const [activeIntegration, setActiveIntegration] = useState<string | null>(null);
   // Mobile "Send to Desktop" state
@@ -2852,7 +2856,7 @@ message = client.messages.create(
                 {regionOptions.map((r) => (
                   <button
                     key={r.value}
-                    onClick={() => setRegionFilter(r.value)}
+                    onClick={() => { setRegionFilter(r.value); if (r.value !== "All") trackRegion(r.value); }}
                     className={`w-full text-left text-xs px-2 py-1.5 transition-colors ${
                       regionFilter === r.value
                         ? "bg-stone-900 text-white"
@@ -2934,7 +2938,7 @@ message = client.messages.create(
                   {sessionTypes.map((type) => (
                     <button
                       key={type}
-                      onClick={() => setTypeFilter(type)}
+                      onClick={() => { setTypeFilter(type); if (type !== "All") trackSessionType(type); }}
                       className={`w-full text-left text-xs px-2 py-1.5 transition-colors ${
                         typeFilter === type
                           ? "bg-stone-900 text-white"
@@ -2989,7 +2993,7 @@ message = client.messages.create(
                       if (!db) return -1;
                       return da.getTime() - db.getTime();
                     })
-                    .map((s) => <ScheduledSessionCard key={s.id} session={s} t={t} lang={lang} isSelected={selectedSessions.has(s.id)} onToggle={toggleSelect} />)
+                    .map((s) => <ScheduledSessionCard key={s.id} session={s} t={t} lang={lang} isSelected={selectedSessions.has(s.id)} onToggle={toggleSelect} onView={(school) => { if (school?.type) trackSchoolType(school.type); if (school?.region) trackRegion(school.region); if (s.type) trackSessionType(s.type); }} />)
                 ) : (
                   <div className="py-12 text-center text-stone-400">
                     <p className="text-xs">{t.noFixed}</p>
@@ -3239,6 +3243,7 @@ message = client.messages.create(
 
       {/* ── Floating Subscribe ── */}
       <FloatingSubscribe t={t} />
+      <AIChatAssistant browsingProfile={browsingProfile} lang={lang} />
 
       {/* ── Onboarding Modal ── */}
       <OnboardingModal t={t} lang={lang} />
