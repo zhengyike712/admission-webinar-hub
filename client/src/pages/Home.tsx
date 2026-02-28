@@ -2796,7 +2796,7 @@ message = client.messages.create(
               href="/portals"
               className="ml-auto px-4 py-3 text-sm font-medium border-b-2 border-transparent text-stone-400 hover:text-stone-600 transition-colors flex items-center gap-1"
             >
-              {lang === "zh" ? "结果 Portal" : lang === "hi" ? "पोर्टल" : "Result Portals"}
+              {lang === "zh" ? "Applicant Portal 入口" : lang === "hi" ? "Applicant Portal" : "Applicant Portals"}
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </a>
           </div>
@@ -3041,26 +3041,8 @@ message = client.messages.create(
             </div>
           ) : view === "interviews" ? (
             <div>
-              {/* Header */}
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-[11px] uppercase tracking-widest text-stone-400 font-medium">
-                  {t.interviewTotalTpl.replace("{n}", String(filteredInterviews.length))}
-                </span>
-                <div className="flex-1 h-px bg-stone-100" />
-              </div>
-
-              {/* Stats bar */}
-              <div className="flex gap-4 mb-4 p-3 bg-stone-50 border border-stone-100 flex-wrap">
-                <div className="flex items-center gap-1.5 text-xs">
-                  <UserCheck size={12} className="text-green-600" />
-                  <span className="text-stone-600 font-medium">{interviewData.filter(s => s.available).length}</span>
-                  <span className="text-stone-400">{t.offerInterview}</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-xs">
-                  <UserX size={12} className="text-stone-300" />
-                  <span className="text-stone-600 font-medium">{interviewData.filter(s => !s.available).length}</span>
-                  <span className="text-stone-400">{t.noInterview}</span>
-                </div>
+              {/* Quick filters bar */}
+              <div className="flex gap-3 mb-4 flex-wrap">
                 {/* Quick filter: applicant_requests only */}
                 <button
                   onClick={() => {
