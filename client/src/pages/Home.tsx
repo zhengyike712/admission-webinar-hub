@@ -2762,87 +2762,54 @@ message = client.messages.create(
         </div>
       </div>
 
-      {/* ── View Toggle — mobile only (sm:hidden), desktop uses 3-column layout ── */}
-      <div className="sm:hidden border-b border-stone-200 bg-white sticky top-12 z-40">
+      {/* ── Nav bar: tabs (mobile) + filter button (all screens) ── */}
+      <div className="border-b border-stone-200 bg-white sticky top-12 z-40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex">
+          <div className="flex items-center">
+            {/* Mobile tabs */}
+            <button onClick={() => setView("interviews")} className={`sm:hidden px-4 py-3 text-sm font-medium border-b-2 transition-colors ${view === "interviews" ? "border-stone-900 text-stone-900" : "border-transparent text-stone-400 hover:text-stone-600"}`}>{t.tabInterviews}</button>
+            <button onClick={() => setView("sessions")} className={`sm:hidden px-4 py-3 text-sm font-medium border-b-2 transition-colors ${view === "sessions" ? "border-stone-900 text-stone-900" : "border-transparent text-stone-400 hover:text-stone-600"}`}>{t.tabSessions}</button>
+            <button onClick={() => setView("schools")} className={`sm:hidden px-4 py-3 text-sm font-medium border-b-2 transition-colors ${view === "schools" ? "border-stone-900 text-stone-900" : "border-transparent text-stone-400 hover:text-stone-600"}`}>{t.tabSchools}</button>
+            {/* Filter button — all screens */}
             <button
-              onClick={() => setView("interviews")}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                view === "interviews"
-                  ? "border-stone-900 text-stone-900"
-                  : "border-transparent text-stone-400 hover:text-stone-600"
-              }`}
+              onClick={() => setMobileFilterOpen(true)}
+              className="flex items-center gap-1.5 text-xs text-stone-500 border border-stone-200 px-2.5 py-1 hover:border-stone-500 hover:text-stone-900 transition-colors"
             >
-              {t.tabInterviews}
-            </button>
-            <button
-              onClick={() => setView("sessions")}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                view === "sessions"
-                  ? "border-stone-900 text-stone-900"
-                  : "border-transparent text-stone-400 hover:text-stone-600"
-              }`}
-            >
-              {t.tabSessions}
-            </button>
-            <button
-              onClick={() => setView("schools")}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                view === "schools"
-                  ? "border-stone-900 text-stone-900"
-                  : "border-transparent text-stone-400 hover:text-stone-600"
-              }`}
-            >
-              {t.tabSchools}
+              <SlidersHorizontal size={11} />
+              <span className="hidden sm:inline">{t.mobileFilterBtn || "筛选"}</span>
             </button>
             {/* Portals link */}
-            <a
-              href="/portals"
-              className="ml-auto px-4 py-3 text-sm font-medium border-b-2 border-transparent text-stone-400 hover:text-stone-600 transition-colors flex items-center gap-1"
-            >
+            <a href="/portals" className="ml-auto px-4 py-3 text-sm font-medium border-b-2 border-transparent text-stone-400 hover:text-stone-600 transition-colors flex items-center gap-1">
               {lang === "zh" ? "Applicant Portal 入口" : lang === "hi" ? "Applicant Portal" : "Applicant Portals"}
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </a>
           </div>
         </div>
       </div>
-      {/* ── Mobile Filter Bar ── */}
-      <div className="hidden border-b border-stone-100 bg-white">
-        <div className="max-w-6xl mx-auto px-4 py-2">
-          <button
-            onClick={() => setMobileFilterOpen(true)}
-            className="flex items-center gap-2 text-xs text-stone-600 border border-stone-200 px-3 py-1.5 hover:border-stone-400 hover:text-stone-900 transition-colors"
-          >
-            <SlidersHorizontal size={12} />
-            <span>{t.mobileFilterBtn}</span>
-          </button>
-        </div>
-      </div>
 
       {/* ── Layout ── */}
-      <div className="hidden sm:flex max-w-6xl mx-auto px-4 sm:px-6 py-6 gap-8">
+      <div className="hidden sm:block max-w-6xl mx-auto px-4 sm:px-6 py-6">
 
-        {/* ── Sidebar ── */}
+        {/* ── Filter Drawer (all screens) ── */}
         <aside
           className={`
-            fixed sm:static inset-0 z-50 sm:z-auto
-            w-56 shrink-0
-            bg-white sm:bg-transparent
+            fixed inset-y-0 left-0 z-50
+            w-64
+            bg-white shadow-xl
             overflow-y-auto
             transition-transform duration-200
-            ${mobileFilterOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0"}
-            pt-4 sm:pt-0 px-4 sm:px-0
+            ${mobileFilterOpen ? "translate-x-0" : "-translate-x-full"}
+            pt-4 px-4
           `}
         >
-          <div className="flex items-center justify-between mb-4 sm:hidden">
-            <span className="text-sm font-medium text-stone-900">{t.mobileFilterTitle}</span>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-stone-900">{t.mobileFilterTitle || "筛选"}</span>
             <button onClick={() => setMobileFilterOpen(false)}>
               <X size={16} className="text-stone-400" />
             </button>
           </div>
 
-          <div className="sticky top-28 space-y-6">
+          <div className="space-y-6 pb-8">
             {/* Search */}
             <div>
               <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
@@ -2970,16 +2937,16 @@ message = client.messages.create(
           </div>
         </aside>
 
-        {/* Mobile overlay */}
+        {/* Overlay (all screens) */}
         {mobileFilterOpen && (
           <div
-            className="sm:hidden fixed inset-0 z-40 bg-black/20"
+            className="fixed inset-0 z-40 bg-black/20"
             onClick={() => setMobileFilterOpen(false)}
           />
         )}
 
         {/* ── Content: 3-column on desktop ── */}
-        <main className="flex-1 min-w-0">
+        <main className="w-full">
           {/* Desktop: 3-column side-by-side */}
           <div className="hidden sm:grid grid-cols-3 gap-4">
 
