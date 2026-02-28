@@ -123,3 +123,20 @@
 - [x] 生成印地语版 OG 分享图片（og-image-hi.png）
 - [x] index.html 添加 og:locale:alternate 多语言 meta 标签
 - [x] scheduler.ts 添加每周一次截止日期核实定时任务
+
+## 修复 404 爬虫 URL
+
+- [x] 修复 Brown University crawlUrl（404）
+- [x] 修复 California Institute of Technology crawlUrl（404）
+- [x] 修复 Cornell University crawlUrl（404）
+- [x] 修复 Dartmouth College crawlUrl（404）
+- [x] 修复 Duke University crawlUrl（404）
+- [x] 修复 Georgetown University crawlUrl（404）
+- [x] 修复 Johns Hopkins University crawlUrl（404）
+- [x] 修复 Massachusetts Institute of Technology crawlUrl（404）
+- [x] 修复 Rice University crawlUrl（404）
+- [x] 修复 UCLA crawlUrl（404）
+- [x] 修复 University of Notre Dame crawlUrl（404）
+- [x] 修复 University of Pennsylvania crawlUrl（404）
+- [x] 修复 Vanderbilt University crawlUrl（404）
+- [x] 修复 Washington University in St. Louis crawlUrl（404）
