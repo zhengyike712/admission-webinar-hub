@@ -994,60 +994,77 @@ function RollingRow({ session, t }: { session: (typeof allSessions)[0]; t: typeo
 
 // ── School Card ───────────────────────────────────────────────
 function SchoolCard({ school, t }: { school: School; t: typeof T["zh"] }) {
+  const [expanded, setExpanded] = useState(false);
   const schoolSessions = allSessions.filter((s) => s.schoolId === school.id);
 
   return (
-    <div className="bg-white border border-stone-200 p-4 hover:border-stone-400 transition-colors duration-150">
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <div className="min-w-0">
-          <div className="flex items-center gap-1.5 mb-0.5">
-            <span
-              className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
-              style={{ backgroundColor: school.color }}
-            />
-            <h3 className="text-sm font-semibold text-stone-900 truncate">
-              {school.shortName || school.name}
-            </h3>
-          </div>
-          {school.shortName && (
-            <p className="text-[11px] text-stone-400 truncate pl-3">{school.name}</p>
-          )}
-        </div>
-        <span className="shrink-0 text-xs font-mono text-stone-400">#{school.rank}</span>
-      </div>
-
-      <p className="text-[11px] text-stone-400 mb-3 pl-3">{school.location}</p>
-
-      <div className="flex flex-wrap gap-1 mb-3 pl-3">
-        {school.tags.slice(0, 3).map((tag) => (
-          <span key={tag} className="text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded">
-            {tag}
+    <div className="border-b border-stone-100 last:border-b-0">
+      {/* Row — always visible */}
+      <div className="flex items-center gap-2 py-2 px-1">
+        <button
+          onClick={() => setExpanded(v => !v)}
+          className="flex items-center gap-2 min-w-0 flex-1 text-left hover:opacity-70 transition-opacity cursor-pointer"
+        >
+          <span
+            className="shrink-0 w-1.5 h-1.5 rounded-full"
+            style={{ backgroundColor: school.color }}
+          />
+          <span className="text-xs text-stone-800 font-medium truncate min-w-0">
+            {school.shortName || school.name}
           </span>
-        ))}
-      </div>
-
-      <div className="text-[11px] text-stone-400 mb-3 pl-3">
-        {schoolSessions.length} {t.tabSessions === "Events" ? "events" : "场活动可报名"}
-      </div>
-
-      <div className="flex gap-2 pl-3">
+          <span className="shrink-0 text-[10px] text-stone-400 font-mono">#{school.rank}</span>
+          {school.tags.slice(0, 2).map((tag) => (
+            <span key={tag} className="hidden sm:inline text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-400 rounded shrink-0">
+              {tag}
+            </span>
+          ))}
+          <ChevronDown
+            size={12}
+            className={`shrink-0 text-stone-300 transition-transform duration-150 ml-auto ${
+              expanded ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+        {/* View schedule CTA — always visible */}
         <a
           href={school.registrationPage}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center gap-1 py-1.5 border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white text-xs font-medium transition-colors duration-150"
+          className="shrink-0 flex items-center gap-0.5 text-[11px] px-2 py-0.5 border border-stone-300 text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-colors duration-150"
         >
           {t.viewSchedule}
-        </a>
-        <a
-          href={school.admissionPage}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center px-2.5 py-1.5 border border-stone-200 text-stone-400 hover:text-stone-700 hover:border-stone-400 transition-colors duration-150"
-        >
-          <ExternalLink size={12} />
+          <ArrowUpRight size={10} />
         </a>
       </div>
+
+      {/* Expanded details */}
+      {expanded && (
+        <div className="px-4 pb-3 pt-1 border-t border-stone-50 bg-stone-50/60">
+          {school.shortName && (
+            <p className="text-[11px] text-stone-400 mb-1">{school.name}</p>
+          )}
+          <p className="text-[11px] text-stone-400 mb-2">{school.location}</p>
+          <div className="flex flex-wrap gap-1 mb-2">
+            {school.tags.map((tag) => (
+              <span key={tag} className="text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded">
+                {tag}
+              </span>
+            ))}
+          </div>
+          <div className="text-[11px] text-stone-400 mb-2">
+            {schoolSessions.length} {t.tabSessions === "Events" ? "events" : "场活动可报名"}
+          </div>
+          <a
+            href={school.admissionPage}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-[11px] text-stone-400 hover:text-stone-700 transition-colors"
+          >
+            <Globe size={10} />
+            {t.tabSessions === "Events" ? "Admissions page" : "招生官网"}
+          </a>
+        </div>
+      )}
     </div>
   );
 }
@@ -2971,6 +2988,31 @@ message = client.messages.create(
                   <span className="text-[11px] uppercase tracking-widest text-stone-400 font-medium">{t.upcoming}</span>
                   <div className="flex-1 h-px bg-stone-100" />
                 </div>
+                {/* Batch selection bar */}
+                {selectedSessions.size > 0 && (
+                  <div className="flex items-center justify-between gap-3 mb-2 px-3 py-2 bg-stone-900 text-white">
+                    <span className="text-xs font-medium">
+                      {t.batchSelectedTpl
+                        .replace("{n}", String(selectedSessions.size))
+                        .replace("{plural}", selectedSessions.size > 1 ? "s" : "")}
+                    </span>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={clearSelection}
+                        className="text-[11px] text-stone-400 hover:text-white transition-colors"
+                      >
+                        {t.batchClear}
+                      </button>
+                      <button
+                        onClick={exportBatchICS}
+                        className="flex items-center gap-1 text-[11px] px-2.5 py-1 bg-white text-stone-900 font-semibold hover:bg-stone-100 transition-colors"
+                      >
+                        <CalendarPlus size={11} />
+                        {t.batchExport}
+                      </button>
+                    </div>
+                  </div>
+                )}
                 {filteredSessions.filter((s) => !s.isRolling).length > 0 ? (
                   <div className="border border-stone-100">
                   {filteredSessions
@@ -3111,7 +3153,7 @@ message = client.messages.create(
                       </span>
                       <div className="flex-1 h-px bg-stone-100" />
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="border border-stone-100">
                       {regionSchools
                         .sort((a, b) => a.rank - b.rank)
                         .map((s) => <SchoolCard key={s.id} school={s} t={t} />)}
