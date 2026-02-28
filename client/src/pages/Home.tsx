@@ -10,6 +10,7 @@ import {
   allSchools,
   allSessions,
   schoolsMap,
+  DATA_LAST_UPDATED,
   type SessionType,
   type School,
   type Region,
@@ -171,6 +172,11 @@ const T: Record<Lang, Record<string, string>> = {
     noInterview: "不提供",
     deadlineSoon: "近期截止",
     noMatchSchool: "没有匹配的学校",
+    dataUpdated: "数据最后更新",
+    noMatchVisitOfficial: "可直接访问官网查看最新日程",
+    expiredHidden: "已结束的活动",
+    showExpired: "显示已结束",
+    hideExpired: "隐藏已结束",
     footerIntegrationsTitle: "集成",
     footerNotionLink: "Notion 集成",
     footerNotionLinkSub: "嵌入 Info Session 小窗口",
@@ -320,6 +326,11 @@ const T: Record<Lang, Record<string, string>> = {
     noInterview: "no interview",
     deadlineSoon: "deadline soon",
     noMatchSchool: "No matching schools",
+    dataUpdated: "Last updated",
+    noMatchVisitOfficial: "Visit the school's official website for the latest schedule",
+    expiredHidden: "Past events",
+    showExpired: "Show past",
+    hideExpired: "Hide past",
     footerIntegrationsTitle: "Integrations",
     footerNotionLink: "Notion Integration",
     footerNotionLinkSub: "Embed Info Session widget",
@@ -469,6 +480,11 @@ const T: Record<Lang, Record<string, string>> = {
     noInterview: "उपलब्ध नहीं",
     deadlineSoon: "अंतिम तारीख नजदीक",
     noMatchSchool: "कोई मिलान वाला विश्वविद्यालय नहीं",
+    dataUpdated: "Last updated",
+    noMatchVisitOfficial: "Visit the school's official website for the latest schedule",
+    expiredHidden: "Past events",
+    showExpired: "Show past",
+    hideExpired: "Hide past",
     footerIntegrationsTitle: "एकीकरण",
     footerNotionLink: "Notion एकीकरण",
     footerNotionLinkSub: "Info Session विजेट एम्बेड करें",
@@ -1782,7 +1798,8 @@ export default function Home() {
   const [selectedSessions, setSelectedSessions] = useState<Set<string>>(new Set());
   const [interviewSearch, setInterviewSearch] = useState("");
   const [interviewFilter, setInterviewFilter] = useState<"all" | "available" | "none" | "near_deadline">("all");
-   const [interviewMethodFilter, setInterviewMethodFilter] = useState<"all" | "school_contacts" | "applicant_requests" | "required">("all");
+  const [interviewMethodFilter, setInterviewMethodFilter] = useState<"all" | "school_contacts" | "applicant_requests" | "required">("all");
+  const [showExpiredSessions, setShowExpiredSessions] = useState(false);
   const { profile: browsingProfile, trackSchoolType, trackRegion, trackSessionType } = useBrowsingTracker();
   const [showIntegrationHub, setShowIntegrationHub] = useState(false);
   const [activeIntegration, setActiveIntegration] = useState<string | null>(null);
@@ -2706,13 +2723,19 @@ message = client.messages.create(
               {t.tabSchools}
             </button>
             {/* Portals link */}
-            <a
-              href="/portals"
-              className="ml-auto px-4 py-3 text-sm font-medium border-b-2 border-transparent text-stone-400 hover:text-stone-600 transition-colors flex items-center gap-1"
-            >
-              {lang === "zh" ? "Applicant Portal 入口" : lang === "hi" ? "Applicant Portal" : "Applicant Portals"}
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            </a>
+            <div className="ml-auto flex items-center gap-4">
+              {/* Data last updated */}
+              <span className="hidden lg:block text-[10px] text-stone-300 select-none">
+                {t.dataUpdated} {DATA_LAST_UPDATED}
+              </span>
+              <a
+                href="/portals"
+                className="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-stone-400 hover:text-stone-600 transition-colors flex items-center gap-1"
+              >
+                {lang === "zh" ? "Applicant Portal 入口" : lang === "hi" ? "Applicant Portal" : "Applicant Portals"}
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -2922,40 +2945,85 @@ message = client.messages.create(
                     </div>
                   </div>
                 )}
-                {filteredSessions.filter((s) => !s.isRolling).length > 0 ? (
-                  <div className="border border-stone-100">
-                  {filteredSessions
-                    .filter((s) => !s.isRolling)
-                    .slice()
-                    .sort((a, b) => {
-                      const aExpired = isExpiredSession(a);
-                      const bExpired = isExpiredSession(b);
-                      // 过期活动移至底部
-                      if (aExpired && !bExpired) return 1;
-                      if (!aExpired && bExpired) return -1;
-                      const da = getNextDate(a);
-                      const db = getNextDate(b);
-                      if (!da && !db) return 0;
-                      if (!da) return 1;
-                      if (!db) return -1;
-                      return da.getTime() - db.getTime();
-                    })
-                    .map((s) => <ScheduledSessionCard key={s.id} session={s} t={t} lang={lang} isSelected={selectedSessions.has(s.id)} onToggle={toggleSelect} onView={(school) => { if (school?.type) trackSchoolType(school.type); if (school?.region) trackRegion(school.region); if (s.type) trackSessionType(s.type); }} />)}
-                  </div>
-                ) : (
-                  <div className="py-12 text-center text-stone-400">
-                    <p className="text-xs">{t.noFixed}</p>
-                  </div>
-                )}
+{(() => {
+                  const nonRolling = filteredSessions.filter((s) => !s.isRolling);
+                  const activeSessions = nonRolling.filter(s => !isExpiredSession(s)).sort((a, b) => {
+                    const da = getNextDate(a);
+                    const db = getNextDate(b);
+                    if (!da && !db) return 0;
+                    if (!da) return 1;
+                    if (!db) return -1;
+                    return da.getTime() - db.getTime();
+                  });
+                  const expiredSessions = nonRolling.filter(s => isExpiredSession(s)).sort((a, b) => {
+                    const da = getNextDate(a);
+                    const db = getNextDate(b);
+                    if (!da && !db) return 0;
+                    if (!da) return 1;
+                    if (!db) return -1;
+                    return db.getTime() - da.getTime(); // most recent first
+                  });
+                  return (
+                    <>
+                      {activeSessions.length > 0 ? (
+                        <div className="border border-stone-100">
+                          {activeSessions.map((s) => <ScheduledSessionCard key={s.id} session={s} t={t} lang={lang} isSelected={selectedSessions.has(s.id)} onToggle={toggleSelect} onView={(school) => { if (school?.type) trackSchoolType(school.type); if (school?.region) trackRegion(school.region); if (s.type) trackSessionType(s.type); }} />)}
+                        </div>
+                      ) : (
+                        <div className="py-12 text-center text-stone-400">
+                          <p className="text-xs">{t.noFixed}</p>
+                        </div>
+                      )}
+                      {expiredSessions.length > 0 && (
+                        <div className="mt-3">
+                          <button
+                            onClick={() => setShowExpiredSessions(v => !v)}
+                            className="flex items-center gap-2 text-[11px] text-stone-300 hover:text-stone-500 transition-colors w-full py-2"
+                          >
+                            <div className="flex-1 h-px bg-stone-100" />
+                            <span>{showExpiredSessions ? t.hideExpired : t.showExpired} ({expiredSessions.length})</span>
+                            <div className="flex-1 h-px bg-stone-100" />
+                          </button>
+                          {showExpiredSessions && (
+                            <div className="border border-stone-100 opacity-50">
+                              {expiredSessions.map((s) => <ScheduledSessionCard key={s.id} session={s} t={t} lang={lang} isSelected={selectedSessions.has(s.id)} onToggle={toggleSelect} onView={(school) => { if (school?.type) trackSchoolType(school.type); if (school?.region) trackRegion(school.region); if (s.type) trackSessionType(s.type); }} />)}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
                 {filteredSessions.length === 0 && (
-                  <div className="py-12 text-center text-stone-400">
+                  <div className="py-10 text-center text-stone-400">
                     <p className="text-xs mb-2">{t.noMatch}</p>
-                    <button
-                      onClick={() => { setSearch(""); setTypeFilter("All"); setRegionFilter("All"); }}
-                      className="text-xs underline underline-offset-2 hover:text-stone-600"
-                    >
-                      {t.clearFilter}
-                    </button>
+                    {/* Try to find a matching school to link to */}
+                    {(() => {
+                      const q = search.trim().toLowerCase();
+                      const matchedSchool = q ? allSchools.find(s =>
+                        s.name.toLowerCase().includes(q) ||
+                        (s.shortName && s.shortName.toLowerCase().includes(q))
+                      ) : null;
+                      return matchedSchool ? (
+                        <a
+                          href={matchedSchool.registrationPage}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs text-blue-500 hover:text-blue-700 underline underline-offset-2 mb-2"
+                        >
+                          {matchedSchool.name} &mdash; {t.noMatchVisitOfficial}
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        </a>
+                      ) : null;
+                    })()}
+                    <div>
+                      <button
+                        onClick={() => { setSearch(""); setTypeFilter("All"); setRegionFilter("All"); }}
+                        className="text-xs underline underline-offset-2 hover:text-stone-600"
+                      >
+                        {t.clearFilter}
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -2993,8 +3061,26 @@ message = client.messages.create(
                     return a.rank - b.rank;
                   });
                   return sorted.length === 0 ? (
-                    <div className="py-12 text-center text-stone-400">
-                      <p className="text-xs">{t.noMatchSchool}</p>
+                    <div className="py-10 text-center text-stone-400">
+                      <p className="text-xs mb-2">{t.noMatchSchool}</p>
+                      {(() => {
+                        const q = interviewSearch.trim().toLowerCase();
+                        const matchedSchool = q ? allSchools.find(s =>
+                          s.name.toLowerCase().includes(q) ||
+                          (s.shortName && s.shortName.toLowerCase().includes(q))
+                        ) : null;
+                        return matchedSchool ? (
+                          <a
+                            href={matchedSchool.admissionPage}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-blue-500 hover:text-blue-700 underline underline-offset-2"
+                          >
+                            {matchedSchool.name} &mdash; {t.noMatchVisitOfficial}
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                          </a>
+                        ) : null;
+                      })()}
                     </div>
                   ) : (
                     <div className="border border-stone-100">
