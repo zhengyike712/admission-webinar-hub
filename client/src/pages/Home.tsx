@@ -120,7 +120,7 @@ const T: Record<Lang, Record<string, string>> = {
     interviewMethodFilterSchool: "学校主动联系",
     interviewMethodFilterApplicant: "学生主动申请",
     interviewMethodFilterRequired: "必须参加",
-    interviewSearchPlaceholder: "搜索学校名称",
+    interviewSearchPlaceholder: "搜索学校名称或面试类型",
     interviewNote: "面试信息仅供参考，请以各校官网最新政策为准。部分面试名额有限，建议尽早申请。",
     interviewCount: "所学校面试信息",
     interviewDeadlineLabel: "报名截止",
@@ -269,7 +269,7 @@ const T: Record<Lang, Record<string, string>> = {
     interviewMethodFilterSchool: "School Contacts You",
     interviewMethodFilterApplicant: "You Request",
     interviewMethodFilterRequired: "Required",
-    interviewSearchPlaceholder: "Search school name",
+    interviewSearchPlaceholder: "Search school name or interview type",
     interviewNote: "Interview information is for reference only. Please verify the latest policies on each school's official website. Some interview slots are limited — apply early.",
     interviewCount: "schools with interview info",
     interviewDeadlineLabel: "Deadline",
@@ -418,7 +418,7 @@ const T: Record<Lang, Record<string, string>> = {
     interviewMethodFilterSchool: "विश्वविद्यालय संपर्क करता है",
     interviewMethodFilterApplicant: "आप अनुरोध करते हैं",
     interviewMethodFilterRequired: "अनिवार्य",
-    interviewSearchPlaceholder: "विश्वविद्यालय नाम खोजें",
+    interviewSearchPlaceholder: "विश्वविद्यालय नाम या साक्षात्कार प्रकार खोजें",
     interviewNote: "इंटरव्यू जानकारी केवल संदर्भ के लिए है। कृपया नवीनतम नीतियां सत्यापित करें। कुछ स्लॉट सीमित हैं — जल्द आवेदन करें।",
     interviewCount: "विश्वविद्यालयों की इंटरव्यू जानकारी",
     interviewDeadlineLabel: "अंतिम तारीख",
@@ -2060,7 +2060,8 @@ export default function Home() {
       const matchSearch =
         !q ||
         s.schoolName.toLowerCase().includes(q) ||
-        (s.shortName?.toLowerCase().includes(q) ?? false);
+        (s.shortName?.toLowerCase().includes(q) ?? false) ||
+        s.types.some(type => type.toLowerCase().includes(q));
       return matchFilter && matchMethod && matchRegionInterview && matchSearch;
     });
   }, [interviewSearch, interviewFilter, interviewMethodFilter, regionFilter]);
@@ -3041,44 +3042,6 @@ message = client.messages.create(
             </div>
           ) : view === "interviews" ? (
             <div>
-              {/* Quick filters bar */}
-              <div className="flex gap-3 mb-4 flex-wrap">
-                {/* Quick filter: applicant_requests only */}
-                <button
-                  onClick={() => {
-                    setInterviewMethodFilter(interviewMethodFilter === "applicant_requests" ? "all" : "applicant_requests");
-                  }}
-                  className={`flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full border transition-colors ${
-                    interviewMethodFilter === "applicant_requests"
-                      ? "bg-amber-50 border-amber-300 text-amber-700"
-                      : "border-stone-200 text-stone-500 hover:border-amber-300 hover:text-amber-600"
-                  }`}
-                >
-                  <span className="font-medium">
-                    {lang === "zh" ? "★ 仅看学生可申请" : lang === "hi" ? "★ आप अनुरोध कर सकते हैं" : "★ You Can Request"}
-                  </span>
-                  <span className="text-[10px] opacity-70">
-                    ({interviewData.filter(s => s.requestMethod === "applicant_requests").length})
-                  </span>
-                </button>
-                {(() => {
-                  const nearCount = interviewData.filter(s => s.deadline && (() => {
-                    const diff = new Date(s.deadline + "T12:00:00Z").getTime() - Date.now();
-                    return diff > 0 && diff < 30 * 86400000;
-                  })()).length;
-                  return nearCount > 0 ? (
-                    <button
-                      onClick={() => setInterviewFilter("near_deadline")}
-                      className="flex items-center gap-1.5 text-xs cursor-pointer hover:opacity-80 transition-opacity"
-                    >
-                      <Clock size={12} className="text-red-500" />
-                      <span className="text-red-600 font-semibold">{nearCount}</span>
-                      <span className="text-red-500">{t.deadlineSoon}</span>
-                    </button>
-                  ) : null;
-                })()}
-              </div>
-
               {/* Cards: grouped by request method when no method filter active, else flat */}
               {(() => {
                 const isFiltered = interviewFilter !== "all" || interviewMethodFilter !== "all" || interviewSearch.trim() !== "";
