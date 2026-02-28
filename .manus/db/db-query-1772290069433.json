@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `portal_subscriptions` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `email` varchar(320) NOT NULL,\n  `schoolId` int NOT NULL,\n  `schoolName` varchar(256) NOT NULL,\n  `round` varchar(32) NOT NULL,\n  `releaseDate` varchar(32) NOT NULL,\n  `notified` boolean NOT NULL DEFAULT false,\n  `notifiedAt` timestamp,\n  `active` boolean NOT NULL DEFAULT true,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `portal_subscriptions_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 28x4cWX34ZKHd6B.9c35f7d5c3f8 --database F6apVxHHK9H6xisJa5W5pf --execute CREATE TABLE IF NOT EXISTS `portal_subscriptions` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `email` varchar(320) NOT NULL,\n  `schoolId` int NOT NULL,\n  `schoolName` varchar(256) NOT NULL,\n  `round` varchar(32) NOT NULL,\n  `releaseDate` varchar(32) NOT NULL,\n  `notified` boolean NOT NULL DEFAULT false,\n  `notifiedAt` timestamp,\n  `active` boolean NOT NULL DEFAULT true,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `portal_subscriptions_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 536
+}

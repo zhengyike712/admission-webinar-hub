@@ -154,3 +154,28 @@ export const chatMessages = mysqlTable("chat_messages", {
 
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertChatMessage = typeof chatMessages.$inferInsert;
+
+/**
+ * portal_subscriptions table — stores email subscriptions for decision release notifications.
+ * Each row represents one email subscribed to one school's decision results.
+ */
+export const portalSubscriptions = mysqlTable("portal_subscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  email: varchar("email", { length: 320 }).notNull(),
+  /** schoolId from portals.ts */
+  schoolId: int("schoolId").notNull(),
+  schoolName: varchar("schoolName", { length: 256 }).notNull(),
+  /** The decision round subscribed to, e.g. "RD" */
+  round: varchar("round", { length: 32 }).notNull(),
+  /** ISO date string of the expected release date */
+  releaseDate: varchar("releaseDate", { length: 32 }).notNull(),
+  /** Whether the notification email has been sent */
+  notified: boolean("notified").default(false).notNull(),
+  /** When the notification was sent */
+  notifiedAt: timestamp("notifiedAt"),
+  active: boolean("active").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PortalSubscription = typeof portalSubscriptions.$inferSelect;
+export type InsertPortalSubscription = typeof portalSubscriptions.$inferInsert;

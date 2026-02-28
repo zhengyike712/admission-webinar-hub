@@ -296,3 +296,12 @@
 - [x] 创建 portal 数据文件
 - [x] 实现 /portals 页面（搜索、分类、portal 链接、结果时间）
 - [x] 主页导航添加 Portals 入口
+
+## Portal 状态自动化 + 结果提醒订阅
+
+- [x] portals.ts 改为日期驱动（用 releaseDate 字段替代 released 布尔值）
+- [x] 前端自动计算已出/待出状态
+- [x] 数据库添加 portal_subscriptions 表
+- [x] tRPC 接口：订阅/取消订阅
+- [x] 定时任务：每天检测到期学校并发送邮件通知
+- [x] /portals 页面添加订阅入口 UI

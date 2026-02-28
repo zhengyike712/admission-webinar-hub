@@ -2,8 +2,9 @@
 // Layout: search + filter bar on top, card grid below
 
 import { useState, useMemo } from "react";
-import { ExternalLink, Search, Clock, CheckCircle2, Circle, ChevronDown, ChevronUp } from "lucide-react";
-import { schoolPortals, ROUND_COLORS, ROUND_LABELS_ZH, type SchoolPortal, type DecisionRound } from "@/data/portals";
+import { ExternalLink, Search, Clock, CheckCircle2, Circle, ChevronDown, ChevronUp, Bell, BellOff, X } from "lucide-react";
+import { schoolPortals, ROUND_COLORS, ROUND_LABELS_ZH, isReleased, type SchoolPortal, type DecisionRound } from "@/data/portals";
+import { trpc } from "@/lib/trpc";
 
 type Lang = "zh" | "en" | "hi";
 
@@ -28,6 +29,15 @@ const T = {
     schools: "所学校",
     backToHome: "← 返回主页",
     notesLabel: "备注",
+  subscribeAlert: "订阅结果提醒",
+  subscribeAlertDesc: "结果发布当天收到邮件通知",
+  subscribeEmail: "输入邮箱",
+  subscribeBtn: "订阅",
+  subscribeSuccess: "已订阅！结果发布时将发送邮件通知",
+  subscribedAlready: "已订阅",
+  unsubscribeBtn: "取消订阅",
+  subscribeError: "订阅失败，请稍后重试",
+  subscribeBanner: "订阅结果提醒，结果发布当天收到邮件",
   },
   en: {
     pageTitle: "Applicant Portals",
@@ -49,6 +59,15 @@ const T = {
     schools: "schools",
     backToHome: "← Back to Home",
     notesLabel: "Notes",
+  subscribeAlert: "Subscribe to Alerts",
+  subscribeAlertDesc: "Get an email when decisions are released",
+  subscribeEmail: "Enter email",
+  subscribeBtn: "Subscribe",
+  subscribeSuccess: "Subscribed! You'll get an email when results are released.",
+  subscribedAlready: "Subscribed",
+  unsubscribeBtn: "Unsubscribe",
+  subscribeError: "Failed to subscribe. Please try again.",
+  subscribeBanner: "Subscribe to get email alerts when decisions are released",
   },
   hi: {
     pageTitle: "आवेदन पोर्टल",
@@ -70,18 +89,116 @@ const T = {
     schools: "विश्वविद्यालय",
     backToHome: "← मुख्य पृष्ठ",
     notesLabel: "नोट्स",
+  subscribeAlert: "अलर्ट सब्सक्राइब करें",
+  subscribeAlertDesc: "परिणाम जारी होने पर ईमेल पाएं",
+  subscribeEmail: "ईमेल दर्ज करें",
+  subscribeBtn: "सब्सक्राइब",
+  subscribeSuccess: "सब्सक्राइब हो गए! परिणाम जारी होने पर ईमेल मिलेगा।",
+  subscribedAlready: "सब्सक्राइब किया",
+  unsubscribeBtn: "अनसब्सक्राइब",
+  subscribeError: "सब्सक्राइब नहीं हो सका। कृपया पुनः प्रयास करें।",
+  subscribeBanner: "परिणाम जारी होने पर ईमेल अलर्ट के लिए सब्सक्राइब करें",
   },
 } as const;
 
 const ROUND_OPTIONS: DecisionRound[] = ["ED", "ED2", "EA", "SCEA", "REA", "RD"];
 
+function SubscribeButton({ portal, round, releaseDate, lang }: {
+  portal: SchoolPortal;
+  round: string;
+  releaseDate: string;
+  lang: Lang;
+}) {
+  const t = T[lang];
+  const [email, setEmail] = useState("");
+  const [showInput, setShowInput] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
+  const [error, setError] = useState("");
+
+  const subscribeMutation = trpc.portalSubs.subscribe.useMutation({
+    onSuccess: () => {
+      setSubscribed(true);
+      setShowInput(false);
+      setError("");
+    },
+    onError: (err) => {
+      setError(t.subscribeError);
+    },
+  });
+
+  if (subscribed) {
+    return (
+      <span className="flex items-center gap-1 text-[10px] text-green-600 font-medium">
+        <Bell size={10} />
+        {t.subscribedAlready}
+      </span>
+    );
+  }
+
+  if (showInput) {
+    return (
+      <div className="flex items-center gap-1 mt-1">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder={t.subscribeEmail}
+          className="flex-1 text-[10px] border border-stone-200 px-1.5 py-0.5 focus:outline-none focus:border-stone-400 min-w-0"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && email) {
+              subscribeMutation.mutate({
+                email,
+                schoolId: portal.schoolId,
+                schoolName: portal.name,
+                round,
+                releaseDate,
+              });
+            }
+          }}
+        />
+        <button
+          onClick={() => {
+            if (email) {
+              subscribeMutation.mutate({
+                email,
+                schoolId: portal.schoolId,
+                schoolName: portal.name,
+                round,
+                releaseDate,
+              });
+            }
+          }}
+          disabled={!email || subscribeMutation.isPending}
+          className="text-[10px] px-1.5 py-0.5 bg-stone-900 text-white hover:bg-stone-700 disabled:opacity-50 transition-colors"
+        >
+          {subscribeMutation.isPending ? "..." : t.subscribeBtn}
+        </button>
+        <button onClick={() => setShowInput(false)} className="text-stone-400 hover:text-stone-700">
+          <X size={10} />
+        </button>
+        {error && <span className="text-[10px] text-red-500">{error}</span>}
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={() => setShowInput(true)}
+      className="flex items-center gap-1 text-[10px] text-stone-400 hover:text-stone-700 transition-colors"
+    >
+      <Bell size={10} />
+      {t.subscribeAlert}
+    </button>
+  );
+}
+
 function PortalCard({ portal, lang }: { portal: SchoolPortal; lang: Lang }) {
   const t = T[lang];
   const [expanded, setExpanded] = useState(false);
 
-  const hasReleased = portal.decisionDates.some((d) => d.released);
-  const allReleased = portal.decisionDates.every((d) => d.released);
-  const pendingDates = portal.decisionDates.filter((d) => !d.released);
+  const hasReleased = portal.decisionDates.some((d) => isReleased(d.releaseDate));
+  const allReleased = portal.decisionDates.every((d) => isReleased(d.releaseDate));
+  const pendingDates = portal.decisionDates.filter((d) => !isReleased(d.releaseDate));
 
   const notes = lang === "zh" ? portal.notesZh : portal.notes;
 
@@ -135,22 +252,34 @@ function PortalCard({ portal, lang }: { portal: SchoolPortal; lang: Lang }) {
         {expanded && (
           <div className="mt-2 flex flex-col gap-1.5">
             {portal.decisionDates.map((dd) => (
-              <div key={dd.round} className="flex items-center gap-2">
-                {dd.released ? (
-                  <CheckCircle2 size={11} className="text-green-500 flex-shrink-0" />
-                ) : (
-                  <Circle size={11} className="text-stone-300 flex-shrink-0" />
-                )}
-                <span
-                  className={`text-[10px] font-medium px-1 py-0.5 border ${ROUND_COLORS[dd.round]}`}
-                >
-                  {lang === "zh" ? ROUND_LABELS_ZH[dd.round] : dd.round}
-                </span>
-                <span className="text-[11px] text-stone-500">
-                  {lang === "zh" ? dd.dateZh : dd.date}
-                </span>
-                {dd.released && (
-                  <span className="text-[10px] text-green-600 font-medium">✓</span>
+              <div key={dd.round} className="flex flex-col gap-0.5">
+                <div className="flex items-center gap-2">
+                  {isReleased(dd.releaseDate) ? (
+                    <CheckCircle2 size={11} className="text-green-500 flex-shrink-0" />
+                  ) : (
+                    <Circle size={11} className="text-stone-300 flex-shrink-0" />
+                  )}
+                  <span
+                    className={`text-[10px] font-medium px-1 py-0.5 border ${ROUND_COLORS[dd.round]}`}
+                  >
+                    {lang === "zh" ? ROUND_LABELS_ZH[dd.round] : dd.round}
+                  </span>
+                  <span className="text-[11px] text-stone-500">
+                    {lang === "zh" ? dd.dateZh : dd.date}
+                  </span>
+                  {isReleased(dd.releaseDate) && (
+                    <span className="text-[10px] text-green-600 font-medium">✓</span>
+                  )}
+                </div>
+                {!isReleased(dd.releaseDate) && dd.releaseDate && (
+                  <div className="pl-5">
+                    <SubscribeButton
+                      portal={portal}
+                      round={dd.round}
+                      releaseDate={dd.releaseDate}
+                      lang={lang}
+                    />
+                  </div>
                 )}
               </div>
             ))}
@@ -201,10 +330,10 @@ export default function Portals() {
         return false;
       }
       // Status filter
-      if (statusFilter === "released" && !portal.decisionDates.some((d) => d.released)) {
+      if (statusFilter === "released" && !portal.decisionDates.some((d) => isReleased(d.releaseDate))) {
         return false;
       }
-      if (statusFilter === "pending" && !portal.decisionDates.some((d) => !d.released)) {
+      if (statusFilter === "pending" && !portal.decisionDates.some((d) => !isReleased(d.releaseDate))) {
         return false;
       }
       return true;

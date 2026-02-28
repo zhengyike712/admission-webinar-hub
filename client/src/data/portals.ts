@@ -4,9 +4,12 @@
  * Applicant portal URLs and decision release dates for each school.
  * Data is manually curated from official university websites.
  *
- * decisionDates: key = round (ED/EA/SCEA/RD/REA/QuestBridge), value = expected release date string
+ * decisionDates: key = round (ED/EA/SCEA/RD/REA/QuestBridge), value = expected release date
  * portalUrl: direct link to the applicant status portal
  * portalName: official name of the portal
+ *
+ * releaseDate: ISO date string (YYYY-MM-DD) for exact dates, or approximate string for fuzzy dates.
+ * isReleased() helper computes status automatically from current date.
  */
 
 export type DecisionRound =
@@ -23,9 +26,9 @@ export interface DecisionDate {
   round: DecisionRound;
   label: string; // human-readable label
   labelZh: string;
-  date: string; // e.g. "Mid-December 2025" or "March 28, 2026"
+  date: string; // display string e.g. "Mid-December 2025"
   dateZh: string;
-  released?: boolean; // true if already released
+  releaseDate: string; // ISO date YYYY-MM-DD for exact, or "approx:YYYY-MM-DD" for fuzzy
 }
 
 export interface SchoolPortal {
@@ -40,6 +43,29 @@ export interface SchoolPortal {
   notesZh?: string;
 }
 
+/**
+ * Determine if a decision date has been released based on current date.
+ * Supports exact ISO dates and "approx:YYYY-MM-DD" format.
+ */
+export function isReleased(releaseDate: string): boolean {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dateStr = releaseDate.startsWith("approx:") ? releaseDate.slice(7) : releaseDate;
+  const release = new Date(dateStr);
+  return today >= release;
+}
+
+/**
+ * Get days until release (negative = already released)
+ */
+export function daysUntilRelease(releaseDate: string): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dateStr = releaseDate.startsWith("approx:") ? releaseDate.slice(7) : releaseDate;
+  const release = new Date(dateStr);
+  return Math.ceil((release.getTime() - today.getTime()) / 86400000);
+}
+
 export const schoolPortals: SchoolPortal[] = [
   // ── Ivy League + Peers ──────────────────────────────────────────────────
   {
@@ -49,8 +75,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Princeton Applicant Portal",
     portalNameZh: "普林斯顿申请者门户",
     decisionDates: [
-      { round: "SCEA", label: "SCEA", labelZh: "限制性早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "SCEA", label: "SCEA", labelZh: "限制性早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -61,8 +87,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "MIT Applicant Portal",
     portalNameZh: "MIT 申请者门户",
     decisionDates: [
-      { round: "EA", label: "Early Action", labelZh: "早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "March 14, 2026", dateZh: "2026年3月14日" },
+      { round: "EA", label: "Early Action", labelZh: "早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-14" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "March 14, 2026", dateZh: "2026年3月14日", releaseDate: "2026-03-14" },
     ],
   },
   {
@@ -72,8 +98,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "my.harvard",
     portalNameZh: "哈佛申请者门户",
     decisionDates: [
-      { round: "SCEA", label: "Restrictive Early Action", labelZh: "限制性早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "SCEA", label: "Restrictive Early Action", labelZh: "限制性早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-12" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -83,8 +109,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Stanford Applicant Portal",
     portalNameZh: "斯坦福申请者门户",
     decisionDates: [
-      { round: "REA", label: "Restrictive Early Action", labelZh: "限制性早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "REA", label: "Restrictive Early Action", labelZh: "限制性早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-12" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -94,8 +120,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Yale Applicant Status Portal",
     portalNameZh: "耶鲁申请者门户",
     decisionDates: [
-      { round: "SCEA", label: "Single-Choice Early Action", labelZh: "单选早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "SCEA", label: "Single-Choice Early Action", labelZh: "单选早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-17" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -106,9 +132,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Penn Applicant Portal",
     portalNameZh: "宾大申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -119,8 +145,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Caltech Applicant Portal",
     portalNameZh: "加州理工申请者门户",
     decisionDates: [
-      { round: "EA", label: "Early Action", labelZh: "早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Mid-March 2026", dateZh: "2026年3月中旬" },
+      { round: "EA", label: "Early Action", labelZh: "早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Mid-March 2026", dateZh: "2026年3月中旬", releaseDate: "approx:2026-03-15" },
     ],
   },
   {
@@ -130,9 +156,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Duke Applicant Portal",
     portalNameZh: "杜克申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -142,9 +168,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Brown Applicant Portal",
     portalNameZh: "布朗申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -155,9 +181,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "JHU Applicant Portal",
     portalNameZh: "约翰霍普金斯申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -167,9 +193,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Northwestern Applicant Portal",
     portalNameZh: "西北大学申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -179,9 +205,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Dartmouth Applicant Portal",
     portalNameZh: "达特茅斯申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -191,9 +217,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Vanderbilt Applicant Portal",
     portalNameZh: "范德堡申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -203,9 +229,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Rice Applicant Portal",
     portalNameZh: "莱斯大学申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -216,9 +242,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "WashU Applicant Portal",
     portalNameZh: "圣路易斯华盛顿大学申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -228,9 +254,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Cornell Applicant Portal",
     portalNameZh: "康奈尔申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -240,8 +266,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Notre Dame Applicant Portal",
     portalNameZh: "圣母大学申请者门户",
     decisionDates: [
-      { round: "REA", label: "Restrictive Early Action", labelZh: "限制性早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "REA", label: "Restrictive Early Action", labelZh: "限制性早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-20" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -251,7 +277,7 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "UCLA Applicant Portal",
     portalNameZh: "UCLA 申请者门户",
     decisionDates: [
-      { round: "RD", label: "Freshman Decision", labelZh: "本科申请结果", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "RD", label: "Freshman Decision", labelZh: "本科申请结果", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
     notesZh: "UC 系统不提供 EA/ED，统一 11月30日截止，3月下旬出结果",
   },
@@ -262,9 +288,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Emory Applicant Portal",
     portalNameZh: "埃默里申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -274,8 +300,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Georgetown Applicant Portal",
     portalNameZh: "乔治城申请者门户",
     decisionDates: [
-      { round: "EA", label: "Early Action", labelZh: "早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "EA", label: "Early Action", labelZh: "早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -285,7 +311,7 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "UC Berkeley Applicant Portal",
     portalNameZh: "伯克利申请者门户",
     decisionDates: [
-      { round: "RD", label: "Freshman Decision", labelZh: "本科申请结果", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "RD", label: "Freshman Decision", labelZh: "本科申请结果", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
     notesZh: "UC 系统不提供 EA/ED，统一 11月30日截止，3月下旬出结果",
   },
@@ -297,8 +323,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "UMich Applicant Portal",
     portalNameZh: "密歇根大学申请者门户",
     decisionDates: [
-      { round: "EA", label: "Early Action", labelZh: "早申", date: "Late January 2026", dateZh: "2026年1月下旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "EA", label: "Early Action", labelZh: "早申", date: "Late January 2026", dateZh: "2026年1月下旬", releaseDate: "2026-01-28" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -309,9 +335,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "CMU Applicant Portal",
     portalNameZh: "卡内基梅隆申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -322,8 +348,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "UVA Applicant Portal",
     portalNameZh: "弗吉尼亚大学申请者门户",
     decisionDates: [
-      { round: "EA", label: "Early Action", labelZh: "早申", date: "Late January 2026", dateZh: "2026年1月下旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "EA", label: "Early Action", labelZh: "早申", date: "Late January 2026", dateZh: "2026年1月下旬", releaseDate: "2026-01-28" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -334,8 +360,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "UNC Applicant Portal",
     portalNameZh: "北卡罗来纳大学申请者门户",
     decisionDates: [
-      { round: "EA", label: "Early Action", labelZh: "早申", date: "Late January 2026", dateZh: "2026年1月下旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "EA", label: "Early Action", labelZh: "早申", date: "Late January 2026", dateZh: "2026年1月下旬", releaseDate: "2026-01-28" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -345,9 +371,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Wake Forest Applicant Portal",
     portalNameZh: "维克森林申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -357,9 +383,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Tufts Applicant Portal",
     portalNameZh: "塔夫茨申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -370,8 +396,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "USC Applicant Portal",
     portalNameZh: "南加大申请者门户",
     decisionDates: [
-      { round: "EA", label: "Early Action", labelZh: "早申", date: "Late January 2026", dateZh: "2026年1月下旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "EA", label: "Early Action", labelZh: "早申", date: "Late January 2026", dateZh: "2026年1月下旬", releaseDate: "2026-01-28" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -382,9 +408,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "NYU Applicant Portal",
     portalNameZh: "纽约大学申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -395,8 +421,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "BC Applicant Portal",
     portalNameZh: "波士顿学院申请者门户",
     decisionDates: [
-      { round: "EA", label: "Early Action", labelZh: "早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "EA", label: "Early Action", labelZh: "早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -407,8 +433,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Georgia Tech Applicant Portal",
     portalNameZh: "佐治亚理工申请者门户",
     decisionDates: [
-      { round: "EA", label: "Early Action", labelZh: "早申", date: "Mid-January 2026", dateZh: "2026年1月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "EA", label: "Early Action", labelZh: "早申", date: "Mid-January 2026", dateZh: "2026年1月中旬", releaseDate: "2026-01-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -419,8 +445,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "UT Austin Applicant Portal",
     portalNameZh: "德克萨斯大学奥斯汀分校申请者门户",
     decisionDates: [
-      { round: "EA", label: "Early Action", labelZh: "早申", date: "February 2026", dateZh: "2026年2月" },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "EA", label: "Early Action", labelZh: "早申", date: "February 2026", dateZh: "2026年2月", releaseDate: "approx:2026-02-01" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -430,9 +456,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Tulane Applicant Portal",
     portalNameZh: "杜兰大学申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -443,8 +469,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "BU Applicant Portal",
     portalNameZh: "波士顿大学申请者门户",
     decisionDates: [
-      { round: "EA", label: "Early Decision / Early Action", labelZh: "早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "EA", label: "Early Decision / Early Action", labelZh: "早申", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -455,8 +481,8 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "UIUC Applicant Portal",
     portalNameZh: "伊利诺伊大学香槟分校申请者门户",
     decisionDates: [
-      { round: "EA", label: "Early Action", labelZh: "早申", date: "January 2026", dateZh: "2026年1月", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "February–March 2026", dateZh: "2026年2月至3月" },
+      { round: "EA", label: "Early Action", labelZh: "早申", date: "January 2026", dateZh: "2026年1月", releaseDate: "approx:2026-01-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "February–March 2026", dateZh: "2026年2月至3月", releaseDate: "approx:2026-02-15" },
     ],
   },
   {
@@ -466,9 +492,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Northeastern Applicant Portal",
     portalNameZh: "东北大学申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -479,7 +505,7 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "UCSD Applicant Portal",
     portalNameZh: "加州大学圣地亚哥分校申请者门户",
     decisionDates: [
-      { round: "RD", label: "Freshman Decision", labelZh: "本科申请结果", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "RD", label: "Freshman Decision", labelZh: "本科申请结果", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   // ── Liberal Arts Colleges ─────────────────────────────────────────────
@@ -490,9 +516,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Williams Applicant Portal",
     portalNameZh: "威廉姆斯学院申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -502,9 +528,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Amherst Applicant Portal",
     portalNameZh: "阿默斯特学院申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -514,9 +540,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Swarthmore Applicant Portal",
     portalNameZh: "斯沃斯莫尔学院申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -526,9 +552,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Pomona Applicant Portal",
     portalNameZh: "波莫纳学院申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -538,9 +564,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Wellesley Applicant Portal",
     portalNameZh: "韦尔斯利学院申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -550,9 +576,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Bowdoin Applicant Portal",
     portalNameZh: "鲍登学院申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -562,9 +588,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Carleton Applicant Portal",
     portalNameZh: "卡尔顿学院申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
   {
@@ -574,9 +600,9 @@ export const schoolPortals: SchoolPortal[] = [
     portalName: "Middlebury Applicant Portal",
     portalNameZh: "明德学院申请者门户",
     decisionDates: [
-      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", released: true },
-      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", released: true },
-      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬" },
+      { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
+      { round: "ED2", label: "Early Decision II", labelZh: "早决定 II", date: "Mid-February 2026", dateZh: "2026年2月中旬", releaseDate: "2026-02-15" },
+      { round: "RD", label: "Regular Decision", labelZh: "常规申请", date: "Late March 2026", dateZh: "2026年3月下旬", releaseDate: "approx:2026-03-26" },
     ],
   },
 ];
@@ -587,18 +613,46 @@ export function getPortalBySchoolId(schoolId: number): SchoolPortal | undefined 
   return schoolPortals.find((p) => p.schoolId === schoolId);
 }
 
+/**
+ * Get upcoming (not yet released) decisions, sorted by release date ascending.
+ */
 export function getUpcomingDecisions(): Array<SchoolPortal & { nextDate: DecisionDate }> {
-  const now = new Date();
   const results: Array<SchoolPortal & { nextDate: DecisionDate }> = [];
 
   for (const portal of schoolPortals) {
-    const upcoming = portal.decisionDates.filter((d) => !d.released);
+    const upcoming = portal.decisionDates.filter((d) => !isReleased(d.releaseDate));
     if (upcoming.length > 0) {
-      results.push({ ...portal, nextDate: upcoming[0] });
+      // Sort upcoming by releaseDate
+      const sorted = [...upcoming].sort((a, b) => {
+        const da = a.releaseDate.startsWith("approx:") ? a.releaseDate.slice(7) : a.releaseDate;
+        const db = b.releaseDate.startsWith("approx:") ? b.releaseDate.slice(7) : b.releaseDate;
+        return new Date(da).getTime() - new Date(db).getTime();
+      });
+      results.push({ ...portal, nextDate: sorted[0] });
     }
   }
 
-  return results;
+  return results.sort((a, b) => {
+    const da = a.nextDate.releaseDate.startsWith("approx:") ? a.nextDate.releaseDate.slice(7) : a.nextDate.releaseDate;
+    const db = b.nextDate.releaseDate.startsWith("approx:") ? b.nextDate.releaseDate.slice(7) : b.nextDate.releaseDate;
+    return new Date(da).getTime() - new Date(db).getTime();
+  });
+}
+
+/**
+ * Get decisions releasing within the next N days.
+ */
+export function getDecisionsReleasingWithin(days: number): Array<{ portal: SchoolPortal; date: DecisionDate }> {
+  const results: Array<{ portal: SchoolPortal; date: DecisionDate }> = [];
+  for (const portal of schoolPortals) {
+    for (const d of portal.decisionDates) {
+      const daysLeft = daysUntilRelease(d.releaseDate);
+      if (daysLeft >= 0 && daysLeft <= days) {
+        results.push({ portal, date: d });
+      }
+    }
+  }
+  return results.sort((a, b) => daysUntilRelease(a.date.releaseDate) - daysUntilRelease(b.date.releaseDate));
 }
 
 export const ROUND_COLORS: Record<DecisionRound, string> = {
