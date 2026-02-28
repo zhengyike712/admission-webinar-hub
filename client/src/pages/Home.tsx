@@ -1271,51 +1271,72 @@ function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof
       school.available ? "" : "opacity-50"
     }`}>
       {/* Row — always visible */}
-      <button
-        onClick={() => hasDetails && setExpanded(v => !v)}
-        className={`w-full flex items-center gap-3 py-2.5 px-1 text-left transition-colors duration-100 ${
-          hasDetails ? "hover:bg-stone-50 cursor-pointer" : "cursor-default"
-        }`}
-      >
-        {/* Status dot */}
-        <span className={`shrink-0 w-1.5 h-1.5 rounded-full ${
-          school.available ? "bg-green-500" : "bg-stone-300"
-        }`} />
+      <div className="flex items-center gap-2 py-2 px-1">
+        {/* Left: clickable expand area */}
+        <button
+          onClick={() => hasDetails && setExpanded(v => !v)}
+          className={`flex items-center gap-2.5 min-w-0 flex-1 text-left transition-colors duration-100 ${
+            hasDetails ? "hover:opacity-70 cursor-pointer" : "cursor-default"
+          }`}
+        >
+          {/* Status dot */}
+          <span className={`shrink-0 w-1.5 h-1.5 rounded-full ${
+            school.available ? "bg-green-500" : "bg-stone-300"
+          }`} />
 
-        {/* School name */}
-        <span className="text-sm text-stone-800 font-medium truncate min-w-0">
-          {school.shortName || school.schoolName}
-        </span>
-
-        {/* Types — hidden on very small screens */}
-        {school.available && school.types.length > 0 && (
-          <span className="hidden sm:flex items-center gap-1 shrink-0">
-            {school.types.slice(0, 2).map((type) => (
-              <span key={type} className="text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded">
-                {type}
-              </span>
-            ))}
-            {school.types.length > 2 && (
-              <span className="text-[10px] text-stone-400">+{school.types.length - 2}</span>
-            )}
+          {/* School name */}
+          <span className="text-sm text-stone-800 font-medium truncate min-w-0">
+            {school.shortName || school.schoolName}
           </span>
-        )}
 
-        {/* Deadline urgent badge */}
-        {deadlineUrgent && (
-          <span className="shrink-0 text-[10px] text-red-600 font-medium">⚠ {deadlineDisplay}</span>
-        )}
+          {/* Types — hidden on very small screens */}
+          {school.available && school.types.length > 0 && (
+            <span className="hidden sm:flex items-center gap-1 shrink-0">
+              {school.types.slice(0, 2).map((type) => (
+                <span key={type} className="text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded">
+                  {type}
+                </span>
+              ))}
+              {school.types.length > 2 && (
+                <span className="text-[10px] text-stone-400">+{school.types.length - 2}</span>
+              )}
+            </span>
+          )}
 
-        {/* Expand chevron */}
-        {hasDetails && (
-          <ChevronDown
-            size={13}
-            className={`ml-auto shrink-0 text-stone-300 transition-transform duration-150 ${
-              expanded ? "rotate-180" : ""
+          {/* Deadline urgent badge */}
+          {deadlineUrgent && (
+            <span className="shrink-0 text-[10px] text-red-600 font-medium">⚠ {deadlineDisplay}</span>
+          )}
+
+          {/* Expand chevron */}
+          {hasDetails && (
+            <ChevronDown
+              size={13}
+              className={`shrink-0 text-stone-300 transition-transform duration-150 ${
+                expanded ? "rotate-180" : ""
+              }`}
+            />
+          )}
+        </button>
+
+        {/* Right: portal link — always visible */}
+        {school.portalUrl && school.portalUrl !== "N/A" && (
+          <a
+            href={school.portalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className={`shrink-0 flex items-center gap-0.5 text-[11px] px-2 py-0.5 border transition-colors duration-150 ${
+              school.available
+                ? "border-stone-300 text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900"
+                : "border-stone-200 text-stone-400 hover:border-stone-300 hover:text-stone-500"
             }`}
-          />
+          >
+            {school.available ? t.interviewGoPortal : t.interviewLearnMore}
+            <ArrowUpRight size={10} />
+          </a>
         )}
-      </button>
+      </div>
 
       {/* Expanded details */}
       {expanded && (
@@ -1355,32 +1376,6 @@ function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof
           {notes && (
             <p className="text-[11px] text-stone-400 leading-relaxed mb-2">{notes}</p>
           )}
-
-          {/* CTA links */}
-          <div className="flex gap-2 flex-wrap">
-            {school.available && school.portalUrl && school.portalUrl !== "N/A" && (
-              <a
-                href={school.portalUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-[11px] text-stone-700 border border-stone-300 px-2.5 py-1 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-colors duration-150"
-              >
-                {t.interviewGoPortal}
-                <ArrowUpRight size={10} />
-              </a>
-            )}
-            {!school.available && school.portalUrl && school.portalUrl !== "N/A" && (
-              <a
-                href={school.portalUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-[11px] text-stone-400 border border-stone-200 px-2.5 py-1 hover:border-stone-400 hover:text-stone-600 transition-colors duration-150"
-              >
-                {t.interviewLearnMore}
-                <ExternalLink size={10} />
-              </a>
-            )}
-          </div>
 
           {/* Prep Tools */}
           {school.available && <InterviewPrepTools school={school} lang={lang} t={t} />}
