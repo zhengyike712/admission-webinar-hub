@@ -152,6 +152,9 @@ const T: Record<Lang, Record<string, string>> = {
     shareLabel: "分享本站",
     onboardingSubtitle: "你了解顶尖大学招生的第一手窗口",
     footerCopyright: "© 2026 景深留学。所有信息均来自各校官网。",
+    batchSelectedTpl: "已选 {n} 场活动",
+    batchClear: "清除选择",
+    batchExport: "批量导出日历 (.ics)",
   },
   en: {
     tagline: "Global University Admissions Info Hub",
@@ -263,6 +266,9 @@ const T: Record<Lang, Record<string, string>> = {
     shareLabel: "Share this site",
     onboardingSubtitle: "Your direct window into top university admissions",
     footerCopyright: "© 2026 AdmitLens. All information sourced from official university websites.",
+    batchSelectedTpl: "{n} event{plural} selected",
+    batchClear: "Clear",
+    batchExport: "Export to Calendar (.ics)",
   },
   hi: {
     tagline: "विश्वविद्यालय प्रवेश सूचना केंद्र",
@@ -374,6 +380,9 @@ const T: Record<Lang, Record<string, string>> = {
     shareLabel: "इस साइट को शेयर करें",
     onboardingSubtitle: "शीर्ष विश्वविद्यालय प्रवेश की सीधी जानकारी",
     footerCopyright: "© 2026 AdmitLens. सभी जानकारी विश्वविद्यालयों की आधिकारिक वेबसाइटों से ली गई है।",
+    batchSelectedTpl: "{n} कार्यक्रम चुने गए",
+    batchClear: "साफ करें",
+    batchExport: "कैलेंडर में निर्यात करें (.ics)",
   },
 } as const;
 
@@ -2171,21 +2180,23 @@ export default function Home() {
       {selectedSessions.size > 0 && (
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-stone-900 text-white px-4 py-3 flex items-center justify-between shadow-lg">
           <span className="text-sm font-medium">
-            {lang === "zh" ? `已选 ${selectedSessions.size} 场活动` : `${selectedSessions.size} event${selectedSessions.size > 1 ? "s" : ""} selected`}
+            {t.batchSelectedTpl
+              .replace("{n}", String(selectedSessions.size))
+              .replace("{plural}", selectedSessions.size > 1 ? "s" : "")}
           </span>
           <div className="flex items-center gap-3">
             <button
               onClick={clearSelection}
               className="text-xs text-stone-400 hover:text-white transition-colors"
             >
-              {lang === "zh" ? "清除选择" : "Clear"}
+              {t.batchClear}
             </button>
             <button
               onClick={exportBatchICS}
               className="flex items-center gap-1.5 px-4 py-1.5 bg-white text-stone-900 text-xs font-semibold hover:bg-stone-100 transition-colors"
             >
               <CalendarPlus size={12} />
-              {lang === "zh" ? "批量导出日历 (.ics)" : "Export to Calendar (.ics)"}
+              {t.batchExport}
             </button>
           </div>
         </div>
