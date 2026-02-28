@@ -5,8 +5,9 @@
 // - Session types: General Info Session, Up Close, Multi-College, Regional, Student Forum
 // ============================================================
 
-/** 数据最后人工核查日期，格式 YYYY-MM-DD */
-export const DATA_LAST_UPDATED = "2026-02-28";
+/** 数据最后更新日期，自动从 git commit 时间戳获取，格式 YYYY-MM-DD */
+declare const __DATA_LAST_UPDATED__: string;
+export const DATA_LAST_UPDATED: string = typeof __DATA_LAST_UPDATED__ !== "undefined" ? __DATA_LAST_UPDATED__ : "2026-02-28";
 
 export type SchoolType = "National University" | "Liberal Arts College" | "Research University" | "Comprehensive University";
 export type Region = "US" | "UK" | "HK" | "AU";

@@ -1,6 +1,7 @@
 import { jsxLocPlugin } from "@builder.io/vite-plugin-jsx-loc";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
+import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { defineConfig, type Plugin, type ViteDevServer } from "vite";
@@ -152,8 +153,28 @@ function vitePluginManusDebugCollector(): Plugin {
 
 const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector()];
 
+// Auto-detect last data update from git commit timestamp of data files
+function getDataLastUpdated(): string {
+  try {
+    const raw = execSync(
+      'git log -1 --format="%ci" -- client/src/data/schools.ts client/src/data/sessions.ts client/src/data/interviews.ts',
+      { cwd: path.resolve(import.meta.dirname), encoding: "utf-8" }
+    ).trim().replace(/"/g, "");
+    if (raw) {
+      // raw format: "2026-02-28 13:57:35 -0500" → extract YYYY-MM-DD
+      return raw.slice(0, 10);
+    }
+  } catch {
+    // fallback: use today's date
+  }
+  return new Date().toISOString().slice(0, 10);
+}
+
 export default defineConfig({
   plugins,
+  define: {
+    __DATA_LAST_UPDATED__: JSON.stringify(getDataLastUpdated()),
+  },
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),

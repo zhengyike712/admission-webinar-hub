@@ -186,7 +186,7 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingF5Title: "Notion 集成",
     onboardingF5Desc: "将 Info Session 日历嵌入你的申请追踪页，一站管理",
     mobileDesktopTitle: "完整功能需在电脑端使用",
-    mobileDesktopDesc: "活动日程、筛选、AI 预习、面试备考等功能在电脑上体验最佳。",
+    mobileDesktopDesc: "活动日程、筛选、面试备考、日历导出等功能在电脑上体验最佳。",
     mobileSendTitle: "发送到电脑",
     mobileScanQR: "扫码打开",
     mobileShareBtn: "系统分享",
@@ -340,7 +340,7 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingF5Title: "Notion Integration",
     onboardingF5Desc: "Embed the Info Session calendar into your application tracker",
     mobileDesktopTitle: "Full features available on desktop",
-    mobileDesktopDesc: "Session calendar, filters, AI prep, interview tools and more are best experienced on desktop.",
+    mobileDesktopDesc: "Session calendar, filters, interview tools, and calendar export are best experienced on desktop.",
     mobileSendTitle: "Send to Computer",
     mobileScanQR: "Scan to open",
     mobileShareBtn: "Share",
@@ -494,7 +494,7 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingF5Title: "Notion एकीकरण",
     onboardingF5Desc: "Info Session कैलेंडर को अपने आवेदन ट्रैकर में एम्बेड करें",
     mobileDesktopTitle: "पूर्ण सुविधाएं डेस्कटॉप पर उपलब्ध",
-    mobileDesktopDesc: "कार्यक्रम कैलेंडर, फ़िल्टर, AI प्रेप और इंटरव्यू टूल्स डेस्कटॉप पर सर्वोत्तम हैं।",
+    mobileDesktopDesc: "कार्यक्रम कैलेंडर, फ़िल्टर, इंटरव्यू टूल्स और कैलेंडर एक्सपोर्ट डेस्कटॉप पर सर्वोत्तम हैं।",
     mobileSendTitle: "कंप्यूटर पर भेजें",
     mobileScanQR: "स्कैन करें",
     mobileShareBtn: "शेयर करें",
@@ -1372,145 +1372,6 @@ function InterviewGroup({
   );
 }
 
-// ── Email Subscribe ───────────────────────────────────────────────
-function EmailSubscribe({ t }: { t: typeof T["zh"] }) {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const subscribeMutation = trpc.subscribers.subscribe.useMutation();
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email.includes("@")) return;
-    subscribeMutation.mutate(
-      { email },
-      { onSuccess: () => setSubmitted(true) }
-    );
-  }
-
-  if (submitted) {
-    return (
-      <div className="flex items-center gap-2 text-xs text-stone-500">
-        <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500" />
-        {t.subscribeSuccess}
-      </div>
-    );
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
-      <div className="relative flex-1">
-        <Mail size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-300" />
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder={t.subscribePlaceholder}
-          className="w-full pl-7 pr-3 py-1.5 text-xs border border-stone-200 focus:border-stone-900 outline-none transition-colors"
-        />
-      </div>
-      <button
-        type="submit"
-        className="px-3 py-1.5 bg-stone-900 text-white text-xs font-medium hover:bg-stone-700 transition-colors whitespace-nowrap"
-      >
-        {t.subscribeBtn}
-      </button>
-    </form>
-  );
-}
-
-// ── Floating Subscribe Button ────────────────────────────────────────────────
-function FloatingSubscribe({ t }: { t: typeof T["zh"] }) {
-  const [open, setOpen] = useState(false);
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const subscribeMutation = trpc.subscribers.subscribe.useMutation();
-
-  // 向下滚动 300px 后才显示按钮
-  useEffect(() => {
-    function handleScroll() {
-      setScrolled(window.scrollY > 300);
-    }
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    if (open) document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [open]);
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email.includes("@")) return;
-    subscribeMutation.mutate(
-      { email },
-      { onSuccess: () => setSubmitted(true) }
-    );
-  }
-
-  return (
-    <div
-      ref={panelRef}
-      className={`fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2 transition-all duration-300 ${
-        scrolled ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-4 pointer-events-none"
-      }`}
-    >
-      {open && (
-        <div className="bg-white border border-stone-200 shadow-lg p-4 w-72 animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold text-stone-900">{t.subscribe}</span>
-            <button onClick={() => setOpen(false)} className="text-stone-300 hover:text-stone-600 transition-colors">
-              <X size={12} />
-            </button>
-          </div>
-          {submitted ? (
-            <div className="flex items-center gap-2 text-xs text-stone-500 py-1">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500" />
-              {t.subscribeSuccess}
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex gap-2">
-              <div className="relative flex-1">
-                <Mail size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-300" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={t.subscribePlaceholder}
-                  className="w-full pl-7 pr-3 py-1.5 text-xs border border-stone-200 focus:border-stone-900 outline-none transition-colors"
-                  autoFocus
-                />
-              </div>
-              <button
-                type="submit"
-                className="px-3 py-1.5 bg-stone-900 text-white text-xs font-medium hover:bg-stone-700 transition-colors whitespace-nowrap"
-              >
-                {t.subscribeBtn}
-              </button>
-            </form>
-          )}
-          <p className="text-[10px] text-stone-300 mt-2">{t.calSubscribeNote}</p>
-        </div>
-      )}
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-3 py-2 bg-stone-900 text-white text-xs font-medium shadow-lg hover:bg-stone-700 transition-colors"
-      >
-        <Mail size={12} />
-        {!open && <span>{t.subscribe}</span>}
-        {open && <X size={12} />}
-      </button>
-    </div>
-  );
-}
-
 // ── Onboarding Modal ──────────────────────────────────────────────────────────
 function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
   const [visible, setVisible] = useState(false);
@@ -1542,16 +1403,8 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
 
   const features = [
     { icon: "🌍", title: t.onboardingF1Title, desc: t.onboardingF1Desc },
-    { icon: "🔗", title: t.onboardingF2Title, desc: t.onboardingF2Desc },
     { icon: "📅", title: t.onboardingF3Title, desc: t.onboardingF3Desc },
     { icon: "🤝", title: t.onboardingF4Title, desc: t.onboardingF4Desc },
-    {
-      icon: null,
-      title: lang === "zh" ? "集成中心" : lang === "hi" ? "इंटीग्रेशन हब" : "Integration Hub",
-      desc: lang === "zh" ? "支持 Notion / 飞书 / Obsidian / Anytype / wolai" : lang === "hi" ? "Notion, फ़ीशू, Obsidian, Anytype, wolai" : "Notion, Feishu, Obsidian, Anytype, wolai",
-      href: "/notion-template",
-      platformIcons: true,
-    },
   ];
 
   return (
@@ -1803,6 +1656,11 @@ export default function Home() {
   const { profile: browsingProfile, trackSchoolType, trackRegion, trackSessionType } = useBrowsingTracker();
   const [showIntegrationHub, setShowIntegrationHub] = useState(false);
   const [activeIntegration, setActiveIntegration] = useState<string | null>(null);
+  const [integrationHubEmail, setIntegrationHubEmail] = useState("");
+  const [integrationHubSubscribed, setIntegrationHubSubscribed] = useState(false);
+  const integrationHubSubscribeMutation = trpc.subscribers.subscribe.useMutation({
+    onSuccess: () => setIntegrationHubSubscribed(true),
+  });
   // Mobile "Send to Desktop" state
   const [mobileQRDataUrl, setMobileQRDataUrl] = useState<string | null>(null);
   const [mobileEmailInput, setMobileEmailInput] = useState("");
@@ -2361,9 +2219,50 @@ message = client.messages.create(
                   </div>
                 )}
               </div>
-              {/* Footer */}
-              <div className="px-5 py-3 border-t border-stone-50 shrink-0">
-                <p className="text-[10px] text-stone-400 text-center">
+              {/* Footer: Subscribe + free note */}
+              <div className="px-5 py-4 border-t border-stone-100 shrink-0 space-y-3">
+                {/* Subscribe row */}
+                <div>
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <Mail size={11} className="text-stone-400" />
+                    <span className="text-[11px] font-semibold text-stone-700">
+                      {zh ? t.subscribe : hi ? "नए कार्यक्रम की सूचना" : t.subscribe}
+                    </span>
+                  </div>
+                  {integrationHubSubscribed ? (
+                    <div className="flex items-center gap-2 text-xs text-stone-500">
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500" />
+                      {t.subscribeSuccess}
+                    </div>
+                  ) : (
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (!integrationHubEmail.includes("@")) return;
+                        integrationHubSubscribeMutation.mutate({ email: integrationHubEmail });
+                      }}
+                      className="flex gap-2"
+                    >
+                      <div className="relative flex-1">
+                        <input
+                          type="email"
+                          value={integrationHubEmail}
+                          onChange={(e) => setIntegrationHubEmail(e.target.value)}
+                          placeholder={t.subscribePlaceholder}
+                          className="w-full pl-3 pr-3 py-1.5 text-xs border border-stone-200 focus:border-stone-900 outline-none transition-colors"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="px-3 py-1.5 bg-stone-900 text-white text-xs font-medium hover:bg-stone-700 transition-colors whitespace-nowrap"
+                      >
+                        {t.subscribeBtn}
+                      </button>
+                    </form>
+                  )}
+                  <p className="text-[10px] text-stone-300 mt-1.5">{t.calSubscribeNote}</p>
+                </div>
+                <p className="text-[10px] text-stone-300 text-center border-t border-stone-50 pt-2">
                   {zh ? "所有集成均免费使用。" : hi ? "सभी इंटीग्रेशन मुफ़्त हैं।" : "All integrations are free to use."}
                 </p>
               </div>
@@ -2518,11 +2417,7 @@ message = client.messages.create(
               <div className="text-xs font-semibold text-stone-900 mb-0.5">{t.onboardingF1Title}</div>
               <div className="text-[10px] text-stone-400 leading-relaxed">{t.onboardingF1Desc}</div>
             </div>
-            <div className="border border-stone-100 p-3">
-              <div className="text-base mb-1">🔗</div>
-              <div className="text-xs font-semibold text-stone-900 mb-0.5">{t.onboardingF2Title}</div>
-              <div className="text-[10px] text-stone-400 leading-relaxed">{t.onboardingF2Desc}</div>
-            </div>
+
             <div className="border border-stone-100 p-3">
               <div className="text-base mb-1">📅</div>
               <div className="text-xs font-semibold text-stone-900 mb-0.5">{t.onboardingF3Title}</div>
@@ -3220,8 +3115,6 @@ message = client.messages.create(
         </div>
       </footer>
 
-      {/* ── Floating Subscribe ── */}
-      <FloatingSubscribe t={t} />
       <AIChatAssistant browsingProfile={browsingProfile} lang={lang} />
 
       {/* ── Onboarding Modal ── */}
