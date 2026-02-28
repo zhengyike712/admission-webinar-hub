@@ -2791,10 +2791,17 @@ message = client.messages.create(
             >
               {t.tabSchools}
             </button>
+            {/* Portals link */}
+            <a
+              href="/portals"
+              className="ml-auto px-4 py-3 text-sm font-medium border-b-2 border-transparent text-stone-400 hover:text-stone-600 transition-colors flex items-center gap-1"
+            >
+              {lang === "zh" ? "结果 Portal" : lang === "hi" ? "पोर्टल" : "Result Portals"}
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </a>
           </div>
         </div>
       </div>
-
       {/* ── Mobile Filter Bar ── */}
       <div className="hidden border-b border-stone-100 bg-white">
         <div className="max-w-6xl mx-auto px-4 py-2">

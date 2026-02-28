@@ -289,3 +289,10 @@
 
 - [x] 未接入时按鈕显示「接入 AI 助手」，接入后改为「 AI 助手」
 - [x] 3 步引导向导：选服务商 → 粘贴 Key 并验证 → 进入对话
+
+## 申请结果 Portal 汇总页面
+
+- [x] 收集各校 applicant portal URL 和结果发布时间
+- [x] 创建 portal 数据文件
+- [x] 实现 /portals 页面（搜索、分类、portal 链接、结果时间）
+- [x] 主页导航添加 Portals 入口

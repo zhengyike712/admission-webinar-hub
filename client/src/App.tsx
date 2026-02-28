@@ -9,6 +9,7 @@ import Admin from "./pages/Admin";
 import NotionEmbed from "./pages/NotionEmbed";
 import NotionTemplate from "./pages/NotionTemplate";
 import ApiDocs from "./pages/ApiDocs";
+import Portals from "./pages/Portals";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -19,6 +20,7 @@ function Router() {
       <Route path={"/embed"} component={NotionEmbed} />
       <Route path={"/notion-template"} component={NotionTemplate} />
       <Route path={"/api-docs"} component={ApiDocs} />
+      <Route path={"/portals"} component={Portals} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
