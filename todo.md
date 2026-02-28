@@ -174,3 +174,7 @@
 - [x] 手动触发全量爬取验证新 URL
 - [x] Notion Embed 嵌入小窗口（/embed 路由，适配 Notion iframe 嵌入）
 - [x] Notion Template 导入入口页（提供申请追踪模板下载 + 使用说明）
+
+## 页脚 Notion 集成入口
+
+- [x] 页脚添加 Notion 集成入口链接（指向 /notion-template，三语言支持）

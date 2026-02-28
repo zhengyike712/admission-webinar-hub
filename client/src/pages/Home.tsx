@@ -168,6 +168,10 @@ const T: Record<Lang, Record<string, string>> = {
     noInterview: "不提供",
     deadlineSoon: "近期截止",
     noMatchSchool: "没有匹配的学校",
+    footerIntegrationsTitle: "集成",
+    footerNotionLink: "Notion 集成",
+    footerNotionLinkSub: "嵌入 Info Session 小窗口",
+    footerNotionNew: "新",
   },
   en: {
     tagline: "Global University Admissions Info Hub",
@@ -295,6 +299,10 @@ const T: Record<Lang, Record<string, string>> = {
     noInterview: "no interview",
     deadlineSoon: "deadline soon",
     noMatchSchool: "No matching schools",
+    footerIntegrationsTitle: "Integrations",
+    footerNotionLink: "Notion Integration",
+    footerNotionLinkSub: "Embed Info Session widget",
+    footerNotionNew: "NEW",
   },
   hi: {
     tagline: "विश्वविद्यालय प्रवेश सूचना केंद्र",
@@ -422,6 +430,10 @@ const T: Record<Lang, Record<string, string>> = {
     noInterview: "उपलब्ध नहीं",
     deadlineSoon: "अंतिम तारीख नजदीक",
     noMatchSchool: "कोई मिलान वाला विश्वविद्यालय नहीं",
+    footerIntegrationsTitle: "एकीकरण",
+    footerNotionLink: "Notion एकीकरण",
+    footerNotionLinkSub: "Info Session विजेट एम्बेड करें",
+    footerNotionNew: "नया",
   },
 } as const;
 
@@ -2218,6 +2230,24 @@ export default function Home() {
                   </div>
                 ))}
               </div>
+            </div>
+            {/* Notion Integration */}
+            <div>
+              <div className="text-[11px] uppercase tracking-widest text-stone-400 mb-2">{t.footerIntegrationsTitle}</div>
+              <a
+                href="/notion-template"
+                className="group flex flex-col gap-1 p-2.5 border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all duration-150 cursor-pointer"
+              >
+                <div className="flex items-center gap-1.5">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" className="text-stone-600" />
+                    <path d="M8 8h8M8 12h5M8 16h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-stone-600" />
+                  </svg>
+                  <span className="text-xs font-medium text-stone-700 group-hover:text-stone-900 transition-colors">{t.footerNotionLink}</span>
+                  <span className="text-[9px] px-1 py-0.5 bg-stone-900 text-white font-medium">{t.footerNotionNew}</span>
+                </div>
+                <div className="text-[11px] text-stone-400 group-hover:text-stone-500 transition-colors pl-[18px]">{t.footerNotionLinkSub}</div>
+              </a>
             </div>
           </div>
           <div className="border-t border-stone-100 pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[11px] text-stone-400">
