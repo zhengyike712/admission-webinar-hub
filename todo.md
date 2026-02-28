@@ -116,3 +116,10 @@
 - [x] 语言偏好 localStorage 持久化（刷新后恢复语言选择）
 - [x] 添加 Open Graph meta 标签（og:title, og:image, og:description, og:locale, twitter:card）
 - [x] 自动化截止日期核实：后端爬虫脚本 + 管理员触发 tRPC 接口 + 前端展示核实状态
+
+## OG 图片多语言 + 截止日期核实定时化
+
+- [x] 生成英文版 OG 分享图片（og-image-en.png）
+- [x] 生成印地语版 OG 分享图片（og-image-hi.png）
+- [x] index.html 添加 og:locale:alternate 多语言 meta 标签
+- [x] scheduler.ts 添加每周一次截止日期核实定时任务
