@@ -1009,11 +1009,11 @@ function InterviewCard({ school, t, lang }: { school: SchoolInterview; t: typeof
     none: "",
   }[school.requestMethod];
 
-  const notes = lang === "zh" ? school.notesZh : school.notesEn;
-
+  const notes = lang === "zh" ? school.notesZh : school.notesEn; // hi falls back to en
   // Format deadline for display
+  const localeLang = lang === "zh" ? "zh-CN" : lang === "hi" ? "hi-IN" : "en-US";
   const deadlineDisplay = school.deadline
-    ? new Date(school.deadline + "T12:00:00Z").toLocaleDateString(lang === "zh" ? "zh-CN" : "en-US", {
+    ? new Date(school.deadline + "T12:00:00Z").toLocaleDateString(localeLang, {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -2101,15 +2101,15 @@ export default function Home() {
                   );
                 }
                 // Grouped view: applicant_requests → school_contacts → required → none
-                const groups: { method: string; labelZh: string; labelEn: string; accent: string }[] = [
-                  { method: "applicant_requests", labelZh: "学生主动申请", labelEn: "You Request", accent: "text-amber-600" },
-                  { method: "school_contacts",    labelZh: "学校主动联系", labelEn: "School Contacts You", accent: "text-blue-600" },
-                  { method: "required",            labelZh: "必须参加",     labelEn: "Required", accent: "text-red-600" },
-                  { method: "none",                labelZh: "不提供面试",   labelEn: "Not Available", accent: "text-stone-400" },
+                const groups: { method: string; label: string; accent: string }[] = [
+                  { method: "applicant_requests", label: t.interviewMethodFilterApplicant, accent: "text-amber-600" },
+                  { method: "school_contacts",    label: t.interviewMethodFilterSchool,    accent: "text-blue-600" },
+                  { method: "required",            label: t.interviewMethodFilterRequired,  accent: "text-red-600" },
+                  { method: "none",                label: t.interviewFilterNone,            accent: "text-stone-400" },
                 ];
                 return (
                   <div className="space-y-8">
-                    {groups.map(({ method, labelZh, labelEn, accent }) => {
+                    {groups.map(({ method, label, accent }) => {
                       const group = filteredInterviews
                         .filter(s => s.requestMethod === method)
                         .sort((a, b) => a.rank - b.rank);
@@ -2118,7 +2118,7 @@ export default function Home() {
                         <section key={method}>
                           <div className="flex items-center gap-3 mb-3">
                             <span className={`text-[11px] uppercase tracking-widest font-semibold ${accent}`}>
-                              {lang === "zh" ? labelZh : labelEn /* group label stays bilingual by design */}
+                              {label}
                             </span>
                             <span className="text-[10px] text-stone-400 bg-stone-100 px-1.5 py-0.5 rounded-full">{group.length}</span>
                             <div className="flex-1 h-px bg-stone-100" />

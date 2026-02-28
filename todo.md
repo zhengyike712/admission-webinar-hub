@@ -167,3 +167,10 @@
 
 - [x] 扫描并修复所有残余 lang === "zh" 硬编码文案
 - [x] useEffect 动态更新 meta[name="description"] content
+
+## 面试分组标签国际化 + Notion 集成
+
+- [x] 面试分组标题（学生主动申请/学校主动联系/必须参加）迁移到 T 对象
+- [x] 手动触发全量爬取验证新 URL
+- [x] Notion Embed 嵌入小窗口（/embed 路由，适配 Notion iframe 嵌入）
+- [x] Notion Template 导入入口页（提供申请追踪模板下载 + 使用说明）

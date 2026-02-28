@@ -34,6 +34,18 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  // Allow /embed and /notion-template to be embedded in Notion iframes
+  app.use("/embed", (_req, res, next) => {
+    res.removeHeader("X-Frame-Options");
+    res.setHeader("Content-Security-Policy", "frame-ancestors *");
+    next();
+  });
+  app.use("/notion-template", (_req, res, next) => {
+    res.removeHeader("X-Frame-Options");
+    res.setHeader("Content-Security-Policy", "frame-ancestors *");
+    next();
+  });
+
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   // tRPC API
