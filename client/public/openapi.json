@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "AdmitLens (景深留学) API",
+    "title": "AdmitLens (景深) API",
     "description": "Real-time database of university admissions info sessions and interview policies. Covers 100+ top universities across the US, UK, Hong Kong, and Australia. All data is sourced directly from official university admissions websites and updated daily.\n\nUse this API to:\n- Find upcoming info sessions for specific schools\n- Check interview availability and application methods\n- Get registration links directly to official portals\n- Filter by region, session type, or school name",
     "version": "1.0.0",
     "contact": {

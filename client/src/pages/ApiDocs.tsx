@@ -1,7 +1,7 @@
 /**
  * ApiDocs.tsx
  *
- * Public API documentation page for AdmitLens (景深留学).
+ * Public API documentation page for AdmitLens (景深).
  * Documents the /api/public/sessions endpoint with examples,
  * parameters, response schema, and integration guides.
  */
@@ -15,10 +15,10 @@ type Lang = "zh" | "en";
 
 const T = {
   zh: {
-    backToHome: "← 返回景深留学",
+    backToHome: "← 返回景深",
     badge: "开发者文档",
     pageTitle: "公开 API 文档",
-    pageDesc: "景深留学提供免费、开放的 JSON API，供开发者、研究者和工具集成者直接获取实时招生活动数据。无需注册，无需 API Key。",
+    pageDesc: "景深提供免费、开放的 JSON API，供开发者、研究者和工具集成者直接获取实时招生活动数据。无需注册，无需 API Key。",
     baseUrl: "基础 URL",
     endpoint: "端点",
     method: "方法",

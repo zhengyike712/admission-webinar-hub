@@ -31,7 +31,7 @@ const T = {
     noEvents: "暂无即将举行的活动",
     allSchools: "所有学校",
     viewAll: "查看全部",
-    poweredBy: "景深留学",
+    poweredBy: "景深",
     sessions: "场活动",
     dataSource: "数据每日更新 · 直连各校官方 Portal",
   },

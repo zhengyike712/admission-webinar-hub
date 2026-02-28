@@ -147,13 +147,13 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingDismiss: "不再显示",
     mobileFilterBtn: "筛选",
     mobileFilterTitle: "筛选",
-    brandName: "景深留学",
-    siteTitle: "景深留学 · 好信息，早知道",
+    brandName: "景深",
+    siteTitle: "景深 · 好信息，早知道",
     siteDesc: "汇聚 70+ 所美国顶尖院校面试政策和招生官线上宣讲活动，一站直达报名入口",
     shareBtn: "分享",
     shareLabel: "分享本站",
     onboardingSubtitle: "你了解顶尖大学招生的第一手窗口",
-    footerCopyright: "© 2026 景深留学。所有信息均来自各校官网。",
+    footerCopyright: "© 2026 景深。所有信息均来自各校官网。",
     batchSelectedTpl: "已选 {n} 场活动",
     batchClear: "清除选择",
     batchExport: "批量导出日历 (.ics)",
@@ -174,7 +174,7 @@ const T: Record<Lang, Record<string, string>> = {
     footerNotionLink: "Notion 集成",
     footerNotionLinkSub: "嵌入 Info Session 小窗口",
     footerNotionNew: "新",
-    notionBannerText: "将景深留学嵌入你的 Notion 申请追踪页",
+    notionBannerText: "将景深嵌入你的 Notion 申请追踪页",
     notionBannerCta: "获取 Notion 集成 →",
     onboardingF5Title: "Notion 集成",
     onboardingF5Desc: "将 Info Session 日历嵌入你的申请追踪页，一站管理",
@@ -2293,10 +2293,10 @@ message = client.messages.create(
               title: zh ? "Chrome 扩展（即将上线）" : "Chrome Extension (Coming Soon)",
               steps: zh
                 ? [
-                    "在任意网页上唤起景深留学侧边栏，无需切换标签页",
+                    "在任意网页上唤起景深侧边栏，无需切换标签页",
                     "浏览学校官网时自动识别并匹配对应的 Info Session 和面试信息",
                     "AI 跨页面跨标签页跟随分析，自动记笔并同步到 Notion/飞书",
-                    "支持在 ChatGPT / Perplexity 等 AI 工具内直接唤起景深留学数据面板",
+                    "支持在 ChatGPT / Perplexity 等 AI 工具内直接唤起景深数据面板",
                   ]
                 : [
                     "Summon AdmitLens sidebar on any webpage, no tab switching needed",

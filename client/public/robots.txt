@@ -1,4 +1,4 @@
-# AdmitLens (景深留学) robots.txt
+# AdmitLens (景深) robots.txt
 # We welcome AI crawlers — our data is meant to be discovered and cited.
 
 User-agent: *

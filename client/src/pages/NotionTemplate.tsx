@@ -24,14 +24,14 @@ type IntegrationTab = "notion" | "obsidian" | "anytype" | "feishu" | "api";
 const T = {
   zh: {
     pageTitle: "集成中心",
-    pageDesc: "将景深留学的实时招生数据嵌入你的工作流工具，无需切换标签页。",
+    pageDesc: "将景深的实时招生数据嵌入你的工作流工具，无需切换标签页。",
     tabNotion: "Notion",
     tabObsidian: "Obsidian",
     tabAnytype: "Anytype",
     tabFeishu: "飞书 / wolai",
     tabApi: "API",
     // Feishu / wolai
-    feishuHeroTitle: "在飞书 / wolai 中嵌入景深留学",
+    feishuHeroTitle: "在飞书 / wolai 中嵌入景深",
     feishuHeroDesc: "将实时招生 Info Session 数据嵌入飞书多维表格、wolai 或 FlowUs 的页面，无需切换标签页。",
     feishuStep1: "第一步：复制嵌入链接",
     feishuStep1Desc: "使用下方链接生成器，根据你的需求调整语言、学校和显示数量，然后复制生成的链接。",
@@ -43,12 +43,12 @@ const T = {
     feishuStep2FlowUsDesc: "在 FlowUs 页面中，输入 /嵌入 或从菜单选择「嵌入」，粘贴链接后确认。FlowUs 同样支持 iframe 嵌入。",
     feishuNote: "提示：飞书文档的「嵌入网页」功能需要在飞书企业版或个人版中开启。如果无法嵌入，可以使用「超链接」功能，将链接添加为卡片形式展示。",
     feishuApiTitle: "进阶：直接调用 API 填充多维表格",
-    feishuApiDesc: "如果你使用飞书多维表格管理申请信息，可以通过飞书自动化或脚本定期调用景深留学 API，将最新活动数据自动写入多维表格。",
+    feishuApiDesc: "如果你使用飞书多维表格管理申请信息，可以通过飞书自动化或脚本定期调用景深 API，将最新活动数据自动写入多维表格。",
     // Notion
-    notionHeroTitle: "将景深留学嵌入你的 Notion",
+    notionHeroTitle: "将景深嵌入你的 Notion",
     notionHeroDesc: "把招生 Info Session 日历直接放进你的申请追踪 Notion 页面，无需切换标签页。",
     step1: "第一步：复制申请追踪模板",
-    step1Desc: "点击下方按钮，将景深留学官方 Notion 申请追踪模板复制到你的工作区。模板内已预置嵌入小窗口位置。",
+    step1Desc: "点击下方按钮，将景深官方 Notion 申请追踪模板复制到你的工作区。模板内已预置嵌入小窗口位置。",
     getTemplate: "获取 Notion 模板",
     step2: "第二步：在 Notion 中嵌入小窗口",
     step2Desc: "在你的 Notion 页面中输入 /embed，然后粘贴下方生成的链接。小窗口会实时显示即将举行的 Info Session。",
@@ -75,7 +75,7 @@ const T = {
     feat4: "点击报名直达官方注册页面",
     feat5: "无需登录，即嵌即用",
     // Obsidian
-    obsidianHeroTitle: "在 Obsidian 中嵌入景深留学",
+    obsidianHeroTitle: "在 Obsidian 中嵌入景深",
     obsidianHeroDesc: "通过 Obsidian 的 HTML 代码块，将实时 Info Session 小窗口嵌入你的申请笔记中。",
     obsidianStep1: "第一步：安装 HTML 插件",
     obsidianStep1Desc: "在 Obsidian 社区插件中搜索并安装「HTML Reader」或「Webpage HTML Export」插件，或使用内置的 HTML 代码块（需开启 Restricted Mode 豁免）。",
@@ -86,16 +86,16 @@ const T = {
     obsidianAltTitle: "备选方案：使用 Dataview 插件",
     obsidianAltDesc: "如果你已安装 Dataview 插件，可以在 dataviewjs 代码块中使用以下代码：",
     // Anytype
-    anytypeHeroTitle: "在 Anytype 中嵌入景深留学",
-    anytypeHeroDesc: "通过 Anytype 的书签或嵌入块，将景深留学的实时数据整合进你的申请追踪对象。",
+    anytypeHeroTitle: "在 Anytype 中嵌入景深",
+    anytypeHeroDesc: "通过 Anytype 的书签或嵌入块，将景深的实时数据整合进你的申请追踪对象。",
     anytypeStep1: "第一步：创建嵌入块",
     anytypeStep1Desc: "在 Anytype 的任意对象中，输入 / 打开命令菜单，选择「Embed」或「Bookmark」，然后粘贴下方生成的链接。",
     anytypeStep2: "第二步：调整显示参数",
     anytypeStep2Desc: "使用下方的链接生成器，根据你的需求调整学校、语言和显示数量，然后将生成的链接粘贴到 Anytype 嵌入块中。",
-    anytypeNote: "注意：Anytype 的嵌入块支持 iframe，可以完整显示景深留学小窗口。如果 Embed 块不可用，可以使用 Bookmark 块作为快速访问入口。",
+    anytypeNote: "注意：Anytype 的嵌入块支持 iframe，可以完整显示景深小窗口。如果 Embed 块不可用，可以使用 Bookmark 块作为快速访问入口。",
     // API
     apiHeroTitle: "公开 JSON API",
-    apiHeroDesc: "直接调用景深留学的公开 API，将实时数据集成到任何工具或工作流中。",
+    apiHeroDesc: "直接调用景深的公开 API，将实时数据集成到任何工具或工作流中。",
     apiEndpoint: "API 端点",
     apiParams: "请求参数",
     apiParamSchool: "school（可选）：按学校缩写筛选，如 MIT、Stanford",
@@ -106,7 +106,7 @@ const T = {
     apiCopyUrl: "复制 API 链接",
     apiDocs: "查看完整文档",
     // Shared
-    backToHome: "← 返回景深留学",
+    backToHome: "← 返回景深",
     integrationBadge: "集成中心",
   },
   en: {

@@ -41,13 +41,13 @@ export const sendLinkRouter = router({
       const { email, url, lang } = input;
 
       const subjects: Record<string, string> = {
-        zh: "你的景深留学链接",
+        zh: "你的景深链接",
         en: "Your AdmitLens Link",
         hi: "आपका AdmitLens लिंक",
       };
 
       const bodies: Record<string, string> = {
-        zh: `你好！\n\n你在手机端请求将景深留学发送到电脑。\n\n点击下方链接在电脑上打开：\n${url}\n\n祝申请顺利！\n景深留学团队`,
+        zh: `你好！\n\n你在手机端请求将景深发送到电脑。\n\n点击下方链接在电脑上打开：\n${url}\n\n祝申请顺利！\n景深团队`,
         en: `Hello!\n\nYou requested to send AdmitLens to your computer.\n\nClick the link below to open on your computer:\n${url}\n\nBest of luck with your applications!\nAdmitLens Team`,
         hi: `नमस्ते!\n\nआपने AdmitLens को अपने कंप्यूटर पर भेजने का अनुरोध किया।\n\nअपने कंप्यूटर पर खोलने के लिए नीचे दिए गए लिंक पर क्लिक करें:\n${url}\n\nआपके आवेदन के लिए शुभकामनाएं!\nAdmitLens Team`,
       };
