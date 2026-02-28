@@ -145,6 +145,11 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingDismiss: "不再显示",
     mobileFilterBtn: "筛选",
     mobileFilterTitle: "筛选",
+    brandName: "景深留学",
+    siteTitle: "景深留学 · 好信息，早知道",
+    siteDesc: "汇聚 70+ 所美国顶尖院校面试政策和招生官线上宣讲活动，一站直达报名入口",
+    shareBtn: "分享",
+    shareLabel: "分享本站",
   },
   en: {
     tagline: "Global University Admissions Info Hub",
@@ -249,6 +254,11 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingDismiss: "Don't show again",
     mobileFilterBtn: "Filter",
     mobileFilterTitle: "Filter",
+    brandName: "AdmitLens",
+    siteTitle: "AdmitLens · Know More, Know Earlier",
+    siteDesc: "70+ US top university interview policies & info sessions in one place",
+    shareBtn: "Share",
+    shareLabel: "Share this site",
   },
   hi: {
     tagline: "विश्वविद्यालय प्रवेश सूचना केंद्र",
@@ -353,6 +363,11 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingDismiss: "फिर नहीं दिखाएं",
     mobileFilterBtn: "फ़िल्टर",
     mobileFilterTitle: "फ़िल्टर",
+    brandName: "AdmitLens",
+    siteTitle: "AdmitLens · अच्छी जानकारी। पहले।",
+    siteDesc: "70+ अमेरिकी विश्वविद्यालयों की इंटरव्यू नीति और वर्चुअल इन्फो सेशन एक जगह",
+    shareBtn: "शेयर",
+    shareLabel: "इस साइट को शेयर करें",
   },
 } as const;
 
@@ -1266,7 +1281,7 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
                   <circle cx="9" cy="9" r="4.5" stroke="#111" strokeWidth="1.2" />
                   <circle cx="9" cy="9" r="1.5" fill="#111" />
                 </svg>
-                <span className="text-sm font-bold text-stone-900">景深留学</span>
+                <span className="text-sm font-bold text-stone-900">{t.brandName}</span>
               </div>
               <p className="text-xs text-stone-400">
                 {t.onboardingWelcome}
@@ -1329,15 +1344,14 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
 
 // ── Share Button ────────────────────────────────────────────
 function ShareButton({ lang }: { lang: Lang }) {
+  const t = T[lang];
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showQR, setShowQR] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const siteUrl = window.location.origin;
-  const siteTitle = lang === "zh" ? "景深留学 · 好信息，早知道" : "JingShen Study Abroad · Know More, Know Earlier";
-  const siteDesc = lang === "zh"
-    ? "汇聙70+所美国顶尖院校面试政策和招生官线上宣讲活动，一站直达报名入口"
-    : "70+ US top university interview policies & info sessions in one place";
+  const siteTitle = t.siteTitle;
+  const siteDesc = t.siteDesc;
 
   // 检测是否支持 Web Share API
   const canNativeShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
@@ -1388,10 +1402,10 @@ function ShareButton({ lang }: { lang: Lang }) {
       <button
         onClick={handleShareClick}
         className="flex items-center gap-1.5 text-[11px] text-stone-500 hover:text-stone-800 transition-colors border border-stone-200 px-2.5 py-1 hover:border-stone-400 bg-white"
-        title={lang === "zh" ? "分享本站" : "Share this site"}
+        title={t.shareLabel}
       >
         <Share2 size={11} />
-        <span className="hidden sm:inline">{lang === "zh" ? "分享" : "Share"}</span>
+        <span className="hidden sm:inline">{t.shareBtn}</span>
       </button>
 
       {open && (
@@ -1626,7 +1640,7 @@ export default function Home() {
               <circle cx="9" cy="9" r="4.5" stroke="#111" strokeWidth="1.2" />
               <circle cx="9" cy="9" r="1.5" fill="#111" />
             </svg>
-            <span className="text-sm font-bold tracking-tight text-stone-900">景深留学</span>
+            <span className="text-sm font-bold tracking-tight text-stone-900">{t.brandName}</span>
             <span className="hidden sm:block text-xs text-stone-400">{t.tagline}</span>
           </div>
           <div className="flex items-center gap-2">
@@ -2092,7 +2106,7 @@ export default function Home() {
                   <circle cx="9" cy="9" r="4.5" stroke="#111" strokeWidth="1.2" />
                   <circle cx="9" cy="9" r="1.5" fill="#111" />
                 </svg>
-                <div className="text-sm font-bold text-stone-900">景深留学</div>
+                <div className="text-sm font-bold text-stone-900">{t.brandName}</div>
               </div>
               <div className="text-[11px] text-stone-400 leading-relaxed">
                 {t.footerBrand}

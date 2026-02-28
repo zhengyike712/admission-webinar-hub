@@ -140,3 +140,7 @@
 - [x] 修复 University of Pennsylvania crawlUrl（404）
 - [x] 修复 Vanderbilt University crawlUrl（404）
 - [x] 修复 Washington University in St. Louis crawlUrl（404）
+
+## 品牌名称国际化
+
+- [x] 将所有硬编码「景深留学」接入 i18n T 对象，随语言切换显示对应翻试
