@@ -46,6 +46,73 @@ async function startServer() {
     next();
   });
 
+  // ── Public JSON API (no auth required) ──
+  // GET /api/public/sessions?school=MIT&upcoming=true&limit=10
+  app.get("/api/public/sessions", async (req, res) => {
+    try {
+      // Dynamic import to avoid bundling client-side data at startup
+      const { allSessions, schoolsMap } = await import("../../client/src/data/schools.js").catch(() =>
+        import("../../client/src/data/schools")
+      );
+      let sessions = [...allSessions] as unknown as Array<Record<string, unknown>>;
+
+      // Filter by school name or abbreviation
+      const schoolParam = req.query.school as string | undefined;
+      if (schoolParam) {
+        const q = schoolParam.toLowerCase();
+        sessions = sessions.filter((s) => {
+          const school = schoolsMap[s.schoolId as string];
+          return (
+            (school?.name || "").toLowerCase().includes(q) ||
+            (school?.shortName || "").toLowerCase().includes(q) ||
+            (s.schoolId as string).toLowerCase().includes(q)
+          );
+        });
+      }
+
+      // Filter upcoming only
+      const upcomingParam = req.query.upcoming as string | undefined;
+      if (upcomingParam === "true" || upcomingParam === "1") {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        sessions = sessions.filter((s) => {
+          if (s.isRolling) return true;
+          const dates = s.dates as string[] | undefined;
+          if (!dates || dates.length === 0) return false;
+          return dates.some((d) => new Date(d + "T00:00:00") >= today);
+        });
+      }
+
+      // Limit
+      const limitParam = parseInt((req.query.limit as string) || "50", 10);
+      const limit = Math.min(Math.max(1, isNaN(limitParam) ? 50 : limitParam), 200);
+      sessions = sessions.slice(0, limit);
+
+      // Enrich with school info
+      const enriched = sessions.map((s) => {
+        const school = schoolsMap[s.schoolId as string];
+        return {
+          ...s,
+          school: school
+            ? { id: s.schoolId, name: school.name, shortName: school.shortName, registrationPage: school.registrationPage }
+            : null,
+        };
+      });
+
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Cache-Control", "public, max-age=3600");
+      res.json({
+        source: "AdmitLens (admissionhub-f6apvxhh.manus.space)",
+        description: "Official university admissions Info Session data. Updated daily from school portals.",
+        total: enriched.length,
+        sessions: enriched,
+      });
+    } catch (err) {
+      console.error("[Public API] Error:", err);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   // tRPC API

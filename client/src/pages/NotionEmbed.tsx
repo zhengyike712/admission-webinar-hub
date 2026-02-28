@@ -33,6 +33,7 @@ const T = {
     viewAll: "查看全部",
     poweredBy: "景深留学",
     sessions: "场活动",
+    dataSource: "数据每日更新 · 直连各校官方 Portal",
   },
   en: {
     upcoming: "Upcoming",
@@ -43,6 +44,7 @@ const T = {
     viewAll: "View all",
     poweredBy: "AdmitLens",
     sessions: "sessions",
+    dataSource: "Updated daily · Direct from school portals",
   },
   hi: {
     upcoming: "आगामी",
@@ -53,6 +55,7 @@ const T = {
     viewAll: "सभी देखें",
     poweredBy: "AdmitLens",
     sessions: "कार्यक्रम",
+    dataSource: "रोजाना अपडेट · सीधे विश्वविद्यालय पोर्टल से",
   },
 } as const;
 
@@ -162,22 +165,25 @@ export default function NotionEmbed() {
             {schoolName}
           </div>
         </div>
-        <a
-          href="/"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            fontSize: "10px",
-            color: subtext,
-            textDecoration: "none",
-            display: "flex",
-            alignItems: "center",
-            gap: "3px",
-          }}
-        >
-          {t.poweredBy}
-          <ExternalLink size={9} />
-        </a>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "2px" }}>
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              fontSize: "10px",
+              color: subtext,
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "3px",
+            }}
+          >
+            {t.poweredBy}
+            <ExternalLink size={9} />
+          </a>
+          <span style={{ fontSize: "9px", color: subtext, opacity: 0.7 }}>{t.dataSource}</span>
+        </div>
       </div>
 
       {/* Session list */}

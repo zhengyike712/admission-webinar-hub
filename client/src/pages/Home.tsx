@@ -1796,31 +1796,31 @@ export default function Home() {
 
       {/* ── Hero ── */}
       <div className="border-b border-stone-100 bg-stone-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 mb-4 leading-tight">
-            {t.heroTitle}
-          </h1>
-          <p className="text-xs text-stone-400 tracking-wide italic">
-            {t.mission}
-          </p>
-        </div>
-      </div>
-
-      {/* ── Notion Integration Banner ── */}
-      <div className="border-b border-stone-100 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex items-center gap-6">
+          {/* Left: headline */}
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 mb-2 leading-tight">
+              {t.heroTitle}
+            </h1>
+            <p className="text-xs text-stone-400 tracking-wide italic">
+              {t.mission}
+            </p>
+          </div>
+          {/* Right: Notion integration card */}
           <a
             href="/notion-template"
-            className="group flex items-center justify-between py-2.5 gap-3 hover:opacity-80 transition-opacity"
+            className="group hidden sm:flex shrink-0 flex-col gap-1.5 border border-stone-200 bg-white hover:border-stone-400 hover:shadow-sm transition-all px-4 py-3 w-52"
           >
-            <div className="flex items-center gap-2 min-w-0">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0 text-stone-500" aria-hidden="true">
+            <div className="flex items-center gap-1.5">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-stone-500 shrink-0" aria-hidden="true">
                 <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
                 <path d="M8 8h8M8 12h5M8 16h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
-              <span className="text-[11px] text-stone-500 truncate">{t.notionBannerText}</span>
+              <span className="text-[10px] font-semibold text-stone-700 uppercase tracking-wide">{t.footerNotionLink}</span>
+              <span className="ml-auto text-[9px] font-bold bg-stone-900 text-white px-1 py-0.5 leading-none">{t.footerNotionNew}</span>
             </div>
-            <span className="shrink-0 text-[11px] font-medium text-stone-900 group-hover:underline whitespace-nowrap">{t.notionBannerCta}</span>
+            <p className="text-[11px] text-stone-500 leading-snug">{t.notionBannerText}</p>
+            <span className="text-[11px] font-medium text-stone-900 group-hover:underline">{t.notionBannerCta}</span>
           </a>
         </div>
       </div>

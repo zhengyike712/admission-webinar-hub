@@ -183,3 +183,9 @@
 
 - [x] 将 Notion 集成入口移至 Hero 区域下方横幅（好信息，早知道 胖吧位置）
 - [x] Onboarding 弹窗加入 Notion 集成功能卡片（第五张）
+
+## Hero 布局调整 + API + 徽章
+
+- [x] Hero 区域改为左右布局，Notion 集成入口卡片置于右侧
+- [x] 开放 /api/public/sessions 公共 JSON API（无需认证，支持 school/upcoming/limit 参数）
+- [x] /embed 页面添加「数据每日更新 · 直连各校官方 Portal」徽章
