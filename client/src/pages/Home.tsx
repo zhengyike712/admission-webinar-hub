@@ -3,6 +3,7 @@
 // Font: system-ui for body, no decorative serifs
 // Layout: left sidebar filter + right content
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import QRCode from "qrcode";
 import {
   allSchools,
   allSessions,
@@ -177,6 +178,20 @@ const T: Record<Lang, Record<string, string>> = {
     notionBannerCta: "获取 Notion 集成 →",
     onboardingF5Title: "Notion 集成",
     onboardingF5Desc: "将 Info Session 日历嵌入你的申请追踪页，一站管理",
+    mobileDesktopTitle: "完整功能需在电脑端使用",
+    mobileDesktopDesc: "活动日程、筛选、AI 预习、面试备考等功能在电脑上体验最佳。",
+    mobileSendTitle: "发送到电脑",
+    mobileScanQR: "扫码打开",
+    mobileShareBtn: "系统分享",
+    mobileEmailBtn: "发送到邮箱",
+    mobileEmailPlaceholder: "输入邮箱地址",
+    mobileEmailSend: "发送",
+    mobileEmailSending: "发送中...",
+    mobileEmailSent: "已发送！请检查邮箱",
+    mobileEmailError: "发送失败，请重试",
+    mobileEmailInvalid: "请输入有效邮箱",
+    mobileCopyLink: "复制链接",
+    mobileCopied: "已复制",
   },
   en: {
     tagline: "Global University Admissions Info Hub",
@@ -312,6 +327,20 @@ const T: Record<Lang, Record<string, string>> = {
     notionBannerCta: "Get Notion Integration →",
     onboardingF5Title: "Notion Integration",
     onboardingF5Desc: "Embed the Info Session calendar into your application tracker",
+    mobileDesktopTitle: "Full features available on desktop",
+    mobileDesktopDesc: "Session calendar, filters, AI prep, interview tools and more are best experienced on desktop.",
+    mobileSendTitle: "Send to Computer",
+    mobileScanQR: "Scan to open",
+    mobileShareBtn: "Share",
+    mobileEmailBtn: "Send to Email",
+    mobileEmailPlaceholder: "Enter your email address",
+    mobileEmailSend: "Send",
+    mobileEmailSending: "Sending...",
+    mobileEmailSent: "Sent! Check your inbox",
+    mobileEmailError: "Failed to send, please retry",
+    mobileEmailInvalid: "Please enter a valid email",
+    mobileCopyLink: "Copy link",
+    mobileCopied: "Copied!",
   },
   hi: {
     tagline: "विश्वविद्यालय प्रवेश सूचना केंद्र",
@@ -447,6 +476,20 @@ const T: Record<Lang, Record<string, string>> = {
     notionBannerCta: "Notion एकीकरण प्राप्त करें →",
     onboardingF5Title: "Notion एकीकरण",
     onboardingF5Desc: "Info Session कैलेंडर को अपने आवेदन ट्रैकर में एम्बेड करें",
+    mobileDesktopTitle: "पूर्ण सुविधाएं डेस्कटॉप पर उपलब्ध",
+    mobileDesktopDesc: "कार्यक्रम कैलेंडर, फ़िल्टर, AI प्रेप और इंटरव्यू टूल्स डेस्कटॉप पर सर्वोत्तम हैं।",
+    mobileSendTitle: "कंप्यूटर पर भेजें",
+    mobileScanQR: "स्कैन करें",
+    mobileShareBtn: "शेयर करें",
+    mobileEmailBtn: "ईमेल पर भेजें",
+    mobileEmailPlaceholder: "ईमेल पता दर्ज करें",
+    mobileEmailSend: "भेजें",
+    mobileEmailSending: "भेजा जा रहा है...",
+    mobileEmailSent: "भेजा गया! इनबॉक्स जांचें",
+    mobileEmailError: "भेजना विफल, पुनः प्रयास करें",
+    mobileEmailInvalid: "कृपया वैध ईमेल दर्ज करें",
+    mobileCopyLink: "लिंक कॉपी करें",
+    mobileCopied: "कॉपी हो गई!",
   },
 } as const;
 
@@ -1826,6 +1869,15 @@ export default function Home() {
    const [interviewMethodFilter, setInterviewMethodFilter] = useState<"all" | "school_contacts" | "applicant_requests" | "required">("all");
   const [showIntegrationHub, setShowIntegrationHub] = useState(false);
   const [activeIntegration, setActiveIntegration] = useState<string | null>(null);
+  // Mobile "Send to Desktop" state
+  const [mobileQRDataUrl, setMobileQRDataUrl] = useState<string | null>(null);
+  const [mobileEmailInput, setMobileEmailInput] = useState("");
+  const [mobileEmailStatus, setMobileEmailStatus] = useState<"idle" | "sending" | "sent" | "error" | "invalid">("idle");
+  const [mobileLinkCopied, setMobileLinkCopied] = useState(false);
+  const sendLinkMutation = trpc.sendLink.sendToEmail.useMutation({
+    onSuccess: () => setMobileEmailStatus("sent"),
+    onError: () => setMobileEmailStatus("error"),
+  });
    const t = T[lang] as typeof T["zh"];
   // ── document.title、html lang 、meta description 随语言切换动态更新 ──
   useEffect(() => {
@@ -1852,6 +1904,15 @@ export default function Home() {
     const twDesc = document.querySelector('meta[name="twitter:description"]');
     if (twDesc) twDesc.setAttribute("content", t.siteDesc);
   }, [lang, t.siteTitle, t.siteDesc]);
+
+  // Generate QR code for current URL on mount (for mobile "Send to Desktop" feature)
+  useEffect(() => {
+    const url = window.location.href;
+    QRCode.toDataURL(url, { width: 180, margin: 1, color: { dark: '#111111', light: '#ffffff' } })
+      .then((dataUrl) => setMobileQRDataUrl(dataUrl))
+      .catch(() => {});
+  }, []);
+
   // Fetch sessions from DB (falls back to static data if unavailable)
   const { data: dbData } = trpc.sessions.list.useQuery(
     { region: "All" },
@@ -2571,34 +2632,123 @@ message = client.messages.create(
             </div>
           </button>
         </div>
-        {/* Desktop CTA */}
-        <div className="mx-4 mb-6 border border-stone-200 bg-stone-50 p-4 flex items-start gap-3">
-          <div className="shrink-0 mt-0.5">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-stone-400">
+        {/* Desktop CTA - Send to Desktop */}
+        <div className="mx-4 mb-6 border border-stone-200 bg-stone-50 p-4">
+          {/* Header */}
+          <div className="flex items-center gap-2 mb-3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-stone-500 shrink-0">
               <rect x="2" y="4" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
               <path d="M8 22h8M12 18v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
+            <div>
+              <div className="text-xs font-semibold text-stone-800">{t.mobileDesktopTitle}</div>
+              <div className="text-[10px] text-stone-400 leading-relaxed">{t.mobileDesktopDesc}</div>
+            </div>
           </div>
-          <div>
-            <div className="text-xs font-semibold text-stone-800 mb-1">
-              {lang === "zh" ? "完整功能需在电脑端使用" : "Full features available on desktop"}
+
+          {/* QR Code section */}
+          <div className="mb-3">
+            <div className="text-[10px] text-stone-500 font-medium mb-2">{t.mobileSendTitle}</div>
+            <div className="flex items-start gap-3">
+              {/* QR Code */}
+              <div className="shrink-0">
+                {mobileQRDataUrl ? (
+                  <img src={mobileQRDataUrl} alt="QR Code" className="w-[90px] h-[90px] border border-stone-200" />
+                ) : (
+                  <div className="w-[90px] h-[90px] border border-stone-200 bg-stone-100 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-stone-300">
+                      <rect x="3" y="3" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.5" />
+                      <rect x="13" y="3" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.5" />
+                      <rect x="3" y="13" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.5" />
+                      <rect x="15" y="15" width="2" height="2" fill="currentColor" />
+                    </svg>
+                  </div>
+                )}
+                <div className="text-[9px] text-stone-400 text-center mt-1">{t.mobileScanQR}</div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex-1 flex flex-col gap-2">
+                {/* Web Share API button */}
+                {typeof navigator !== "undefined" && typeof navigator.share === "function" && (
+                  <button
+                    onClick={async () => {
+                      try {
+                        await navigator.share({
+                          title: t.siteTitle,
+                          text: t.siteDesc,
+                          url: window.location.href,
+                        });
+                      } catch {}
+                    }}
+                    className="flex items-center gap-1.5 text-[10px] text-stone-700 border border-stone-300 px-2.5 py-1.5 hover:border-stone-500 hover:bg-white transition-colors w-full justify-center"
+                  >
+                    <Share2 size={10} />
+                    {t.mobileShareBtn}
+                  </button>
+                )}
+
+                {/* Copy link button */}
+                <button
+                  onClick={() => {
+                    navigator.clipboard?.writeText(window.location.href).then(() => {
+                      setMobileLinkCopied(true);
+                      setTimeout(() => setMobileLinkCopied(false), 2000);
+                    });
+                  }}
+                  className="flex items-center gap-1.5 text-[10px] text-stone-700 border border-stone-300 px-2.5 py-1.5 hover:border-stone-500 hover:bg-white transition-colors w-full justify-center"
+                >
+                  {mobileLinkCopied ? <Check size={10} className="text-green-600" /> : <Copy size={10} />}
+                  {mobileLinkCopied ? t.mobileCopied : t.mobileCopyLink}
+                </button>
+              </div>
             </div>
-            <div className="text-[10px] text-stone-400 leading-relaxed">
-              {lang === "zh"
-                ? "活动日程、筛选、AI 预习、面试备考等功能在电脑上体验最佳。将此页面发送到电脑来查看。"
-                : "Session calendar, filters, AI prep, interview tools and more are best experienced on desktop. Open this page on your computer."}
-            </div>
-            <button
-              onClick={() => {
-                navigator.clipboard?.writeText(window.location.href).then(() => {
-                  // show brief toast
-                });
-              }}
-              className="mt-2 flex items-center gap-1.5 text-[10px] text-stone-500 border border-stone-200 px-2.5 py-1 hover:border-stone-400 hover:text-stone-700 transition-colors"
-            >
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" strokeWidth="2" /></svg>
-              {lang === "zh" ? "复制链接" : "Copy link"}
-            </button>
+          </div>
+
+          {/* Email section */}
+          <div className="border-t border-stone-200 pt-3">
+            <div className="text-[10px] text-stone-500 font-medium mb-1.5">{t.mobileEmailBtn}</div>
+            {mobileEmailStatus === "sent" ? (
+              <div className="flex items-center gap-1.5 text-[10px] text-green-700 bg-green-50 border border-green-200 px-2.5 py-2">
+                <Check size={10} />
+                {t.mobileEmailSent}
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  value={mobileEmailInput}
+                  onChange={(e) => { setMobileEmailInput(e.target.value); setMobileEmailStatus("idle"); }}
+                  placeholder={t.mobileEmailPlaceholder}
+                  className="flex-1 text-[10px] border border-stone-200 px-2.5 py-1.5 outline-none focus:border-stone-500 bg-white min-w-0"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const email = mobileEmailInput.trim();
+                      if (!email || !/^[^@]+@[^@]+\.[^@]+$/.test(email)) { setMobileEmailStatus("invalid"); return; }
+                      setMobileEmailStatus("sending");
+                      sendLinkMutation.mutate({ email, url: window.location.href, lang });
+                    }
+                  }}
+                />
+                <button
+                  disabled={mobileEmailStatus === "sending"}
+                  onClick={() => {
+                    const email = mobileEmailInput.trim();
+                    if (!email || !/^[^@]+@[^@]+\.[^@]+$/.test(email)) { setMobileEmailStatus("invalid"); return; }
+                    setMobileEmailStatus("sending");
+                    sendLinkMutation.mutate({ email, url: window.location.href, lang });
+                  }}
+                  className="shrink-0 text-[10px] bg-stone-900 text-white px-3 py-1.5 hover:bg-stone-700 transition-colors disabled:opacity-50"
+                >
+                  {mobileEmailStatus === "sending" ? t.mobileEmailSending : t.mobileEmailSend}
+                </button>
+              </div>
+            )}
+            {(mobileEmailStatus === "error" || mobileEmailStatus === "invalid") && (
+              <div className="mt-1 text-[9px] text-red-500">
+                {mobileEmailStatus === "invalid" ? t.mobileEmailInvalid : t.mobileEmailError}
+              </div>
+            )}
           </div>
         </div>
       </div>
