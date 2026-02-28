@@ -214,3 +214,8 @@
 - [x] onboarding 弹窗集成功能卡升级为多平台展示
 - [x] 面试页面加「仅看学生可主动申请」快捷筛选按鈕
 - [x] llms.txt 加 Sitemap 字段（robots.txt 已有）
+
+## 集成中心浮层 + footer 更新
+
+- [x] 集成中心改为主页内浮层（不跳转），用户可自行选择在新 tab 打开
+- [x] footer Notion 集成卡片改为集成中心入口（展示 5 个平台 favicon）
