@@ -5,7 +5,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import QRCode from "qrcode";
 import { useBrowsingTracker } from "@/hooks/useBrowsingTracker";
-import AIChatAssistant from "@/components/AIChatAssistant";
+// import AIChatAssistant from "@/components/AIChatAssistant"; // temporarily hidden
 import {
   allSchools,
   allSessions,
@@ -3288,7 +3288,9 @@ message = client.messages.create(
         </div>
       </footer>
 
+      {/* AIChatAssistant temporarily hidden — re-enable when ready
       <AIChatAssistant browsingProfile={browsingProfile} lang={lang} />
+      */}
 
       {/* ── Onboarding Modal ── */}
       <OnboardingModal t={t} lang={lang} />
