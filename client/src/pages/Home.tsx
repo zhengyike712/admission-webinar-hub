@@ -922,7 +922,7 @@ function RollingRow({ session, t }: { session: (typeof allSessions)[0]; t: typeo
 }
 
 // ── School Card ───────────────────────────────────────────────
-function SchoolCard({ school, t }: { school: School; t: typeof T["zh"] }) {
+function SchoolCard({ school, t, rankMode = 'usnews' }: { school: School; t: typeof T["zh"]; rankMode?: 'usnews' | 'qs' }) {
   const [expanded, setExpanded] = useState(false);
   const schoolSessions = allSessions.filter((s) => s.schoolId === school.id);
 
@@ -941,7 +941,11 @@ function SchoolCard({ school, t }: { school: School; t: typeof T["zh"] }) {
           <span className="text-xs text-stone-800 font-medium truncate min-w-0">
             {school.shortName || school.name}
           </span>
-          <span className="shrink-0 text-[10px] text-stone-400 font-mono">#{school.rank}</span>
+          {rankMode === 'qs' && school.qsRank ? (
+            <span className="shrink-0 text-[10px] text-stone-400 font-mono">QS#{school.qsRank}</span>
+          ) : (
+            <span className="shrink-0 text-[10px] text-stone-400 font-mono">#{school.rank}</span>
+          )}
           {school.tags.slice(0, 2).map((tag) => (
             <span key={tag} className="hidden sm:inline text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-400 rounded shrink-0">
               {tag}
@@ -1655,6 +1659,8 @@ export default function Home() {
   const [showExpiredSessions, setShowExpiredSessions] = useState(false);
   const { profile: browsingProfile, trackSchoolType, trackRegion, trackSessionType } = useBrowsingTracker();
   const [showIntegrationHub, setShowIntegrationHub] = useState(false);
+  // Rank mode: 'usnews' | 'qs'
+  const [rankMode, setRankMode] = useState<'usnews' | 'qs'>('usnews');
   const [activeIntegration, setActiveIntegration] = useState<string | null>(null);
   // Subscribe panel state (navbar bell icon)
   const [showSubscribePanel, setShowSubscribePanel] = useState(false);
@@ -2857,6 +2863,28 @@ message = client.messages.create(
                   className="pl-8 h-8 text-xs border-stone-200 rounded-none focus-visible:ring-0 focus-visible:border-stone-900"
                 />
               </div>
+              {/* Hot suggestions */}
+              {(() => {
+                const hotSchools = [
+                  "MIT", "Stanford", "Harvard", "Yale", "Princeton",
+                  "CMU", "Cornell", "NYU", "UCLA", "UC Berkeley",
+                ];
+                const currentVal = view === "interviews" ? interviewSearch : search;
+                if (currentVal) return null;
+                return (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {hotSchools.map((name) => (
+                      <button
+                        key={name}
+                        onClick={() => view === "interviews" ? setInterviewSearch(name) : setSearch(name)}
+                        className="text-[10px] px-1.5 py-0.5 border border-stone-200 text-stone-400 hover:border-stone-500 hover:text-stone-700 transition-colors"
+                      >
+                        {name}
+                      </button>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Region filter */}
@@ -3203,11 +3231,52 @@ message = client.messages.create(
             </div>
           ) : (
             <div className="space-y-6">
+              {/* Rank mode toggle */}
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase tracking-widest text-stone-400 font-medium shrink-0">
+                  {lang === "zh" ? "排名来源" : "Rank by"}
+                </span>
+                <div className="flex border border-stone-200 overflow-hidden">
+                  <button
+                    onClick={() => setRankMode('usnews')}
+                    className={`px-2.5 py-1 text-[10px] font-medium transition-colors ${
+                      rankMode === 'usnews'
+                        ? 'bg-stone-900 text-white'
+                        : 'text-stone-500 hover:bg-stone-50'
+                    }`}
+                  >
+                    USNews
+                  </button>
+                  <button
+                    onClick={() => setRankMode('qs')}
+                    className={`px-2.5 py-1 text-[10px] font-medium transition-colors border-l border-stone-200 ${
+                      rankMode === 'qs'
+                        ? 'bg-stone-900 text-white'
+                        : 'text-stone-500 hover:bg-stone-50'
+                    }`}
+                  >
+                    QS World
+                  </button>
+                </div>
+                <span className="text-[10px] text-stone-300">
+                  {rankMode === 'usnews'
+                    ? (lang === "zh" ? "US News 2026 美国大学排名" : "US News 2026 National Rankings")
+                    : (lang === "zh" ? "QS 世界大学排名 2026" : "QS World University Rankings 2026")}
+                </span>
+              </div>
               {/* Group schools by region */}
               {(["US", "UK", "HK", "AU"] as Region[]).map((region) => {
                 const regionSchools = filteredSchools.filter((s) => s.region === region);
                 if (regionSchools.length === 0) return null;
                 const regionLabel = regionOptions.find(r => r.value === region)?.label || region;
+                const sortedRegionSchools = [...regionSchools].sort((a, b) => {
+                  if (rankMode === 'qs') {
+                    const qa = a.qsRank ?? 9999;
+                    const qb = b.qsRank ?? 9999;
+                    return qa - qb;
+                  }
+                  return a.rank - b.rank;
+                });
                 return (
                   <section key={region}>
                     <div className="flex items-center gap-3 mb-3">
@@ -3217,9 +3286,9 @@ message = client.messages.create(
                       <div className="flex-1 h-px bg-stone-100" />
                     </div>
                     <div className="border border-stone-100">
-                      {regionSchools
-                        .sort((a, b) => a.rank - b.rank)
-                        .map((s) => <SchoolCard key={s.id} school={s} t={t} />)}
+                      {sortedRegionSchools.map((s) => (
+                        <SchoolCard key={s.id} school={s} t={t} rankMode={rankMode} />
+                      ))}
                     </div>
                   </section>
                 );
