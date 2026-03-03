@@ -1660,9 +1660,21 @@ export default function Home() {
   const [showSubscribePanel, setShowSubscribePanel] = useState(false);
   const [subscribeEmail, setSubscribeEmail] = useState("");
   const [subscribeSubmitted, setSubscribeSubmitted] = useState(false);
+  const subscribePanelRef = useRef<HTMLDivElement>(null);
   const subscribeMutation = trpc.subscribers.subscribe.useMutation({
     onSuccess: () => setSubscribeSubmitted(true),
   });
+  // Close subscribe panel on outside click
+  useEffect(() => {
+    if (!showSubscribePanel) return;
+    function handleOutsideClick(e: MouseEvent) {
+      if (subscribePanelRef.current && !subscribePanelRef.current.contains(e.target as Node)) {
+        setShowSubscribePanel(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [showSubscribePanel]);
   // Mobile "Send to Desktop" state
   const [mobileQRDataUrl, setMobileQRDataUrl] = useState<string | null>(null);
   const [mobileEmailInput, setMobileEmailInput] = useState("");
@@ -2264,7 +2276,7 @@ message = client.messages.create(
               ))}
             </div>
             {/* Subscribe bell button */}
-            <div className="relative">
+            <div className="relative" ref={subscribePanelRef}>
               <button
                 onClick={() => setShowSubscribePanel(v => !v)}
                 title={lang === "zh" ? t.subscribe : "Subscribe to updates"}
@@ -2493,6 +2505,58 @@ message = client.messages.create(
       <div className="sm:hidden flex flex-col min-h-[calc(100vh-56px)] bg-white">
         {/* Feature cards */}
         <div className="px-4 pt-6 pb-4 space-y-3">
+          {/* Mobile: This Week / Today mini banner */}
+          {(() => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const in7Days = new Date(today.getTime() + 7 * 86400000);
+            const upcoming = allSessions
+              .filter(s => !s.isRolling && s.dates && s.dates.length > 0)
+              .flatMap(s => (s.dates || []).map(d => ({ session: s, date: d })))
+              .filter(({ date }) => { const d = new Date(date + "T00:00:00"); return d >= today && d <= in7Days; })
+              .sort((a, b) => a.date.localeCompare(b.date))
+              .slice(0, 3);
+            if (upcoming.length === 0) return null;
+            const todayCount = upcoming.filter(({ date }) => new Date(date + "T00:00:00").getTime() === today.getTime()).length;
+            return (
+              <div className="bg-amber-50 border border-amber-200 px-3 py-2.5">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">
+                    {todayCount > 0
+                      ? (lang === "zh" ? `今日 ${todayCount} 场活动` : lang === "hi" ? `आज ${todayCount} इवेंट` : `${todayCount} event${todayCount > 1 ? "s" : ""} today`)
+                      : (lang === "zh" ? "本周活动" : lang === "hi" ? "इस सप्ताह" : "This Week")}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  {upcoming.map(({ session, date }) => {
+                    const school = schoolsMap[session.schoolId];
+                    const d = new Date(date + "T00:00:00");
+                    const diffDays = Math.ceil((d.getTime() - today.getTime()) / 86400000);
+                    const dayLabel = diffDays === 0
+                      ? (lang === "zh" ? "今天" : lang === "hi" ? "आज" : "Today")
+                      : diffDays === 1
+                      ? (lang === "zh" ? "明天" : lang === "hi" ? "कल" : "Tomorrow")
+                      : d.toLocaleDateString(lang === "zh" ? "zh-CN" : "en-US", { month: "short", day: "numeric", weekday: "short" });
+                    return (
+                      <a
+                        key={`mob-${session.schoolId}-${date}`}
+                        href={session.registrationUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-xs text-stone-700"
+                      >
+                        <span className={`shrink-0 text-[9px] font-bold px-1 py-0.5 leading-none ${
+                          diffDays === 0 ? "bg-red-500 text-white" : "bg-amber-400 text-white"
+                        }`}>{dayLabel}</span>
+                        <span className="font-semibold truncate">{school?.shortName || school?.name || ""}</span>
+                        <span className="text-stone-400 shrink-0">↗</span>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
           {/* AO intro card */}
           <div className="border border-stone-900 bg-stone-50 p-4">
             <div className="flex items-center gap-2 mb-3">

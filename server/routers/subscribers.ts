@@ -9,6 +9,7 @@ import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 import { subscribers } from "../../drizzle/schema";
 import { eq, desc } from "drizzle-orm";
+import { notifyOwner } from "../_core/notification";
 
 export const subscribersRouter = router({
   /**
@@ -38,6 +39,12 @@ export const subscribersRouter = router({
             regions: input.regions ?? [],
           },
         });
+
+      // Notify owner of new subscriber (fire-and-forget)
+      notifyOwner({
+        title: "新订阅者",
+        content: `📬 ${input.email} 订阅了活动提醒${input.regions && input.regions.length > 0 ? `，关注地区：${input.regions.join(", ")}` : ""}`,
+      }).catch(() => {/* ignore notification errors */});
 
       return { success: true };
     }),
