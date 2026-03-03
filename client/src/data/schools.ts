@@ -1353,6 +1353,36 @@ export const sessions: Session[] = [
     registrationUrl: "https://www.umass.edu/admissions/visits/virtual-programs",
     isRolling: false,
   },
+
+  // ===== Rank 51–70: International Student Sessions =====
+
+  // Indiana University Bloomington — 国际生专场（滚动注册）
+  {
+    id: "iu-intl-virtual-meeting",
+    schoolId: 84,
+    title: "IU Bloomington: International Virtual Meeting with Admissions Counselor",
+    type: "International Student Session",
+    description: "印地安大学国际招生顾问一对一或小组虚拟会面，专为国际申请者设计，每周开放新时段，可直接提问申请材料、奖学金和签证相关问题。",
+    dates: ["2026-03-05", "2026-03-09", "2026-03-10", "2026-03-12", "2026-03-17", "2026-03-20", "2026-03-24"],
+    time: "多时段可选（ET）",
+    duration: "30 min",
+    registrationUrl: "https://process.indiana.edu/portal/intl-virtual-meetings",
+    isRolling: false,
+  },
+
+  // University of Pittsburgh — 国际生录取后专场
+  {
+    id: "pitt-intl-admitted-session",
+    schoolId: 86,
+    title: "Pitt Virtual International Admitted Student Session",
+    type: "International Student Session",
+    description: "匹兹堡大学专为被录取国际本科生举办的虚拟宣讲，涵盖住房安排、移民支持（F-1签证）、奖学金激活和校园生活，由国际招生官主持。",
+    dates: ["2026-03-06"],
+    time: "9:00 PM ET",
+    duration: "60 min",
+    registrationUrl: "https://www.explore.pitt.edu/register/?id=557f0e69-b15d-4150-9e33-12ba10760912",
+    isRolling: false,
+  },
 ];
 
 // ===== International Schools =====
