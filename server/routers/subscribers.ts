@@ -163,4 +163,53 @@ export const subscribersRouter = router({
 
     return { count: rows.length };
   }),
+
+  /**
+   * Full subscriber stats for admin dashboard.
+   * Returns totals, region breakdown, and full list.
+   */
+  adminStats: protectedProcedure.query(async ({ ctx }) => {
+    if (ctx.user.role !== "admin") throw new Error("Admin only");
+    const db = await getDb();
+    if (!db) return { total: 0, active: 0, inactive: 0, regionBreakdown: [], list: [] };
+
+    const all = await db
+      .select()
+      .from(subscribers)
+      .orderBy(desc(subscribers.createdAt));
+
+    const active = all.filter((s) => s.active);
+    const inactive = all.filter((s) => !s.active);
+
+    // Build region breakdown from active subscribers
+    const regionMap = new Map<string, number>();
+    for (const sub of active) {
+      const regions = (sub.regions as string[] | null) ?? [];
+      if (regions.length === 0) {
+        regionMap.set("未指定", (regionMap.get("未指定") ?? 0) + 1);
+      } else {
+        for (const r of regions) {
+          regionMap.set(r, (regionMap.get(r) ?? 0) + 1);
+        }
+      }
+    }
+
+    const regionBreakdown = Array.from(regionMap.entries())
+      .map(([region, count]) => ({ region, count }))
+      .sort((a, b) => b.count - a.count);
+
+    return {
+      total: all.length,
+      active: active.length,
+      inactive: inactive.length,
+      regionBreakdown,
+      list: all.map((s) => ({
+        id: s.id,
+        email: s.email,
+        active: s.active,
+        regions: (s.regions as string[] | null) ?? [],
+        createdAt: s.createdAt,
+      })),
+    };
+  }),
 });

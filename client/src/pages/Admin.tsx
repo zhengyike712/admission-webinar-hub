@@ -266,8 +266,8 @@ export default function Admin() {
     trpc.sessions.crawlLogs.useQuery({ limit: 100 });
 
   const { data: subscribersData, refetch: refetchSubs } =
-    trpc.subscribers.list.useQuery(
-      { limit: 200 },
+    trpc.subscribers.adminStats.useQuery(
+      undefined,
       { enabled: user?.role === "admin" }
     );
 
@@ -329,7 +329,11 @@ export default function Admin() {
   }
 
   const logs = logsData ?? [];
-  const subs = subscribersData ?? [];
+  const subs = subscribersData?.list ?? [];
+  const subsActive = subscribersData?.active ?? 0;
+  const subsInactive = subscribersData?.inactive ?? 0;
+  const subsTotal = subscribersData?.total ?? 0;
+  const regionBreakdown = subscribersData?.regionBreakdown ?? [];
   const verifications = (verificationsData ?? []) as Array<{
     id: string;
     schoolName: string;
@@ -425,7 +429,7 @@ export default function Admin() {
             {([
               { key: "logs", label: `爬取日志 (${totalLogs})` },
               { key: "interviews", label: `面试截止核实 (${verifications.length})${verifyChanged > 0 ? ` ⚠️${verifyChanged}` : ""}` },
-              { key: "subscribers", label: `订阅者 (${subs.length})` },
+              { key: "subscribers", label: `订阅者 (${subsActive})` },
             ] as const).map(({ key, label }) => (
               <button
                 key={key}
@@ -552,40 +556,104 @@ export default function Admin() {
 
         {/* Subscribers tab */}
         {activeTab === "subscribers" && (
-          <div>
-            {subs.length === 0 ? (
-              <div className="py-12 text-center text-stone-400 text-sm">
-                暂无订阅者
+          <div className="space-y-5">
+            {/* Summary stats */}
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { label: "活跃订阅", value: subsActive, color: "text-green-700" },
+                { label: "已退订", value: subsInactive, color: "text-stone-400" },
+                { label: "累计总数", value: subsTotal, color: "text-stone-900" },
+              ].map((s) => (
+                <div key={s.label} className="border border-stone-100 p-3">
+                  <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
+                  <div className="text-[11px] text-stone-400 mt-0.5">{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Region breakdown */}
+            {regionBreakdown.length > 0 && (
+              <div>
+                <h3 className="text-[11px] uppercase tracking-widest text-stone-400 font-medium mb-2">地区分布（活跃订阅者）</h3>
+                <div className="flex flex-wrap gap-2">
+                  {regionBreakdown.map(({ region, count }) => {
+                    const pct = subsActive > 0 ? Math.round((count / subsActive) * 100) : 0;
+                    return (
+                      <div key={region} className="flex items-center gap-2 border border-stone-100 px-3 py-1.5">
+                        <span className="text-xs text-stone-700 font-medium">{region}</span>
+                        <span className="text-[11px] text-stone-400">{count} 人</span>
+                        <span className="text-[10px] text-stone-300">{pct}%</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                {/* Bar chart */}
+                <div className="mt-3 space-y-1.5">
+                  {regionBreakdown.map(({ region, count }) => {
+                    const pct = subsActive > 0 ? (count / subsActive) * 100 : 0;
+                    return (
+                      <div key={region} className="flex items-center gap-2">
+                        <span className="text-[11px] text-stone-500 w-16 shrink-0 text-right">{region}</span>
+                        <div className="flex-1 bg-stone-100 h-1.5">
+                          <div
+                            className="bg-stone-800 h-1.5 transition-all duration-500"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                        <span className="text-[11px] text-stone-400 w-8">{count}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
+            )}
+
+            {/* Subscriber list */}
+            {subs.length === 0 ? (
+              <div className="py-12 text-center text-stone-400 text-sm">暂无订阅者</div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="border-b border-stone-200">
-                      {["邮箱", "感兴趣地区", "订阅时间"].map((h) => (
-                        <th
-                          key={h}
-                          className="px-3 py-2 text-[10px] uppercase tracking-widest text-stone-400 font-medium"
-                        >
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {subs.map((sub) => (
-                      <tr key={sub.id} className="border-b border-stone-100 hover:bg-stone-50">
-                        <td className="px-3 py-2 text-xs text-stone-700">{sub.email}</td>
-                        <td className="px-3 py-2 text-[11px] text-stone-400">
-                          {(sub.regions as string[] | null)?.join("、") || "全部"}
-                        </td>
-                        <td className="px-3 py-2 text-[11px] text-stone-400">
-                          {new Date(sub.createdAt).toLocaleDateString("zh-CN")}
-                        </td>
+              <div>
+                <h3 className="text-[11px] uppercase tracking-widest text-stone-400 font-medium mb-2">订阅者列表</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="border-b border-stone-200">
+                        {["邮箱", "状态", "感兴趣地区", "订阅时间"].map((h) => (
+                          <th
+                            key={h}
+                            className="px-3 py-2 text-[10px] uppercase tracking-widest text-stone-400 font-medium"
+                          >
+                            {h}
+                          </th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {subs.map((sub) => (
+                        <tr key={sub.id} className={`border-b border-stone-100 hover:bg-stone-50 ${!sub.active ? "opacity-40" : ""}`}>
+                          <td className="px-3 py-2 text-xs text-stone-700 font-mono">{sub.email}</td>
+                          <td className="px-3 py-2">
+                            {sub.active ? (
+                              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 bg-green-50 text-green-700 border border-green-200">
+                                <CheckCircle size={8} /> 活跃
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-400 border border-stone-200">
+                                <XCircle size={8} /> 已退订
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-3 py-2 text-[11px] text-stone-400">
+                            {sub.regions?.join("、") || "—"}
+                          </td>
+                          <td className="px-3 py-2 text-[11px] text-stone-400">
+                            {new Date(sub.createdAt).toLocaleDateString("zh-CN")}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
