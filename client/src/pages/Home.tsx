@@ -1656,10 +1656,12 @@ export default function Home() {
   const { profile: browsingProfile, trackSchoolType, trackRegion, trackSessionType } = useBrowsingTracker();
   const [showIntegrationHub, setShowIntegrationHub] = useState(false);
   const [activeIntegration, setActiveIntegration] = useState<string | null>(null);
-  const [integrationHubEmail, setIntegrationHubEmail] = useState("");
-  const [integrationHubSubscribed, setIntegrationHubSubscribed] = useState(false);
-  const integrationHubSubscribeMutation = trpc.subscribers.subscribe.useMutation({
-    onSuccess: () => setIntegrationHubSubscribed(true),
+  // Subscribe panel state (navbar bell icon)
+  const [showSubscribePanel, setShowSubscribePanel] = useState(false);
+  const [subscribeEmail, setSubscribeEmail] = useState("");
+  const [subscribeSubmitted, setSubscribeSubmitted] = useState(false);
+  const subscribeMutation = trpc.subscribers.subscribe.useMutation({
+    onSuccess: () => setSubscribeSubmitted(true),
   });
   // Mobile "Send to Desktop" state
   const [mobileQRDataUrl, setMobileQRDataUrl] = useState<string | null>(null);
@@ -2219,50 +2221,9 @@ message = client.messages.create(
                   </div>
                 )}
               </div>
-              {/* Footer: Subscribe + free note */}
-              <div className="px-5 py-4 border-t border-stone-100 shrink-0 space-y-3">
-                {/* Subscribe row */}
-                <div>
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <Mail size={11} className="text-stone-400" />
-                    <span className="text-[11px] font-semibold text-stone-700">
-                      {zh ? t.subscribe : hi ? "नए कार्यक्रम की सूचना" : t.subscribe}
-                    </span>
-                  </div>
-                  {integrationHubSubscribed ? (
-                    <div className="flex items-center gap-2 text-xs text-stone-500">
-                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500" />
-                      {t.subscribeSuccess}
-                    </div>
-                  ) : (
-                    <form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        if (!integrationHubEmail.includes("@")) return;
-                        integrationHubSubscribeMutation.mutate({ email: integrationHubEmail });
-                      }}
-                      className="flex gap-2"
-                    >
-                      <div className="relative flex-1">
-                        <input
-                          type="email"
-                          value={integrationHubEmail}
-                          onChange={(e) => setIntegrationHubEmail(e.target.value)}
-                          placeholder={t.subscribePlaceholder}
-                          className="w-full pl-3 pr-3 py-1.5 text-xs border border-stone-200 focus:border-stone-900 outline-none transition-colors"
-                        />
-                      </div>
-                      <button
-                        type="submit"
-                        className="px-3 py-1.5 bg-stone-900 text-white text-xs font-medium hover:bg-stone-700 transition-colors whitespace-nowrap"
-                      >
-                        {t.subscribeBtn}
-                      </button>
-                    </form>
-                  )}
-                  <p className="text-[10px] text-stone-300 mt-1.5">{t.calSubscribeNote}</p>
-                </div>
-                <p className="text-[10px] text-stone-300 text-center border-t border-stone-50 pt-2">
+              {/* Footer */}
+              <div className="px-5 py-3 border-t border-stone-50 shrink-0">
+                <p className="text-[10px] text-stone-400 text-center">
                   {zh ? "所有集成均免费使用。" : hi ? "सभी इंटीग्रेशन मुफ़्त हैं।" : "All integrations are free to use."}
                 </p>
               </div>
@@ -2301,6 +2262,80 @@ message = client.messages.create(
                   {l === "zh" ? "中" : l === "en" ? "EN" : "हिं"}
                 </button>
               ))}
+            </div>
+            {/* Subscribe bell button */}
+            <div className="relative">
+              <button
+                onClick={() => setShowSubscribePanel(v => !v)}
+                title={lang === "zh" ? t.subscribe : "Subscribe to updates"}
+                className={`flex items-center justify-center w-7 h-7 border transition-colors ${
+                  subscribeSubmitted
+                    ? "border-green-400 text-green-600 bg-green-50"
+                    : showSubscribePanel
+                    ? "border-stone-900 text-stone-900 bg-stone-50"
+                    : "border-stone-200 text-stone-500 hover:border-stone-400 hover:text-stone-800"
+                }`}
+              >
+                {subscribeSubmitted ? (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                ) : (
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                )}
+              </button>
+              {/* Subscribe dropdown panel */}
+              {showSubscribePanel && (
+                <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-stone-200 shadow-lg z-[60] animate-in fade-in slide-in-from-top-1 duration-150">
+                  <div className="px-4 pt-4 pb-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-semibold text-stone-900">
+                        {lang === "zh" ? t.subscribe : lang === "hi" ? "नए कार्यक्रम की सूचना" : t.subscribe}
+                      </span>
+                      <button
+                        onClick={() => setShowSubscribePanel(false)}
+                        className="text-stone-300 hover:text-stone-600 transition-colors"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-stone-400 mb-3">{t.calSubscribeNote}</p>
+                  </div>
+                  <div className="px-4 pb-4">
+                    {subscribeSubmitted ? (
+                      <div className="flex items-center gap-2 text-xs text-stone-500 py-1">
+                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500" />
+                        {t.subscribeSuccess}
+                      </div>
+                    ) : (
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (!subscribeEmail.includes("@")) return;
+                          subscribeMutation.mutate({ email: subscribeEmail });
+                        }}
+                        className="flex gap-2"
+                      >
+                        <div className="relative flex-1">
+                          <Mail size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-300" />
+                          <input
+                            type="email"
+                            value={subscribeEmail}
+                            onChange={(e) => setSubscribeEmail(e.target.value)}
+                            placeholder={t.subscribePlaceholder}
+                            className="w-full pl-7 pr-3 py-1.5 text-xs border border-stone-200 focus:border-stone-900 outline-none transition-colors"
+                            autoFocus
+                          />
+                        </div>
+                        <button
+                          type="submit"
+                          className="px-3 py-1.5 bg-stone-900 text-white text-xs font-medium hover:bg-stone-700 transition-colors whitespace-nowrap"
+                        >
+                          {t.subscribeBtn}
+                        </button>
+                      </form>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
             {/* Share button */}
             <ShareButton lang={lang} />
@@ -2384,6 +2419,76 @@ message = client.messages.create(
           </button>
         </div>
       </div>
+      {/* ── This Week Banner (desktop only) ── */}
+      {(() => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const in7Days = new Date(today.getTime() + 7 * 86400000);
+        const thisWeekSessions = allSessions
+          .filter(s => !s.isRolling && s.dates && s.dates.length > 0)
+          .flatMap(s => (s.dates || []).map(d => ({ session: s, date: d })))
+          .filter(({ date }) => {
+            const d = new Date(date + "T00:00:00");
+            return d >= today && d <= in7Days;
+          })
+          .sort((a, b) => a.date.localeCompare(b.date))
+          .slice(0, 4);
+        if (thisWeekSessions.length === 0) return null;
+        return (
+          <div className="hidden sm:block bg-amber-50 border-b border-amber-100">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 flex items-center gap-3 overflow-x-auto">
+              <span className="shrink-0 text-[10px] font-bold text-amber-700 uppercase tracking-wider">
+                {lang === "zh" ? "本周活动" : lang === "hi" ? "इस सप्ताह" : "This Week"}
+              </span>
+              <div className="flex items-center gap-2 flex-wrap">
+                {thisWeekSessions.map(({ session, date }) => {
+                  const school = schoolsMap[session.schoolId];
+                  const d = new Date(date + "T00:00:00");
+                  const dayLabel = d.toLocaleDateString(lang === "zh" ? "zh-CN" : "en-US", { month: "short", day: "numeric", weekday: "short" });
+                  const diffDays = Math.ceil((d.getTime() - today.getTime()) / 86400000);
+                  const urgency = diffDays === 0 ? "today" : diffDays === 1 ? "tomorrow" : null;
+                  return (
+                    <a
+                      key={`${session.schoolId}-${date}`}
+                      href={session.registrationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-2.5 py-1 bg-white border border-amber-200 hover:border-amber-400 hover:shadow-sm transition-all text-xs text-stone-700 whitespace-nowrap group"
+                    >
+                      {urgency && (
+                        <span className={`text-[9px] font-bold px-1 py-0.5 leading-none ${
+                          urgency === "today" ? "bg-red-500 text-white" : "bg-amber-400 text-white"
+                        }`}>
+                          {urgency === "today"
+                            ? (lang === "zh" ? "今天" : lang === "hi" ? "आज" : "TODAY")
+                            : (lang === "zh" ? "明天" : lang === "hi" ? "कल" : "TMR")}
+                        </span>
+                      )}
+                      <span className="font-medium text-stone-500 text-[10px]">{dayLabel}</span>
+                      <span className="font-semibold">{school?.shortName || school?.name || ""}</span>
+                      <span className="text-stone-400 text-[10px] group-hover:text-amber-600 transition-colors">↗</span>
+                    </a>
+                  );
+                })}
+                {allSessions
+                  .filter(s => !s.isRolling && s.dates && s.dates.length > 0)
+                  .flatMap(s => (s.dates || []).map(d => ({ session: s, date: d })))
+                  .filter(({ date }) => { const d = new Date(date + "T00:00:00"); return d >= today && d <= in7Days; })
+                  .length > 4 && (
+                  <span className="text-[10px] text-amber-600 font-medium">
+                    +{allSessions
+                      .filter(s => !s.isRolling && s.dates && s.dates.length > 0)
+                      .flatMap(s => (s.dates || []).map(d => ({ session: s, date: d })))
+                      .filter(({ date }) => { const d = new Date(date + "T00:00:00"); return d >= today && d <= in7Days; })
+                      .length - 4}
+                    {lang === "zh" ? " 场" : " more"}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
       {/* ── Mobile-only: Simplified Landing ── */}
       <div className="sm:hidden flex flex-col min-h-[calc(100vh-56px)] bg-white">
         {/* Feature cards */}
