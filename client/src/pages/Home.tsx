@@ -2322,7 +2322,11 @@ message = client.messages.create(
                         onSubmit={(e) => {
                           e.preventDefault();
                           if (!subscribeEmail.includes("@")) return;
-                          subscribeMutation.mutate({ email: subscribeEmail });
+                          subscribeMutation.mutate({
+                            email: subscribeEmail,
+                            origin: window.location.origin,
+                            lang,
+                          });
                         }}
                         className="flex gap-2"
                       >

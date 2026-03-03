@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Admin from "./pages/Admin";
+import Unsubscribe from "./pages/Unsubscribe";
 import NotionEmbed from "./pages/NotionEmbed";
 import NotionTemplate from "./pages/NotionTemplate";
 import ApiDocs from "./pages/ApiDocs";
@@ -21,6 +22,7 @@ function Router() {
       <Route path={"/notion-template"} component={NotionTemplate} />
       <Route path={"/api-docs"} component={ApiDocs} />
       <Route path={"/portals"} component={Portals} />
+      <Route path={"/unsubscribe"} component={Unsubscribe} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -4,12 +4,14 @@
  * Handles email subscription management.
  */
 
+import crypto from "crypto";
 import { z } from "zod";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 import { subscribers } from "../../drizzle/schema";
 import { eq, desc } from "drizzle-orm";
 import { notifyOwner } from "../_core/notification";
+import { sendEmail, buildSubscribeConfirmationEmail } from "../_core/email";
 
 export const subscribersRouter = router({
   /**
@@ -20,11 +22,16 @@ export const subscribersRouter = router({
       z.object({
         email: z.string().email(),
         regions: z.array(z.string()).optional(),
+        origin: z.string().optional(),
+        lang: z.enum(["zh", "en", "hi"]).optional(),
       })
     )
     .mutation(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error("Database unavailable");
+
+      // Generate a unique unsubscribe token
+      const unsubscribeToken = crypto.randomBytes(32).toString("hex");
 
       await db
         .insert(subscribers)
@@ -32,13 +39,38 @@ export const subscribersRouter = router({
           email: input.email,
           regions: input.regions ?? [],
           active: true,
+          unsubscribeToken,
         })
         .onDuplicateKeyUpdate({
           set: {
             active: true,
             regions: input.regions ?? [],
+            // Keep existing token if already set, only set on first subscribe
           },
         });
+
+      // Fetch the stored token (may differ if this is a re-subscribe)
+      const [row] = await db
+        .select({ unsubscribeToken: subscribers.unsubscribeToken })
+        .from(subscribers)
+        .where(eq(subscribers.email, input.email))
+        .limit(1);
+
+      const token = row?.unsubscribeToken ?? unsubscribeToken;
+      const origin = input.origin ?? "https://admissionhub-f6apvxhh.manus.space";
+      const unsubscribeUrl = `${origin}/unsubscribe?token=${token}`;
+
+      // Send confirmation email (fire-and-forget)
+      const emailContent = buildSubscribeConfirmationEmail({
+        unsubscribeUrl,
+        lang: (input.lang as "zh" | "en" | "hi") ?? "zh",
+      });
+      sendEmail({
+        to: input.email,
+        subject: emailContent.subject,
+        html: emailContent.html,
+        text: emailContent.text,
+      }).catch(() => {/* ignore email errors */});
 
       // Notify owner of new subscriber (fire-and-forget)
       notifyOwner({
@@ -64,6 +96,39 @@ export const subscribersRouter = router({
         .where(eq(subscribers.email, input.email));
 
       return { success: true };
+    }),
+
+  /**
+   * Unsubscribe by token — used in one-click unsubscribe links from emails.
+   * No authentication required; the token acts as a bearer credential.
+   */
+  unsubscribeByToken: publicProcedure
+    .input(z.object({ token: z.string().min(1) }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database unavailable");
+
+      const [row] = await db
+        .select({ id: subscribers.id, email: subscribers.email, active: subscribers.active })
+        .from(subscribers)
+        .where(eq(subscribers.unsubscribeToken, input.token))
+        .limit(1);
+
+      if (!row) {
+        // Token not found — return success anyway to avoid enumeration
+        return { success: true, alreadyUnsubscribed: true };
+      }
+
+      if (!row.active) {
+        return { success: true, alreadyUnsubscribed: true };
+      }
+
+      await db
+        .update(subscribers)
+        .set({ active: false })
+        .where(eq(subscribers.id, row.id));
+
+      return { success: true, alreadyUnsubscribed: false, email: row.email };
     }),
 
   /**

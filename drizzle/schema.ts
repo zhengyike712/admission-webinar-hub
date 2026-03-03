@@ -86,6 +86,8 @@ export const subscribers = mysqlTable("subscribers", {
   /** Optional: regions the subscriber is interested in (JSON array) */
   regions: json("regions").$type<string[]>(),
   active: boolean("active").default(true).notNull(),
+  /** Unique token used in one-click unsubscribe links */
+  unsubscribeToken: varchar("unsubscribeToken", { length: 64 }).unique(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
