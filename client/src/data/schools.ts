@@ -1225,6 +1225,134 @@ export const sessions: Session[] = [
     registrationUrl: "https://admissions.yale.edu/virtual-events",
     partnerSchools: ["Barnard", "Colorado College", "Rice", "Tufts"],
   },
+
+  // ===== Rank 51–70 US Schools =====
+
+  // UC Irvine (rank 51)
+  {
+    id: "uci-virtual-info",
+    schoolId: 81,
+    title: "UC Irvine Virtual Admissions Info Sessions",
+    type: "General Info Session",
+    description: "UC Irvine 招生官介绍入学要求、奖学金和校园生活，并回答校内外申请者的问题。",
+    dates: ["2026-03-10", "2026-03-24", "2026-04-07", "2026-04-21"],
+    time: "5:00 PM PT",
+    duration: "60 min",
+    registrationUrl: "https://www.admissions.uci.edu/connect/events.php",
+    isRolling: false,
+  },
+
+  // University of Maryland (rank 52)
+  {
+    id: "umd-virtual-tour",
+    schoolId: 82,
+    title: "UMD Virtual Information Sessions",
+    type: "General Info Session",
+    description: "马里兰大学招生官在线宣讲，介绍学术项目、学生生活和奇沙弗尔德校区环境。",
+    dates: ["2026-03-12", "2026-03-26", "2026-04-09", "2026-04-23"],
+    time: "6:00 PM ET",
+    duration: "60 min",
+    registrationUrl: "https://admissions.umd.edu/visit/virtual-programs",
+    isRolling: false,
+  },
+
+  // Indiana University (rank 54)
+  {
+    id: "iu-virtual-session",
+    schoolId: 84,
+    title: "IU Bloomington Virtual Admissions Sessions",
+    type: "General Info Session",
+    description: "印地安大学招生官介绍商学院、音乐学院、公共事务等项目特色和奖学金机会。",
+    dates: ["2026-03-17", "2026-04-07", "2026-04-28"],
+    time: "7:00 PM ET",
+    duration: "60 min",
+    registrationUrl: "https://admissions.indiana.edu/visit/virtual.html",
+    isRolling: false,
+  },
+
+  // University of Pittsburgh (rank 56)
+  {
+    id: "pitt-virtual-info",
+    schoolId: 86,
+    title: "Pitt Virtual Information Sessions",
+    type: "General Info Session",
+    description: "匮兹堡大学招生官介绍各学院项目、荣誉学院和国际学生支持服务。",
+    dates: ["2026-03-19", "2026-04-02", "2026-04-16", "2026-04-30"],
+    time: "6:00 PM ET",
+    duration: "60 min",
+    registrationUrl: "https://www.admissions.pitt.edu/visit/virtual-programs/",
+    isRolling: false,
+  },
+
+  // Texas A&M (rank 58)
+  {
+    id: "tamu-virtual-session",
+    schoolId: 88,
+    title: "Texas A&M Virtual Admissions Sessions",
+    type: "General Info Session",
+    description: "德州农工大学招生官在线宣讲，介绍工程、农业科学和商学项目特色和奖学金。",
+    dates: ["2026-03-11", "2026-03-25", "2026-04-08", "2026-04-22"],
+    time: "6:00 PM CT",
+    duration: "60 min",
+    registrationUrl: "https://admissions.tamu.edu/visit/virtual",
+    isRolling: false,
+  },
+
+  // University of Colorado Boulder (rank 61)
+  {
+    id: "cu-boulder-virtual",
+    schoolId: 91,
+    title: "CU Boulder Virtual Admissions Events",
+    type: "General Info Session",
+    description: "科罗拉多大学博尔德分校招生官介绍工程、商学、环境科学项目和奖学金机会。",
+    dates: ["2026-03-18", "2026-04-01", "2026-04-15"],
+    time: "5:00 PM MT",
+    duration: "60 min",
+    registrationUrl: "https://www.colorado.edu/admissions/events",
+    isRolling: false,
+  },
+
+  // Virginia Tech (rank 65)
+  {
+    id: "vt-virtual-info",
+    schoolId: 95,
+    title: "Virginia Tech Virtual Information Sessions",
+    type: "General Info Session",
+    description: "弗吉尼亚理工大学招生官介绍工程、计算机科学和商学项目，并分享黑堡校园生活。",
+    dates: ["2026-03-16", "2026-03-30", "2026-04-13", "2026-04-27"],
+    time: "6:00 PM ET",
+    duration: "60 min",
+    registrationUrl: "https://www.admissions.vt.edu/visit/virtual.html",
+    isRolling: false,
+  },
+
+  // Arizona State University (rank 68)
+  {
+    id: "asu-virtual-session",
+    schoolId: 98,
+    title: "ASU Virtual Admissions Sessions",
+    type: "General Info Session",
+    description: "亚利桑那州立大学招生官介绍各学院项目、奖学金和在线学位项目，并回答国际学生申请问题。",
+    dates: null,
+    time: "多时段可选",
+    duration: "60 min",
+    registrationUrl: "https://admission.asu.edu/events",
+    isRolling: true,
+  },
+
+  // University of Massachusetts Amherst (rank 70)
+  {
+    id: "umass-virtual-info",
+    schoolId: 100,
+    title: "UMass Amherst Virtual Information Sessions",
+    type: "General Info Session",
+    description: "马萨诸塞州大学安赫斯特分校招生官介绍工程、商学、公共健康等项目，并分享奖学金机会。",
+    dates: ["2026-03-14", "2026-03-28", "2026-04-11", "2026-04-25"],
+    time: "6:00 PM ET",
+    duration: "60 min",
+    registrationUrl: "https://www.umass.edu/admissions/visits/virtual-programs",
+    isRolling: false,
+  },
 ];
 
 // ===== International Schools =====
