@@ -984,6 +984,24 @@ function SchoolCard({ school, t, rankMode = 'usnews' }: { school: School; t: typ
               </span>
             ))}
           </div>
+          {/* Dual ranking display */}
+          <div className="flex items-center gap-3 mb-2">
+            {school.region === 'US' && (
+              <span className="text-[10px] text-stone-500">
+                <span className="font-semibold text-stone-700">USNews</span> #{school.rank}
+              </span>
+            )}
+            {school.qsRank && (
+              <span className="text-[10px] text-stone-500">
+                <span className="font-semibold text-stone-700">QS</span> #{school.qsRank}
+              </span>
+            )}
+            {!school.qsRank && school.region !== 'US' && (
+              <span className="text-[10px] text-stone-400">
+                {school.region === 'UK' ? 'UK' : school.region} Rank #{school.rank}
+              </span>
+            )}
+          </div>
           <div className="text-[11px] text-stone-400 mb-2">
             {schoolSessions.length} {t.tabSessions === "Events" ? "events" : "场活动可报名"}
           </div>
@@ -1408,7 +1426,8 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
   const features = [
     { icon: "🌍", title: t.onboardingF1Title, desc: t.onboardingF1Desc },
     { icon: "📅", title: t.onboardingF3Title, desc: t.onboardingF3Desc },
-    { icon: "🤝", title: t.onboardingF4Title, desc: t.onboardingF4Desc },
+    // F4 Interview Portal silenced — re-enable when feature is ready
+    // { icon: "🤝", title: t.onboardingF4Title, desc: t.onboardingF4Desc },
   ];
 
   return (
@@ -1661,6 +1680,12 @@ export default function Home() {
   const [showIntegrationHub, setShowIntegrationHub] = useState(false);
   // Rank mode: 'usnews' | 'qs'
   const [rankMode, setRankMode] = useState<'usnews' | 'qs'>('usnews');
+  // Rank range filter for schools sidebar
+  type RankRange = 'all' | 'top10' | 'top20' | 'top30' | 'top50' | 'top100';
+  const [rankRangeFilter, setRankRangeFilter] = useState<RankRange>('all');
+  // School sub-type filter (National University vs Liberal Arts College)
+  type SchoolSubType = 'all' | 'National University' | 'Liberal Arts College';
+  const [schoolSubTypeFilter, setSchoolSubTypeFilter] = useState<SchoolSubType>('all');
   const [activeIntegration, setActiveIntegration] = useState<string | null>(null);
   // Subscribe panel state (navbar bell icon)
   const [showSubscribePanel, setShowSubscribePanel] = useState(false);
@@ -1842,9 +1867,26 @@ export default function Home() {
         (s.shortName?.toLowerCase().includes(q) ?? false) ||
         s.location.toLowerCase().includes(q) ||
         s.tags.some((tag) => tag.toLowerCase().includes(q));
-      return matchRegion && matchSearch;
+      // Sub-type filter (National University vs Liberal Arts College)
+      const matchSubType =
+        schoolSubTypeFilter === 'all' ||
+        s.type === schoolSubTypeFilter;
+      // Rank range filter
+      const matchRankRange = (() => {
+        if (rankRangeFilter === 'all') return true;
+        const limit = rankRangeFilter === 'top10' ? 10
+          : rankRangeFilter === 'top20' ? 20
+          : rankRangeFilter === 'top30' ? 30
+          : rankRangeFilter === 'top50' ? 50
+          : 100;
+        if (rankMode === 'qs') return s.qsRank != null && s.qsRank <= limit;
+        // For USNews, only applies to US schools (non-US schools always shown)
+        if (s.region !== 'US') return true;
+        return s.rank <= limit;
+      })();
+      return matchRegion && matchSearch && matchSubType && matchRankRange;
     });
-  }, [search, regionFilter]);
+  }, [search, regionFilter, schoolSubTypeFilter, rankRangeFilter, rankMode]);
 
   const filteredInterviews = useMemo(() => {
     return interviewData.filter((s) => {
@@ -2602,11 +2644,13 @@ message = client.messages.create(
               <div className="text-xs font-semibold text-stone-900 mb-0.5">{t.onboardingF3Title}</div>
               <div className="text-[10px] text-stone-400 leading-relaxed">{t.onboardingF3Desc}</div>
             </div>
+            {/* F4 Interview Portal silenced
             <div className="border border-stone-100 p-3">
               <div className="text-base mb-1">🤝</div>
               <div className="text-xs font-semibold text-stone-900 mb-0.5">{t.onboardingF4Title}</div>
               <div className="text-[10px] text-stone-400 leading-relaxed">{t.onboardingF4Desc}</div>
             </div>
+            */}
           </div>
           {/* Integration Hub shortcut */}
           <button
@@ -2802,6 +2846,7 @@ message = client.messages.create(
               <span className="hidden lg:block text-[10px] text-stone-300 select-none">
                 {t.dataUpdated} {DATA_LAST_UPDATED}
               </span>
+              {/* Applicant Portal link — silenced, re-enable when feature is ready
               <a
                 href="/portals"
                 className="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-stone-400 hover:text-stone-600 transition-colors flex items-center gap-1"
@@ -2809,6 +2854,7 @@ message = client.messages.create(
                 {lang === "zh" ? "Applicant Portal 入口" : lang === "hi" ? "Applicant Portal" : "Applicant Portals"}
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </a>
+              */}
             </div>
           </div>
         </div>
@@ -2863,17 +2909,40 @@ message = client.messages.create(
                   className="pl-8 h-8 text-xs border-stone-200 rounded-none focus-visible:ring-0 focus-visible:border-stone-900"
                 />
               </div>
-              {/* Hot suggestions */}
+              {/* Hot suggestions — personalized by browsingProfile */}
               {(() => {
-                const hotSchools = [
+                // Base list ordered by global popularity
+                const baseSchools = [
                   "MIT", "Stanford", "Harvard", "Yale", "Princeton",
                   "CMU", "Cornell", "NYU", "UCLA", "UC Berkeley",
+                  "Oxford", "Cambridge", "HKU", "UniMelb",
                 ];
+                // Boost schools whose region or type the user has browsed
+                const topRegions = Object.entries(browsingProfile.regions)
+                  .sort((a, b) => b[1] - a[1])
+                  .slice(0, 2)
+                  .map(([r]) => r);
+                const topTypes = Object.entries(browsingProfile.schoolTypes)
+                  .sort((a, b) => b[1] - a[1])
+                  .slice(0, 2)
+                  .map(([t]) => t);
+                // Map shortName → school for scoring
+                const scoreMap: Record<string, number> = {};
+                allSchools.forEach((s) => {
+                  const key = s.shortName || s.name.split(" ")[0];
+                  let score = 0;
+                  if (topRegions.includes(s.region)) score += 2;
+                  if (topTypes.includes(s.type)) score += 1;
+                  scoreMap[key] = score;
+                });
+                const sorted = [...baseSchools].sort(
+                  (a, b) => (scoreMap[b] ?? 0) - (scoreMap[a] ?? 0)
+                ).slice(0, 10);
                 const currentVal = view === "interviews" ? interviewSearch : search;
                 if (currentVal) return null;
                 return (
                   <div className="mt-2 flex flex-wrap gap-1">
-                    {hotSchools.map((name) => (
+                    {sorted.map((name) => (
                       <button
                         key={name}
                         onClick={() => view === "interviews" ? setInterviewSearch(name) : setSearch(name)}
@@ -2908,6 +2977,67 @@ message = client.messages.create(
                 ))}
               </div>
             </div>
+
+            {/* School sub-type + Rank range filters (schools view only) */}
+            {view === "schools" && (
+              <>
+                {/* Sub-type: National University vs Liberal Arts College */}
+                {(regionFilter === 'All' || regionFilter === 'US') && (
+                  <div>
+                    <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
+                      {lang === "zh" ? "学校类型" : "School Type"}
+                    </label>
+                    <div className="space-y-0.5">
+                      {([
+                        { value: 'all' as const, label: lang === "zh" ? "全部" : "All" },
+                        { value: 'National University' as const, label: lang === "zh" ? "综合大学" : "National Univ." },
+                        { value: 'Liberal Arts College' as const, label: lang === "zh" ? "文理学院" : "Liberal Arts" },
+                      ]).map((opt) => (
+                        <button
+                          key={opt.value}
+                          onClick={() => setSchoolSubTypeFilter(opt.value)}
+                          className={`w-full text-left text-xs px-2 py-1.5 transition-colors ${
+                            schoolSubTypeFilter === opt.value
+                              ? 'bg-stone-900 text-white'
+                              : 'text-stone-500 hover:bg-stone-50'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {/* Rank range filter */}
+                <div>
+                  <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
+                    {lang === "zh" ? "排名区间" : "Rank Range"}
+                  </label>
+                  <div className="space-y-0.5">
+                    {([
+                      { value: 'all' as const, label: lang === "zh" ? "全部" : "All" },
+                      { value: 'top10' as const, label: rankMode === 'qs' ? 'QS Top 10' : 'USNews Top 10' },
+                      { value: 'top20' as const, label: rankMode === 'qs' ? 'QS Top 20' : 'USNews Top 20' },
+                      { value: 'top30' as const, label: rankMode === 'qs' ? 'QS Top 30' : 'USNews Top 30' },
+                      { value: 'top50' as const, label: rankMode === 'qs' ? 'QS Top 50' : 'USNews Top 50' },
+                      { value: 'top100' as const, label: rankMode === 'qs' ? 'QS Top 100' : 'USNews Top 100' },
+                    ]).map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setRankRangeFilter(opt.value)}
+                        className={`w-full text-left text-xs px-2 py-1.5 transition-colors ${
+                          rankRangeFilter === opt.value
+                            ? 'bg-stone-900 text-white'
+                            : 'text-stone-500 hover:bg-stone-50'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Interview filter */}
             {view === "interviews" && (

@@ -10,7 +10,7 @@ import Unsubscribe from "./pages/Unsubscribe";
 import NotionEmbed from "./pages/NotionEmbed";
 import NotionTemplate from "./pages/NotionTemplate";
 import ApiDocs from "./pages/ApiDocs";
-import Portals from "./pages/Portals";
+// import Portals from "./pages/Portals"; // silenced — re-enable when feature is ready
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -21,7 +21,7 @@ function Router() {
       <Route path={"/embed"} component={NotionEmbed} />
       <Route path={"/notion-template"} component={NotionTemplate} />
       <Route path={"/api-docs"} component={ApiDocs} />
-      <Route path={"/portals"} component={Portals} />
+      {/* <Route path={"/portals"} component={Portals} /> */}
       <Route path={"/unsubscribe"} component={Unsubscribe} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
