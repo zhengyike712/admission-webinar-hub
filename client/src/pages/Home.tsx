@@ -158,8 +158,12 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingSubtitle: "你了解顶尖大学招生的第一手窗口",
     footerCopyright: "© 2026 景深。所有信息均来自各校官网。",
     batchSelectedTpl: "已选 {n} 场活动",
+    batchInterviewSelectedTpl: "已选 {n} 所学校",
+    batchSchoolSelectedTpl: "已选 {n} 所学校",
     batchClear: "清除选择",
     batchExport: "批量导出日历 (.ics)",
+    batchInterviewExport: "导出截止日期 (.ics)",
+    batchSchoolExport: "导出学校列表 (.csv)",
     shareCopyLink: "复制链接",
     shareCopied: "已复制链接",
     shareWeChat: "分享到微信",
@@ -312,8 +316,12 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingSubtitle: "Your direct window into top university admissions",
     footerCopyright: "© 2026 Kollegers. All information sourced from official university websites.",
     batchSelectedTpl: "{n} event{plural} selected",
+    batchInterviewSelectedTpl: "{n} school{plural} selected",
+    batchSchoolSelectedTpl: "{n} school{plural} selected",
     batchClear: "Clear",
     batchExport: "Export to Calendar (.ics)",
+    batchInterviewExport: "Export Deadlines (.ics)",
+    batchSchoolExport: "Export Schools (.csv)",
     shareCopyLink: "Copy link",
     shareCopied: "Copied!",
     shareWeChat: "Share to WeChat",
@@ -466,8 +474,12 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingSubtitle: "शीर्ष विश्वविद्यालय प्रवेश की सीधी जानकारी",
     footerCopyright: "© 2026 Kollegers. सभी जानकारी विश्वविद्यालयों की आधिकारिक वेबसाइटों से ली गई है।",
     batchSelectedTpl: "{n} कार्यक्रम चुने गए",
+    batchInterviewSelectedTpl: "{n} विश्वविद्यालय चुने गए",
+    batchSchoolSelectedTpl: "{n} विश्वविद्यालय चुने गए",
     batchClear: "साफ करें",
     batchExport: "कैलेंडर में निर्यात करें (.ics)",
+    batchInterviewExport: "अंतिम तारीखें निर्यात करें (.ics)",
+    batchSchoolExport: "विश्वविद्यालय सूची निर्यात करें (.csv)",
     shareCopyLink: "लिंक कॉपी करें",
     shareCopied: "कॉपी हो गई!",
     shareWeChat: "WeChat पर शेयर करें",
@@ -923,7 +935,7 @@ function RollingRow({ session, t }: { session: (typeof allSessions)[0]; t: typeo
 }
 
 // ── School Card ───────────────────────────────────────────────
-function SchoolCard({ school, t, rankMode = 'usnews' }: { school: School; t: typeof T["zh"]; rankMode?: 'usnews' | 'qs' }) {
+function SchoolCard({ school, t, rankMode = 'usnews', isSelected, onToggle }: { school: School; t: typeof T["zh"]; rankMode?: 'usnews' | 'qs'; isSelected?: boolean; onToggle?: (id: number) => void }) {
   const [expanded, setExpanded] = useState(false);
   const schoolSessions = allSessions.filter((s) => s.schoolId === school.id);
 
@@ -931,6 +943,23 @@ function SchoolCard({ school, t, rankMode = 'usnews' }: { school: School; t: typ
     <div className="border-b border-stone-100 last:border-b-0">
       {/* Row — always visible */}
       <div className="flex items-center gap-2 py-2 px-1">
+        {/* Checkbox */}
+        {onToggle && (
+          <div
+            className="shrink-0 flex items-center justify-center w-5 cursor-pointer"
+            onClick={(e) => { e.preventDefault(); onToggle(school.id); }}
+          >
+            <div className={`w-3.5 h-3.5 border-2 flex items-center justify-center transition-colors ${
+              isSelected ? "bg-blue-600 border-blue-600" : "border-stone-300 bg-white"
+            }`}>
+              {isSelected && (
+                <svg viewBox="0 0 10 8" className="w-2 h-1.5 fill-none stroke-white stroke-2">
+                  <polyline points="1,4 4,7 9,1" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </div>
+          </div>
+        )}
         <button
           onClick={() => setExpanded(v => !v)}
           className="flex items-center gap-2 min-w-0 flex-1 text-left hover:opacity-70 transition-opacity cursor-pointer"
@@ -1185,7 +1214,7 @@ function InterviewDeadlineCalButton({ school, t }: { school: SchoolInterview; t:
   );
 }
 
-function InterviewCard({ school, t, lang, onTypeClick }: { school: SchoolInterview; t: typeof T["zh"]; lang: Lang; onTypeClick?: (type: string) => void }) {
+function InterviewCard({ school, t, lang, onTypeClick, isSelected, onToggle }: { school: SchoolInterview; t: typeof T["zh"]; lang: Lang; onTypeClick?: (type: string) => void; isSelected?: boolean; onToggle?: (id: string) => void }) {
   const [expanded, setExpanded] = useState(false);
 
   const methodLabel = {
@@ -1219,6 +1248,23 @@ function InterviewCard({ school, t, lang, onTypeClick }: { school: SchoolIntervi
     }`}>
       {/* Row — always visible */}
       <div className="flex items-center gap-2 py-2 px-1">
+        {/* Checkbox */}
+        {onToggle && (
+          <div
+            className="shrink-0 flex items-center justify-center w-5 cursor-pointer"
+            onClick={(e) => { e.preventDefault(); onToggle(school.id); }}
+          >
+            <div className={`w-3.5 h-3.5 border-2 flex items-center justify-center transition-colors ${
+              isSelected ? "bg-blue-600 border-blue-600" : "border-stone-300 bg-white"
+            }`}>
+              {isSelected && (
+                <svg viewBox="0 0 10 8" className="w-2 h-1.5 fill-none stroke-white stroke-2">
+                  <polyline points="1,4 4,7 9,1" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </div>
+          </div>
+        )}
         {/* Left: clickable expand area */}
         <button
           onClick={() => hasDetails && setExpanded(v => !v)}
@@ -1339,7 +1385,7 @@ function InterviewCard({ school, t, lang, onTypeClick }: { school: SchoolIntervi
 }
 // ── InterviewGroup ───────────────────────────────────────────────
 function InterviewGroup({
-  method, label, accent, group, t, lang, defaultCollapsed, limitCount, onTypeClick,
+  method, label, accent, group, t, lang, defaultCollapsed, limitCount, onTypeClick, selectedInterviews, onToggleInterview,
 }: {
   method: string;
   label: string;
@@ -1350,6 +1396,8 @@ function InterviewGroup({
   defaultCollapsed?: boolean;
   limitCount?: number;
   onTypeClick?: (type: string) => void;
+  selectedInterviews?: Set<string>;
+  onToggleInterview?: (id: string) => void;
 }) {
   const [collapsed, setCollapsed] = useState(!!defaultCollapsed);
   const [expanded, setExpanded] = useState(false);
@@ -1375,7 +1423,7 @@ function InterviewGroup({
       {!collapsed && (
         <>
           <div className="border border-stone-100 divide-y-0">
-            {displayGroup.map((s) => <InterviewCard key={s.id} school={s} t={t} lang={lang} onTypeClick={onTypeClick} />)}
+            {displayGroup.map((s) => <InterviewCard key={s.id} school={s} t={t} lang={lang} onTypeClick={onTypeClick} isSelected={selectedInterviews?.has(s.id)} onToggle={onToggleInterview} />)}
           </div>
           {hasMore && !expanded && (
             <button
@@ -1669,6 +1717,8 @@ export default function Home() {
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [lang, setLang] = useState<Lang>(() => getInitialLang());
   const [selectedSessions, setSelectedSessions] = useState<Set<string>>(new Set());
+  const [selectedInterviews, setSelectedInterviews] = useState<Set<string>>(new Set());
+  const [selectedSchools, setSelectedSchools] = useState<Set<number>>(new Set());
   const [interviewSearch, setInterviewSearch] = useState("");
   const [interviewFilter, setInterviewFilter] = useState<"all" | "available" | "none" | "near_deadline">("all");
   const [interviewMethodFilter, setInterviewMethodFilter] = useState<"all" | "school_contacts" | "applicant_requests" | "required">("all");
@@ -1785,6 +1835,80 @@ export default function Home() {
 
   function clearSelection() {
     setSelectedSessions(new Set());
+  }
+
+  function toggleSelectInterview(id: string) {
+    setSelectedInterviews((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  function clearInterviewSelection() {
+    setSelectedInterviews(new Set());
+  }
+
+  function exportInterviewDeadlinesICS() {
+    const events: string[] = [];
+    for (const id of Array.from(selectedInterviews)) {
+      const school = filteredInterviews.find((s) => s.id === id);
+      if (!school || !school.deadline) continue;
+      const dateCompact = school.deadline.replace(/-/g, "");
+      const title = `${t.interviewDeadlineTitle}: ${school.shortName || school.schoolName}`;
+      events.push([
+        "BEGIN:VEVENT",
+        `DTSTART;VALUE=DATE:${dateCompact}`,
+        `DTEND;VALUE=DATE:${dateCompact}`,
+        `SUMMARY:${title.replace(/,/g, "\\,")}`,
+        `DESCRIPTION:${school.portalUrl}`,
+        `URL:${school.portalUrl}`,
+        `UID:interview-batch-${school.id}@kollegers`,
+        "END:VEVENT",
+      ].join("\r\n"));
+    }
+    const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Kollegers//EN", "CALSCALE:GREGORIAN", ...events, "END:VCALENDAR"].join("\r\n");
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "kollegers-interview-deadlines.ics";
+    link.click();
+  }
+
+  function toggleSelectSchool(id: number) {
+    setSelectedSchools((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  function clearSchoolSelection() {
+    setSelectedSchools(new Set());
+  }
+
+  function exportSchoolsCSV() {
+    const header = ["School Name", "Region", "Type", "Location", "USNews Rank", "QS Rank", "Admission Page", "Registration Page"];
+    const rows = Array.from(selectedSchools).map((id) => {
+      const s = allSchools.find((sc) => sc.id === id);
+      if (!s) return null;
+      return [
+        `"${s.name}"`,
+        s.region,
+        `"${s.type}"`,
+        `"${s.location}"`,
+        s.rank,
+        s.qsRank ?? "",
+        s.admissionPage,
+        s.registrationPage,
+      ].join(",");
+    }).filter(Boolean);
+    const csv = [header.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "kollegers-schools.csv";
+    link.click();
   }
 
   function exportBatchICS() {
@@ -3273,6 +3397,31 @@ message = client.messages.create(
             </div>
           ) : view === "interviews" ? (
             <div>
+              {/* Batch selection bar for interviews */}
+              {selectedInterviews.size > 0 && (
+                <div className="flex items-center justify-between gap-3 mb-3 px-3 py-2 bg-stone-900 text-white">
+                  <span className="text-xs font-medium">
+                    {t.batchInterviewSelectedTpl
+                      .replace("{n}", String(selectedInterviews.size))
+                      .replace("{plural}", selectedInterviews.size > 1 ? "s" : "")}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={clearInterviewSelection}
+                      className="text-[11px] text-stone-400 hover:text-white transition-colors"
+                    >
+                      {t.batchClear}
+                    </button>
+                    <button
+                      onClick={exportInterviewDeadlinesICS}
+                      className="flex items-center gap-1 text-[11px] px-2.5 py-1 bg-white text-stone-900 font-semibold hover:bg-stone-100 transition-colors"
+                    >
+                      <CalendarPlus size={11} />
+                      {t.batchInterviewExport}
+                    </button>
+                  </div>
+                </div>
+              )}
               {/* Cards: grouped by request method when no method filter active, else flat */}
               {(() => {
                 const isFiltered = interviewFilter !== "all" || interviewMethodFilter !== "all" || interviewSearch.trim() !== "";
@@ -3307,7 +3456,7 @@ message = client.messages.create(
                     </div>
                   ) : (
                     <div className="border border-stone-100">
-                      {sorted.map((s) => <InterviewCard key={s.id} school={s} t={t} lang={lang} onTypeClick={(type) => setInterviewSearch(type)} />)}
+                      {sorted.map((s) => <InterviewCard key={s.id} school={s} t={t} lang={lang} onTypeClick={(type) => setInterviewSearch(type)} isSelected={selectedInterviews.has(s.id)} onToggle={toggleSelectInterview} />)}
                     </div>
                   );
                 }
@@ -3338,6 +3487,8 @@ message = client.messages.create(
                           defaultCollapsed={defaultCollapsed}
                           limitCount={limitCount}
                           onTypeClick={(type) => setInterviewSearch(type)}
+                          selectedInterviews={selectedInterviews}
+                          onToggleInterview={toggleSelectInterview}
                         />
                       );
                     })}
@@ -3358,6 +3509,31 @@ message = client.messages.create(
             </div>
           ) : (
             <div className="space-y-6">
+              {/* Batch selection bar for schools */}
+              {selectedSchools.size > 0 && (
+                <div className="flex items-center justify-between gap-3 px-3 py-2 bg-stone-900 text-white">
+                  <span className="text-xs font-medium">
+                    {t.batchSchoolSelectedTpl
+                      .replace("{n}", String(selectedSchools.size))
+                      .replace("{plural}", selectedSchools.size > 1 ? "s" : "")}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={clearSchoolSelection}
+                      className="text-[11px] text-stone-400 hover:text-white transition-colors"
+                    >
+                      {t.batchClear}
+                    </button>
+                    <button
+                      onClick={exportSchoolsCSV}
+                      className="flex items-center gap-1 text-[11px] px-2.5 py-1 bg-white text-stone-900 font-semibold hover:bg-stone-100 transition-colors"
+                    >
+                      <svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor"><path d="M8 12L3 7h3V2h4v5h3L8 12z"/><path d="M2 14h12v1H2z"/></svg>
+                      {t.batchSchoolExport}
+                    </button>
+                  </div>
+                </div>
+              )}
               {/* Rank mode toggle */}
               <div className="flex items-center gap-2">
                 <span className="text-[10px] uppercase tracking-widest text-stone-400 font-medium shrink-0">
@@ -3414,7 +3590,7 @@ message = client.messages.create(
                     </div>
                     <div className="border border-stone-100">
                       {sortedRegionSchools.map((s) => (
-                        <SchoolCard key={s.id} school={s} t={t} rankMode={rankMode} />
+                        <SchoolCard key={s.id} school={s} t={t} rankMode={rankMode} isSelected={selectedSchools.has(s.id)} onToggle={toggleSelectSchool} />
                       ))}
                     </div>
                   </section>

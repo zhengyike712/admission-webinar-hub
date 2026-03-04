@@ -331,3 +331,8 @@
 - [x] 更新 VITE_APP_TITLE 为 Kollegers（平台内置变量不可修改，页面标题已由 JS 动态覆盖为 Kollegers）
 - [x] 重新生成三张 OG 图片（zh/en/hi）含新品牌名
 - [x] 修复 Portals.tsx 英文 pageDesc 中的旧品牌名残留（检查后无残留，已确认）
+
+## 导出功能扩展
+
+- [x] 面试入口 Tab：添加批量选择 + 导出 .ics（面试截止日期）功能
+- [x] 学校目录 Tab：添加导出学校列表（含官网/Portal 链接）功能
