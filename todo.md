@@ -325,3 +325,9 @@
 - [x] 英文 heroTitle 改为 "Better Info. Earlier."（与中文「好信息，早知道」对应）
 - [x] 印地语 heroTitle 改为 "बेहतर जानकारी। पहले।"
 - [x] 全站品牌名从「AdmitLens」改为「Kollegers」（Home.tsx、Portals.tsx、NotionTemplate.tsx、NotionEmbed.tsx、ApiDocs.tsx、index.html、llms.txt、robots.txt）
+
+## 品牌名收尾（Kollegers）
+
+- [x] 更新 VITE_APP_TITLE 为 Kollegers（平台内置变量不可修改，页面标题已由 JS 动态覆盖为 Kollegers）
+- [x] 重新生成三张 OG 图片（zh/en/hi）含新品牌名
+- [x] 修复 Portals.tsx 英文 pageDesc 中的旧品牌名残留（检查后无残留，已确认）
