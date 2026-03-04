@@ -12,13 +12,12 @@ import { useState } from "react";
 import { ExternalLink, Copy, Check, BookOpen, Layers, Zap, Code2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { allSchools } from "@/data/schools";
+import { getInitialLang, type Lang } from "@/lib/lang";
 
 const SITE_ORIGIN = window.location.origin;
 
 const NOTION_TEMPLATE_URL =
   "https://www.notion.so/templates/college-application-tracker";
-
-type Lang = "zh" | "en" | "hi";
 type IntegrationTab = "notion" | "obsidian" | "anytype" | "feishu" | "api";
 
 const T = {
@@ -383,8 +382,8 @@ function CodeBlock({ code, label }: { code: string; label: string }) {
 }
 
 export default function NotionTemplate() {
-  const urlLang = (new URLSearchParams(window.location.search).get("lang") as Lang) || "zh";
-  const [lang] = useState<Lang>(urlLang);
+  const urlLang = new URLSearchParams(window.location.search).get("lang") as Lang | null;
+  const [lang] = useState<Lang>(urlLang === "zh" || urlLang === "en" || urlLang === "hi" ? urlLang : getInitialLang());
   const t = T[lang] || T.zh;
   const [activeTab, setActiveTab] = useState<IntegrationTab>("notion");
 

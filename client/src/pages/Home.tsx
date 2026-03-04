@@ -18,6 +18,7 @@ import {
 } from "@/data/schools";
 import { interviewData, type SchoolInterview } from "@/data/interviews";
 import { trpc } from "@/lib/trpc";
+import { getInitialLang, saveLang, type Lang as DetectedLang } from "@/lib/lang";
 import { Input } from "@/components/ui/input";
 import {
   Search,
@@ -42,7 +43,7 @@ import {
 } from "lucide-react";
 
 type ViewMode = "sessions" | "schools" | "interviews";
-type Lang = "zh" | "en" | "hi";
+type Lang = DetectedLang;
 
 // ── i18n ─────────────────────────────────────────────────────
 const T: Record<Lang, Record<string, string>> = {
@@ -1666,11 +1667,7 @@ export default function Home() {
   const [typeFilter, setTypeFilter] = useState<SessionType | "All">("All");
   const [regionFilter, setRegionFilter] = useState<Region | "All">("All");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-  const [lang, setLang] = useState<Lang>(() => {
-    const saved = localStorage.getItem("jingshen_lang");
-    if (saved === "zh" || saved === "en" || saved === "hi") return saved;
-    return "zh";
-  });
+  const [lang, setLang] = useState<Lang>(() => getInitialLang());
   const [selectedSessions, setSelectedSessions] = useState<Set<string>>(new Set());
   const [interviewSearch, setInterviewSearch] = useState("");
   const [interviewFilter, setInterviewFilter] = useState<"all" | "available" | "none" | "near_deadline">("all");
@@ -2309,7 +2306,7 @@ message = client.messages.create(
               {(["zh", "en", "hi"] as Lang[]).map((l, i) => (
                 <button
                   key={l}
-                  onClick={() => { setLang(l); localStorage.setItem("jingshen_lang", l); }}
+                  onClick={() => { setLang(l); saveLang(l); }}
                   className={`px-2 py-1 text-[11px] transition-colors ${
                     i > 0 ? "border-l border-stone-200" : ""
                   } ${

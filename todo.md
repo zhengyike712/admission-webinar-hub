@@ -310,3 +310,12 @@
 
 - [ ] Tab 导航「结果 Portal」改为「Applicant Portal 入口」
 - [ ] 删除面试页面统计数据区域（共 70 所学校面试信息· 45 提供面试· 25 不提供）
+
+## 语言自动检测（系统语言随动）
+
+- [x] 创建 client/src/lib/lang.ts 共享工具（detectBrowserLang / getInitialLang / saveLang）
+- [x] Home.tsx：语言初始化改用 getInitialLang()，切换时改用 saveLang()
+- [x] Portals.tsx：语言初始化改用 getInitialLang()，切换时改用 saveLang()
+- [x] NotionTemplate.tsx：URL 参数优先，无参数时 getInitialLang()
+- [x] NotionEmbed.tsx：URL 参数优先，无参数时 detectBrowserLang()
+- [x] ApiDocs.tsx：URL 参数优先，无参数时 detectBrowserLang()（仅 zh/en）

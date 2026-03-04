@@ -8,6 +8,7 @@
 
 import { useState } from "react";
 import { Copy, Check, ExternalLink, Code2, Globe, Zap, Database } from "lucide-react";
+import { detectBrowserLang } from "@/lib/lang";
 
 const SITE_ORIGIN = window.location.origin;
 
@@ -147,8 +148,12 @@ function CodeBlock({ code, label }: { code: string; label: string }) {
 }
 
 export default function ApiDocs() {
-  const urlLang = (new URLSearchParams(window.location.search).get("lang") as Lang) || "en";
-  const [lang] = useState<Lang>(urlLang === "zh" ? "zh" : "en");
+  const urlLang = new URLSearchParams(window.location.search).get("lang");
+  const [lang] = useState<Lang>(() => {
+    if (urlLang === "zh" || urlLang === "en") return urlLang;
+    const detected = detectBrowserLang();
+    return detected === "zh" ? "zh" : "en";
+  });
   const t = T[lang];
 
   const baseUrl = SITE_ORIGIN;

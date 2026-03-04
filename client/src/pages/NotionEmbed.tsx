@@ -19,8 +19,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { allSessions, allSchools, schoolsMap } from "@/data/schools";
 import { ExternalLink, Calendar, Clock } from "lucide-react";
-
-type Lang = "zh" | "en" | "hi";
+import { detectBrowserLang, type Lang } from "@/lib/lang";
 type Theme = "light" | "dark";
 
 const T = {
@@ -63,7 +62,7 @@ function getParams() {
   const p = new URLSearchParams(window.location.search);
   return {
     school: p.get("school") || "",
-    lang: (p.get("lang") as Lang) || "zh",
+    lang: (p.get("lang") as Lang) || detectBrowserLang(),
     limit: parseInt(p.get("limit") || "5", 10),
     theme: (p.get("theme") as Theme) || "light",
   };

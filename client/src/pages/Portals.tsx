@@ -5,8 +5,7 @@ import { useState, useMemo } from "react";
 import { ExternalLink, Search, Clock, CheckCircle2, Circle, ChevronDown, ChevronUp, Bell, BellOff, X } from "lucide-react";
 import { schoolPortals, ROUND_COLORS, ROUND_LABELS_ZH, isReleased, type SchoolPortal, type DecisionRound } from "@/data/portals";
 import { trpc } from "@/lib/trpc";
-
-type Lang = "zh" | "en" | "hi";
+import { getInitialLang, saveLang, type Lang } from "@/lib/lang";
 
 const T = {
   zh: {
@@ -307,7 +306,7 @@ function PortalCard({ portal, lang }: { portal: SchoolPortal; lang: Lang }) {
 }
 
 export default function Portals() {
-  const [lang, setLang] = useState<Lang>("zh");
+  const [lang, setLang] = useState<Lang>(() => getInitialLang());
   const [search, setSearch] = useState("");
   const [roundFilter, setRoundFilter] = useState<DecisionRound | "">("");
   const [statusFilter, setStatusFilter] = useState<"" | "released" | "pending">("");
@@ -355,7 +354,7 @@ export default function Portals() {
             {(["zh", "en", "hi"] as Lang[]).map((l) => (
               <button
                 key={l}
-                onClick={() => setLang(l)}
+                onClick={() => { setLang(l); saveLang(l); }}
                 className={`text-[11px] px-2 py-0.5 border transition-colors ${
                   lang === l
                     ? "bg-stone-900 text-white border-stone-900"
