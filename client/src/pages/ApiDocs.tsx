@@ -1,7 +1,7 @@
 /**
  * ApiDocs.tsx
  *
- * Public API documentation page for AdmitLens (景深).
+ * Public API documentation page for Kollegers (景深).
  * Documents the /api/public/sessions endpoint with examples,
  * parameters, response schema, and integration guides.
  */
@@ -69,10 +69,10 @@ const T = {
     licenseVal: "CC BY-NC 4.0（非商业用途免费使用，需注明来源）",
   },
   en: {
-    backToHome: "← Back to AdmitLens",
+    backToHome: "← Back to Kollegers",
     badge: "Developer Docs",
     pageTitle: "Public API Documentation",
-    pageDesc: "AdmitLens provides a free, open JSON API for developers, researchers, and tool integrators to access real-time admissions event data. No registration or API key required.",
+    pageDesc: "Kollegers provides a free, open JSON API for developers, researchers, and tool integrators to access real-time admissions event data. No registration or API key required.",
     baseUrl: "Base URL",
     endpoint: "Endpoint",
     method: "Method",
@@ -437,8 +437,8 @@ curl "${baseUrl}${endpointPath}?upcoming=true&limit=5"`;
           </div>
           <p className="text-xs text-stone-500 leading-relaxed">
             {lang === "zh"
-              ? "AdmitLens 支持三种方式与 Claude 集成，无需 API Key，免费使用。"
-              : "AdmitLens supports three integration methods with Claude. No API key required, free to use."}
+              ? "Kollegers 支持三种方式与 Claude 集成，无需 API Key，免费使用。"
+              : "Kollegers supports three integration methods with Claude. No API key required, free to use."}
           </p>
 
           {/* Three methods */}
@@ -450,8 +450,8 @@ curl "${baseUrl}${endpointPath}?upcoming=true&limit=5"`;
               </h3>
               <ol className="text-xs text-stone-500 space-y-1 list-decimal list-inside">
                 {(lang === "zh"
-                  ? ["打开 claude.ai，创建或进入一个 Project", "点击 Settings → Tools → Add Tool", "选择 MCP Server，输入以下 URL", "保存后，在该 Project 的对话中即可调用 AdmitLens 数据"]
-                  : ["Open claude.ai, create or enter a Project", "Click Settings → Tools → Add Tool", "Select MCP Server, enter the URL below", "After saving, AdmitLens data is available in all conversations in this Project"]
+                  ? ["打开 claude.ai，创建或进入一个 Project", "点击 Settings → Tools → Add Tool", "选择 MCP Server，输入以下 URL", "保存后，在该 Project 的对话中即可调用 Kollegers 数据"]
+                  : ["Open claude.ai, create or enter a Project", "Click Settings → Tools → Add Tool", "Select MCP Server, enter the URL below", "After saving, Kollegers data is available in all conversations in this Project"]
                 ).map((step, i) => <li key={i}>{step}</li>)}
               </ol>
               <div className="mt-3 bg-stone-900 rounded p-3 font-mono text-xs text-green-400">
@@ -471,7 +471,7 @@ curl "${baseUrl}${endpointPath}?upcoming=true&limit=5"`;
               </p>
               <div className="bg-stone-900 rounded p-3 font-mono text-xs text-green-400 whitespace-pre">{`{
   "mcpServers": {
-    "admitlens": {
+    "kollegers": {
       "url": "${SITE_ORIGIN}/mcp"
     }
   }

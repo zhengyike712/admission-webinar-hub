@@ -319,3 +319,9 @@
 - [x] NotionTemplate.tsx：URL 参数优先，无参数时 getInitialLang()
 - [x] NotionEmbed.tsx：URL 参数优先，无参数时 detectBrowserLang()
 - [x] ApiDocs.tsx：URL 参数优先，无参数时 detectBrowserLang()（仅 zh/en）
+
+## Hero 标题 + 品牌名更新
+
+- [x] 英文 heroTitle 改为 "Better Info. Earlier."（与中文「好信息，早知道」对应）
+- [x] 印地语 heroTitle 改为 "बेहतर जानकारी। पहले।"
+- [x] 全站品牌名从「AdmitLens」改为「Kollegers」（Home.tsx、Portals.tsx、NotionTemplate.tsx、NotionEmbed.tsx、ApiDocs.tsx、index.html、llms.txt、robots.txt）

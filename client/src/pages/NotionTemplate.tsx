@@ -110,14 +110,14 @@ const T = {
   },
   en: {
     pageTitle: "Integration Hub",
-    pageDesc: "Embed AdmitLens real-time admissions data into your workflow tools — no tab switching needed.",
+    pageDesc: "Embed Kollegers real-time admissions data into your workflow tools — no tab switching needed.",
     tabNotion: "Notion",
     tabObsidian: "Obsidian",
     tabAnytype: "Anytype",
     tabFeishu: "Feishu / wolai",
     tabApi: "API",
     // Feishu / wolai
-    feishuHeroTitle: "Embed AdmitLens in Feishu / wolai",
+    feishuHeroTitle: "Embed Kollegers in Feishu / wolai",
     feishuHeroDesc: "Embed real-time Info Session data into Feishu Docs, wolai, or FlowUs pages — no tab switching needed.",
     feishuStep1: "Step 1: Copy the Embed Link",
     feishuStep1Desc: "Use the link builder below to customize language, school, and session count, then copy the generated link.",
@@ -129,12 +129,12 @@ const T = {
     feishuStep2FlowUsDesc: "In a FlowUs page, type /embed or select \"Embed\" from the menu, paste the link and confirm. FlowUs also supports iframe embedding.",
     feishuNote: "Note: Feishu's \"Embed Webpage\" feature requires Feishu Enterprise or Personal edition. If embedding is unavailable, use the \"Hyperlink\" feature to add the link as a card.",
     feishuApiTitle: "Advanced: Call the API to Populate Feishu Base",
-    feishuApiDesc: "If you manage applications in Feishu Base, you can use Feishu Automation or scripts to periodically call the AdmitLens API and write the latest session data directly into your spreadsheet.",
+    feishuApiDesc: "If you manage applications in Feishu Base, you can use Feishu Automation or scripts to periodically call the Kollegers API and write the latest session data directly into your spreadsheet.",
     // Notion
-    notionHeroTitle: "Embed AdmitLens in Your Notion",
+    notionHeroTitle: "Embed Kollegers in Your Notion",
     notionHeroDesc: "Put your college admissions Info Session calendar directly inside your Notion application tracker.",
     step1: "Step 1: Get the Application Tracker Template",
-    step1Desc: "Click below to duplicate the official AdmitLens Notion template into your workspace. The embed widget slot is already set up.",
+    step1Desc: "Click below to duplicate the official Kollegers Notion template into your workspace. The embed widget slot is already set up.",
     getTemplate: "Get Notion Template",
     step2: "Step 2: Embed the Widget in Notion",
     step2Desc: "Type /embed in your Notion page, then paste the generated link below. The widget shows upcoming Info Sessions in real time.",
@@ -161,7 +161,7 @@ const T = {
     feat4: "One-click registration to official pages",
     feat5: "No login required — embed and go",
     // Obsidian
-    obsidianHeroTitle: "Embed AdmitLens in Obsidian",
+    obsidianHeroTitle: "Embed Kollegers in Obsidian",
     obsidianHeroDesc: "Use Obsidian's HTML code blocks to embed a live Info Session widget in your application notes.",
     obsidianStep1: "Step 1: Install an HTML Plugin",
     obsidianStep1Desc: "Search for and install the \"HTML Reader\" or \"Custom HTML Block\" plugin in Obsidian's community plugins. This allows rendering HTML iframes inside notes.",
@@ -172,16 +172,16 @@ const T = {
     obsidianAltTitle: "Alternative: Using the Dataview Plugin",
     obsidianAltDesc: "If you have the Dataview plugin installed, use this code in a dataviewjs block:",
     // Anytype
-    anytypeHeroTitle: "Embed AdmitLens in Anytype",
-    anytypeHeroDesc: "Use Anytype's embed or bookmark block to integrate AdmitLens live data into your application tracking objects.",
+    anytypeHeroTitle: "Embed Kollegers in Anytype",
+    anytypeHeroDesc: "Use Anytype's embed or bookmark block to integrate Kollegers live data into your application tracking objects.",
     anytypeStep1: "Step 1: Create an Embed Block",
     anytypeStep1Desc: "In any Anytype object, type / to open the command menu, select \"Embed\" or \"Bookmark\", then paste the generated link below.",
     anytypeStep2: "Step 2: Adjust Display Parameters",
     anytypeStep2Desc: "Use the link builder below to customize school, language, and session count, then paste the generated link into the Anytype embed block.",
-    anytypeNote: "Note: Anytype's embed block supports iframes and will display the full AdmitLens widget. If Embed is unavailable, use Bookmark as a quick-access shortcut.",
+    anytypeNote: "Note: Anytype's embed block supports iframes and will display the full Kollegers widget. If Embed is unavailable, use Bookmark as a quick-access shortcut.",
     // API
     apiHeroTitle: "Public JSON API",
-    apiHeroDesc: "Call the AdmitLens public API directly to integrate real-time data into any tool or workflow.",
+    apiHeroDesc: "Call the Kollegers public API directly to integrate real-time data into any tool or workflow.",
     apiEndpoint: "API Endpoint",
     apiParams: "Query Parameters",
     apiParamSchool: "school (optional): Filter by school abbreviation, e.g. MIT, Stanford",
@@ -192,19 +192,19 @@ const T = {
     apiCopyUrl: "Copy API URL",
     apiDocs: "View Full Docs",
     // Shared
-    backToHome: "← Back to AdmitLens",
+    backToHome: "← Back to Kollegers",
     integrationBadge: "Integration Hub",
   },
   hi: {
     pageTitle: "इंटीग्रेशन हब",
-    pageDesc: "AdmitLens के रियल-टाइम डेटा को अपने वर्कफ्लो टूल में एम्बेड करें।",
+    pageDesc: "Kollegers के रियल-टाइम डेटा को अपने वर्कफ्लो टूल में एम्बेड करें।",
     tabNotion: "Notion",
     tabObsidian: "Obsidian",
     tabAnytype: "Anytype",
     tabFeishu: "Feishu / wolai",
     tabApi: "API",
     // Feishu / wolai
-    feishuHeroTitle: "Feishu / wolai में AdmitLens एम्बेड करें",
+    feishuHeroTitle: "Feishu / wolai में Kollegers एम्बेड करें",
     feishuHeroDesc: "रियल-टाइम Info Session डेटा को Feishu Docs, wolai, या FlowUs पेज में एम्बेड करें।",
     feishuStep1: "चरण 1: एम्बेड लिंक कॉपी करें",
     feishuStep1Desc: "नीचे के लिंक बिल्डर का उपयोग करके भाषा, स्कूल और सत्र संख्या कस्टमाइज़ करें, फिर लिंक कॉपी करें।",
@@ -216,12 +216,12 @@ const T = {
     feishuStep2FlowUsDesc: "FlowUs पेज में /embed टाइप करें या मेनू से \"Embed\" चुनें, लिंक पेस्ट करें।",
     feishuNote: "नोट: Feishu की एम्बेड सुविधा के लिए Enterprise या Personal संस्करण आवश्यक है।",
     feishuApiTitle: "उन्नत: Feishu Base में API डेटा भरें",
-    feishuApiDesc: "Feishu Automation का उपयोग करके AdmitLens API को नियमित रूप से कॉल करें और नवीनतम सत्र डेटा स्वचालित रूप से लिखें।",
+    feishuApiDesc: "Feishu Automation का उपयोग करके Kollegers API को नियमित रूप से कॉल करें और नवीनतम सत्र डेटा स्वचालित रूप से लिखें।",
     // Notion
-    notionHeroTitle: "AdmitLens को Notion में एम्बेड करें",
+    notionHeroTitle: "Kollegers को Notion में एम्बेड करें",
     notionHeroDesc: "अपने कॉलेज प्रवेश Info Session कैलेंडर को सीधे अपने Notion ट्रैकर में रखें।",
     step1: "चरण 1: एप्लीकेशन ट्रैकर टेम्पलेट प्राप्त करें",
-    step1Desc: "नीचे क्लिक करके AdmitLens Notion टेम्पलेट को अपने वर्कस्पेस में डुप्लिकेट करें।",
+    step1Desc: "नीचे क्लिक करके Kollegers Notion टेम्पलेट को अपने वर्कस्पेस में डुप्लिकेट करें।",
     getTemplate: "Notion टेम्पलेट प्राप्त करें",
     step2: "चरण 2: Notion में विजेट एम्बेड करें",
     step2Desc: "अपने Notion पेज में /embed टाइप करें, फिर नीचे जेनरेट किया गया लिंक पेस्ट करें।",
@@ -248,7 +248,7 @@ const T = {
     feat4: "आधिकारिक पंजीकरण पेज पर एक-क्लिक",
     feat5: "लॉगिन की आवश्यकता नहीं",
     // Obsidian
-    obsidianHeroTitle: "Obsidian में AdmitLens एम्बेड करें",
+    obsidianHeroTitle: "Obsidian में Kollegers एम्बेड करें",
     obsidianHeroDesc: "Obsidian के HTML कोड ब्लॉक का उपयोग करके लाइव Info Session विजेट एम्बेड करें।",
     obsidianStep1: "चरण 1: HTML प्लगइन इंस्टॉल करें",
     obsidianStep1Desc: "Obsidian के कम्युनिटी प्लगइन में \"Custom HTML Block\" खोजें और इंस्टॉल करें।",
@@ -259,8 +259,8 @@ const T = {
     obsidianAltTitle: "वैकल्पिक: Dataview प्लगइन का उपयोग करें",
     obsidianAltDesc: "यदि आपके पास Dataview प्लगइन है, तो dataviewjs ब्लॉक में यह कोड उपयोग करें:",
     // Anytype
-    anytypeHeroTitle: "Anytype में AdmitLens एम्बेड करें",
-    anytypeHeroDesc: "Anytype के एम्बेड ब्लॉक का उपयोग करके AdmitLens लाइव डेटा को एकीकृत करें।",
+    anytypeHeroTitle: "Anytype में Kollegers एम्बेड करें",
+    anytypeHeroDesc: "Anytype के एम्बेड ब्लॉक का उपयोग करके Kollegers लाइव डेटा को एकीकृत करें।",
     anytypeStep1: "चरण 1: एम्बेड ब्लॉक बनाएं",
     anytypeStep1Desc: "किसी भी Anytype ऑब्जेक्ट में / टाइप करें, \"Embed\" चुनें और नीचे जेनरेट किया गया लिंक पेस्ट करें।",
     anytypeStep2: "चरण 2: डिस्प्ले पैरामीटर समायोजित करें",
@@ -268,7 +268,7 @@ const T = {
     anytypeNote: "नोट: Anytype का एम्बेड ब्लॉक iframes को सपोर्ट करता है।",
     // API
     apiHeroTitle: "सार्वजनिक JSON API",
-    apiHeroDesc: "AdmitLens के सार्वजनिक API को सीधे कॉल करें और किसी भी टूल में रियल-टाइम डेटा एकीकृत करें।",
+    apiHeroDesc: "Kollegers के सार्वजनिक API को सीधे कॉल करें और किसी भी टूल में रियल-टाइम डेटा एकीकृत करें।",
     apiEndpoint: "API एंडपॉइंट",
     apiParams: "क्वेरी पैरामीटर",
     apiParamSchool: "school (वैकल्पिक): स्कूल संक्षिप्त नाम से फ़िल्टर करें, जैसे MIT, Stanford",
@@ -279,7 +279,7 @@ const T = {
     apiCopyUrl: "API URL कॉपी करें",
     apiDocs: "पूर्ण दस्तावेज़ देखें",
     // Shared
-    backToHome: "← AdmitLens पर वापस जाएं",
+    backToHome: "← Kollegers पर वापस जाएं",
     integrationBadge: "इंटीग्रेशन हब",
   },
 } as const;
@@ -349,7 +349,7 @@ function EmbedBuilder({ t, lang }: { t: typeof T[Lang]; lang: Lang }) {
       <div>
         <label className="text-xs text-stone-500 block mb-2">{t.previewTitle}</label>
         <div className="border border-stone-200 rounded overflow-hidden" style={{ height: "320px" }}>
-          <iframe key={embedUrl} src={embedUrl} style={{ width: "100%", height: "100%", border: "none" }} title="AdmitLens Widget Preview" />
+          <iframe key={embedUrl} src={embedUrl} style={{ width: "100%", height: "100%", border: "none" }} title="Kollegers Widget Preview" />
         </div>
       </div>
     </div>
@@ -396,12 +396,12 @@ export default function NotionTemplate() {
   height="400"
   frameborder="0"
   style="border-radius:8px;border:1px solid #e5e5e5;"
-  title="AdmitLens Info Sessions"
+  title="Kollegers Info Sessions"
 ></iframe>`;
 
   const obsidianDataviewCode = `\`\`\`dataviewjs
 const container = dv.el("div", "", {cls: "admitlens-widget"});
-container.innerHTML = \`<iframe src="${embedUrl}" width="100%" height="400" frameborder="0" style="border-radius:8px;border:1px solid #e5e5e5;" title="AdmitLens Info Sessions"></iframe>\`;
+container.innerHTML = \`<iframe src="${embedUrl}" width="100%" height="400" frameborder="0" style="border-radius:8px;border:1px solid #e5e5e5;" title="Kollegers Info Sessions"></iframe>\`;
 \`\`\``;
 
   const apiResponseExample = `{

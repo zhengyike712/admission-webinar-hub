@@ -203,7 +203,7 @@ const T: Record<Lang, Record<string, string>> = {
   },
   en: {
     tagline: "Global University Admissions Info Hub",
-    heroTitle: "Admission Virtual Info Sessions",
+    heroTitle: "Better Info. Earlier.",
     heroDesc: "Official virtual events hosted by admissions officers — direct links to registration.",
     mission: "Better info. Earlier.",
     tabSessions: "Events",
@@ -304,13 +304,13 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingDismiss: "Don't show again",
     mobileFilterBtn: "Filter",
     mobileFilterTitle: "Filter",
-    brandName: "AdmitLens",
-    siteTitle: "AdmitLens · Know More, Know Earlier",
+    brandName: "Kollegers",
+    siteTitle: "Kollegers · Better Info. Earlier.",
     siteDesc: "70+ US top university interview policies & info sessions in one place",
     shareBtn: "Share",
     shareLabel: "Share this site",
     onboardingSubtitle: "Your direct window into top university admissions",
-    footerCopyright: "© 2026 AdmitLens. All information sourced from official university websites.",
+    footerCopyright: "© 2026 Kollegers. All information sourced from official university websites.",
     batchSelectedTpl: "{n} event{plural} selected",
     batchClear: "Clear",
     batchExport: "Export to Calendar (.ics)",
@@ -336,7 +336,7 @@ const T: Record<Lang, Record<string, string>> = {
     footerNotionLink: "Notion Integration",
     footerNotionLinkSub: "Embed Info Session widget",
     footerNotionNew: "NEW",
-    notionBannerText: "Embed AdmitLens into your Notion application tracker",
+    notionBannerText: "Embed Kollegers into your Notion application tracker",
     notionBannerCta: "Get Notion Integration →",
     onboardingF5Title: "Notion Integration",
     onboardingF5Desc: "Embed the Info Session calendar into your application tracker",
@@ -357,7 +357,7 @@ const T: Record<Lang, Record<string, string>> = {
   },
   hi: {
     tagline: "विश्वविद्यालय प्रवेश सूचना केंद्र",
-    heroTitle: "सही जानकारी, सही समय पर",
+    heroTitle: "बेहतर जानकारी। पहले।",
     heroDesc: "प्रवेश अधिकारियों द्वारा आयोजित ऑनलाइन कार्यक्रम — सीधे रजिस्ट्रेशन लिंक",
     mission: "अच्छी जानकारी। पहले।",
     tabSessions: "कार्यक्रम",
@@ -458,13 +458,13 @@ const T: Record<Lang, Record<string, string>> = {
     onboardingDismiss: "फिर नहीं दिखाएं",
     mobileFilterBtn: "फ़िल्टर",
     mobileFilterTitle: "फ़िल्टर",
-    brandName: "AdmitLens",
-    siteTitle: "AdmitLens · अच्छी जानकारी। पहले।",
+    brandName: "Kollegers",
+    siteTitle: "Kollegers · बेहतर जानकारी। पहले।",
     siteDesc: "70+ अमेरिकी विश्वविद्यालयों की इंटरव्यू नीति और वर्चुअल इन्फो सेशन एक जगह",
     shareBtn: "शेयर",
     shareLabel: "इस साइट को शेयर करें",
     onboardingSubtitle: "शीर्ष विश्वविद्यालय प्रवेश की सीधी जानकारी",
-    footerCopyright: "© 2026 AdmitLens. सभी जानकारी विश्वविद्यालयों की आधिकारिक वेबसाइटों से ली गई है।",
+    footerCopyright: "© 2026 Kollegers. सभी जानकारी विश्वविद्यालयों की आधिकारिक वेबसाइटों से ली गई है।",
     batchSelectedTpl: "{n} कार्यक्रम चुने गए",
     batchClear: "साफ करें",
     batchExport: "कैलेंडर में निर्यात करें (.ics)",
@@ -490,7 +490,7 @@ const T: Record<Lang, Record<string, string>> = {
     footerNotionLink: "Notion एकीकरण",
     footerNotionLinkSub: "Info Session विजेट एम्बेड करें",
     footerNotionNew: "नया",
-    notionBannerText: "AdmitLens को अपने Notion आवेदन ट्रैकर में एम्बेड करें",
+    notionBannerText: "Kollegers को अपने Notion आवेदन ट्रैकर में एम्बेड करें",
     notionBannerCta: "Notion एकीकरण प्राप्त करें →",
     onboardingF5Title: "Notion एकीकरण",
     onboardingF5Desc: "Info Session कैलेंडर को अपने आवेदन ट्रैकर में एम्बेड करें",
@@ -636,11 +636,11 @@ function buildICS(title: string, description: string, url: string, dates: string
       `SUMMARY:${title.replace(/,/g, "\\,")}`,
       `DESCRIPTION:${description.replace(/,/g, "\\,")}\\n\\nRegister: ${url}`,
       `URL:${url}`,
-      `UID:${dateStr}-${title.replace(/\s+/g, "-").toLowerCase()}@admitlens`,
+      `UID:${dateStr}-${title.replace(/\s+/g, "-").toLowerCase()}@kollegers`,
       "END:VEVENT",
     ].join("\r\n");
   }).filter(Boolean);
-  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//AdmitLens//EN", "CALSCALE:GREGORIAN", ...events, "END:VCALENDAR"].join("\r\n");
+  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Kollegers//EN", "CALSCALE:GREGORIAN", ...events, "END:VCALENDAR"].join("\r\n");
 }
 
 function parseDurationMinutes(durationStr?: string): number {
@@ -1098,7 +1098,7 @@ function buildInterviewDeadlineICS(school: SchoolInterview, titleLabel: string):
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//AdmitLens//EN",
+    "PRODID:-//Kollegers//EN",
     "CALSCALE:GREGORIAN",
     "BEGIN:VEVENT",
     `DTSTART;VALUE=DATE:${dateCompact}`,
@@ -1106,7 +1106,7 @@ function buildInterviewDeadlineICS(school: SchoolInterview, titleLabel: string):
     `SUMMARY:${title.replace(/,/g, "\\,")}`,
     `DESCRIPTION:${school.portalUrl}`,
     `URL:${school.portalUrl}`,
-    `UID:interview-deadline-${school.id}@admitlens`,
+    `UID:interview-deadline-${school.id}@kollegers`,
     "END:VEVENT",
     "END:VCALENDAR",
   ].join("\r\n");
@@ -1400,7 +1400,7 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const seen = localStorage.getItem("admitlens_onboarded");
+    const seen = localStorage.getItem("kollegers_onboarded");
     if (!seen) {
       const timer = setTimeout(() => setVisible(true), 800);
       return () => clearTimeout(timer);
@@ -1408,7 +1408,7 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
   }, []);
 
   const dismiss = useCallback(() => {
-    localStorage.setItem("admitlens_onboarded", "1");
+    localStorage.setItem("kollegers_onboarded", "1");
     setVisible(false);
   }, []);
 
@@ -1807,16 +1807,16 @@ export default function Home() {
           `SUMMARY:${title.replace(/,/g, "\\,")}`,
           `DESCRIPTION:Register: ${session.registrationUrl}`,
           `URL:${session.registrationUrl}`,
-          `UID:${dateStr}-${id}@admitlens`,
+          `UID:${dateStr}-${id}@kollegers`,
           "END:VEVENT",
         ].join("\r\n"));
       }
     }
-    const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//AdmitLens//EN", "CALSCALE:GREGORIAN", ...events, "END:VCALENDAR"].join("\r\n");
+    const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Kollegers//EN", "CALSCALE:GREGORIAN", ...events, "END:VCALENDAR"].join("\r\n");
     const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "admitlens-events.ics";
+    link.download = "kollegers-events.ics";
     link.click();
   }
 
@@ -1931,12 +1931,12 @@ export default function Home() {
               steps: zh
                 ? [
                     "复制下方嵌入代码，粘贴到 Notion 页面的 /embed 块",
-                    "或使用模板包：在模板库搜索 \"AdmitLens\" 即可获取预设申请追踪页",
+                    "或使用模板包：在模板库搜索 \"Kollegers\" 即可获取预设申请追踪页",
                     "嵌入小窗口支持实时筛选，无需手动更新",
                   ]
                 : [
                     "Copy the embed code below and paste into a Notion /embed block",
-                    "Or use our template: search \"AdmitLens\" in Notion template gallery",
+                    "Or use our template: search \"Kollegers\" in Notion template gallery",
                     "The embed widget supports real-time filtering, no manual updates needed",
                   ],
               code: `<iframe src="https://admissionhub-f6apvxhh.manus.space/embed" width="100%" height="600" frameborder="0"></iframe>`,
@@ -2064,9 +2064,9 @@ MCP Server URL: https://admissionhub-f6apvxhh.manus.space/mcp
 # 方式二：Claude Desktop (claude_desktop_config.json)
 {
   "mcpServers": {
-    "admitlens": {
+    "kollegers": {
       "command": "npx",
-      "args": ["-y", "@admitlens/mcp-server"],
+      "args": ["-y", "@kollegers/mcp-server"],
       "env": {}
     }
   }
@@ -2103,9 +2103,9 @@ MCP Server URL: https://admissionhub-f6apvxhh.manus.space/mcp
 # Option 2: Claude Desktop (claude_desktop_config.json)
 {
   "mcpServers": {
-    "admitlens": {
+    "kollegers": {
       "command": "npx",
-      "args": ["-y", "@admitlens/mcp-server"],
+      "args": ["-y", "@kollegers/mcp-server"],
       "env": {}
     }
   }
@@ -2151,10 +2151,10 @@ message = client.messages.create(
                     "支持在 ChatGPT / Perplexity 等 AI 工具内直接唤起景深数据面板",
                   ]
                 : [
-                    "Summon AdmitLens sidebar on any webpage, no tab switching needed",
+                    "Summon Kollegers sidebar on any webpage, no tab switching needed",
                     "Auto-detect and match Info Sessions and interview info when browsing school sites",
                     "AI cross-page analysis, auto note-taking synced to Notion/Feishu",
-                    "Invoke AdmitLens data panel directly inside ChatGPT / Perplexity",
+                    "Invoke Kollegers data panel directly inside ChatGPT / Perplexity",
                   ],
               code: `// 即将上线，欢迎预登记体验
 // Coming soon — join the waitlist below`,
