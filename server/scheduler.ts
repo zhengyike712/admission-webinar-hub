@@ -66,7 +66,7 @@ async function runDailyCrawl(): Promise<void> {
     console.log(`[Scheduler] ${summary}`);
 
     await notifyOwner({
-      title: "AdmitLens 每日数据更新",
+      title: "Kollegers 每日数据更新",
       content: summary,
     });
   } catch (err) {
@@ -89,12 +89,12 @@ async function runWeeklyDeadlineVerification(): Promise<void> {
         .join("\n");
 
       await notifyOwner({
-        title: `⚠️ AdmitLens 截止日期变更提醒（${summary.changed} 所学校）`,
+        title: `⚠️ Kollegers 截止日期变更提醒（${summary.changed} 所学校）`,
         content: `${logMsg}\n\n变更学校：\n${changedList || "（见管理后台）"}`,
       });
     } else {
       await notifyOwner({
-        title: "AdmitLens 每周截止日期核实",
+        title: "Kollegers 每周截止日期核实",
         content: logMsg,
       });
     }

@@ -336,3 +336,16 @@
 
 - [x] 面试入口 Tab：添加批量选择 + 导出 .ics（面试截止日期）功能
 - [x] 学校目录 Tab：添加导出学校列表（含官网/Portal 链接）功能
+
+## 链接修复策略 B+D
+
+- [x] 提取 404 失效链接清单并分组
+- [x] 并行搜索各校当前有效虚拟活动页面（策略 B）
+- [x] 在 schools.ts 添加 linkStatus 字段并批量更新链接
+- [x] 前端实现失效链接提示 + 用户反馈按钮（策略 D）
+
+## 品牌收尾 + Portal 链接修复（本次会话）
+
+- [x] 修复 7 个 Applicant Portal 404 链接（Berkeley→apply.berkeley.edu、Dartmouth→admissions.dartmouth.edu/check-your-application、Duke→admiss.ugrad.duke.edu/portal/status、Northwestern→ugadmission.northwestern.edu/apply/status、UPenn→admissions.upenn.edu/how-to-apply/for-applicants、UT Austin→admissions.utexas.edu/mystatus/、Vanderbilt→myappvu.vanderbilt.edu）
+- [x] 替换 server/scheduler.ts 中的 AdmitLens → Kollegers（3 处 notifyOwner 标题）
+- [x] 重新启用 /portals 路由（取消 App.tsx 中的注释）

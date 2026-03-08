@@ -37,6 +37,8 @@ export interface School {
   tags: string[];
 }
 
+export type LinkStatus = "active" | "unverified" | "dead";
+
 export interface Session {
   id: string;
   schoolId: number;
@@ -48,6 +50,7 @@ export interface Session {
   time?: string; // e.g. "7:00 PM ET"
   duration?: string; // e.g. "60 min"
   registrationUrl: string;
+  linkStatus?: LinkStatus; // "active" = verified OK, "dead" = confirmed 404, "unverified" = not checked
   isRolling?: boolean; // true = calendar-based, pick any available date
   partnerSchools?: string[]; // for multi-college sessions
 }
@@ -131,7 +134,7 @@ export const schools: School[] = [
   {
     id: 11, name: "Northwestern University", type: "National University", region: "US", rank: 11, qsRank: 42,
     location: "Evanston, IL", state: "IL", color: "#4E2A84",
-    registrationPage: "https://admission.northwestern.edu/visit/virtual-visits/",
+    registrationPage: "https://ugadmission.northwestern.edu/portal/online_sessions",
     admissionPage: "https://admission.northwestern.edu",
     tags: ["Journalism", "Business"],
   },
@@ -218,7 +221,7 @@ export const schools: School[] = [
     id: 23, name: "Carnegie Mellon University", shortName: "CMU",
     type: "National University", region: "US", rank: 23, qsRank: 52,
     location: "Pittsburgh, PA", state: "PA", color: "#C41230",
-    registrationPage: "https://admission.cmu.edu/visit/virtual-visits.html",
+    registrationPage: "https://admission.cmu.edu/register/?id=6c61bd29-37f1-45af-b2ac-28b840577b21",
     admissionPage: "https://admission.cmu.edu",
     tags: ["CS", "Engineering"],
   },
@@ -448,21 +451,21 @@ export const schools: School[] = [
   {
     id: 53, name: "Swarthmore College", type: "Liberal Arts College", region: "US", rank: 3,
     location: "Swarthmore, PA", state: "PA", color: "#8C1515",
-    registrationPage: "https://www.swarthmore.edu/admissions-aid/virtual-visits",
+    registrationPage: "https://apply.swarthmore.edu/portal/virtual_admissions_dean",
     admissionPage: "https://www.swarthmore.edu/admissions-aid",
     tags: ["No Loan Policy", "Engineering"],
   },
   {
     id: 54, name: "Pomona College", type: "Liberal Arts College", region: "US", rank: 4,
     location: "Claremont, CA", state: "CA", color: "#0C2340",
-    registrationPage: "https://www.pomona.edu/admissions/visit/virtual",
+    registrationPage: "https://www.pomona.edu/admissions/connect/virtual-connections/connect-through-webinars",
     admissionPage: "https://www.pomona.edu/admissions",
     tags: ["No Loan Policy", "Claremont Consortium"],
   },
   {
     id: 55, name: "Wellesley College", type: "Liberal Arts College", region: "US", rank: 5,
     location: "Wellesley, MA", state: "MA", color: "#1D6FA4",
-    registrationPage: "https://www.wellesley.edu/admission/visit/virtual",
+    registrationPage: "https://admission.wellesley.edu/portal/webinars",
     admissionPage: "https://www.wellesley.edu/admission",
     tags: ["Women's College", "No Loan Policy"],
   },
@@ -673,7 +676,7 @@ export const schools: School[] = [
     id: 84, name: "Indiana University Bloomington", shortName: "IU Bloomington",
     type: "National University", region: "US", rank: 54, qsRank: 350,
     location: "Bloomington, IN", state: "IN", color: "#990000",
-    registrationPage: "https://admissions.indiana.edu/visit/virtual.html",
+    registrationPage: "https://admissions.indiana.edu/events/fall-virtual-open-house/registration.html",
     admissionPage: "https://admissions.indiana.edu",
     tags: ["Public", "Business", "Music"],
   },
@@ -705,7 +708,7 @@ export const schools: School[] = [
     id: 88, name: "Texas A&M University", shortName: "Texas A&M",
     type: "National University", region: "US", rank: 58, qsRank: 186,
     location: "College Station, TX", state: "TX", color: "#500000",
-    registrationPage: "https://admissions.tamu.edu/visit/virtual",
+    registrationPage: "https://recruiter.tamu.edu/portal/nr_new_aggie_series",
     admissionPage: "https://admissions.tamu.edu",
     tags: ["Public", "Engineering", "Agriculture"],
   },
@@ -760,7 +763,7 @@ export const schools: School[] = [
   {
     id: 95, name: "Virginia Tech", type: "National University", region: "US", rank: 65, qsRank: 401,
     location: "Blacksburg, VA", state: "VA", color: "#861F41",
-    registrationPage: "https://www.admissions.vt.edu/visit/virtual.html",
+    registrationPage: "https://admit.vt.edu/portal/additional_info_sessions?id=b05f4d41-4c42-4b01-9a1d-1b2df00b5205",
     admissionPage: "https://www.admissions.vt.edu",
     tags: ["Public", "Engineering", "Architecture"],
   },
@@ -930,7 +933,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://mitadmissions.org/apply/visit/",
+    registrationUrl: "https://apply.mitadmissions.org/portal/virtualmit",
     isRolling: true,
   },
 
@@ -958,7 +961,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://admissions.upenn.edu/visit/virtual-visits",
+    registrationUrl: "https://key.admissions.upenn.edu/register/?id=71e57f5d-0190-4470-a9ea-17ee90fd2691",
     isRolling: true,
   },
   {
@@ -970,7 +973,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://admissions.upenn.edu/visit/virtual-visits",
+    registrationUrl: "https://key.admissions.upenn.edu/register/?id=71e57f5d-0190-4470-a9ea-17ee90fd2691",
     isRolling: true,
   },
 
@@ -984,7 +987,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://admissions.duke.edu/visit/virtual-visits/",
+    registrationUrl: "https://admiss.ugrad.duke.edu/portal/visits",
     isRolling: true,
   },
 
@@ -998,7 +1001,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://admission.brown.edu/visit/virtual-visit",
+    registrationUrl: "https://apply.college.brown.edu/portal/virtual_events",
     isRolling: true,
   },
 
@@ -1012,7 +1015,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://apply.jhu.edu/visit/virtual-visits/",
+    registrationUrl: "https://apply.jhu.edu/event_group/information-session/",
     isRolling: true,
   },
 
@@ -1026,7 +1029,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://admission.northwestern.edu/visit/virtual-visits/",
+    registrationUrl: "https://ugadmission.northwestern.edu/portal/online_sessions",
     isRolling: true,
   },
 
@@ -1040,7 +1043,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://admissions.dartmouth.edu/visit/virtual-visits",
+    registrationUrl: "https://apply.dartmouth.edu/portal/campus-visit-virtual",
     isRolling: true,
   },
 
@@ -1054,7 +1057,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://admissions.vanderbilt.edu/visit/virtual/",
+    registrationUrl: "https://myappvu.vanderbilt.edu/portal/onlinesession",
     isRolling: true,
   },
 
@@ -1082,7 +1085,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://admissions.wustl.edu/visit/virtual-visits/",
+    registrationUrl: "https://pathway.wustl.edu/portal/virtual_visit",
     isRolling: true,
   },
 
@@ -1096,7 +1099,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://admissions.cornell.edu/visit/virtual-visits",
+    registrationUrl: "https://engage.admissions.cornell.edu/portal/prospective_student_events",
     isRolling: true,
   },
 
@@ -1110,7 +1113,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://uadmissions.georgetown.edu/visit/virtual-visits/",
+    registrationUrl: "https://uapply.georgetown.edu/portal/virtualsession",
     isRolling: true,
   },
 
@@ -1124,7 +1127,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://admission.cmu.edu/visit/virtual-visits.html",
+    registrationUrl: "https://admission.cmu.edu/register/?id=6c61bd29-37f1-45af-b2ac-28b840577b21",
     isRolling: true,
   },
 
@@ -1166,7 +1169,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://www.swarthmore.edu/admissions-aid/virtual-visits",
+    registrationUrl: "https://apply.swarthmore.edu/portal/virtual_admissions_dean",
     isRolling: true,
   },
 
@@ -1180,7 +1183,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://www.pomona.edu/admissions/visit/virtual",
+    registrationUrl: "https://www.pomona.edu/admissions/connect/virtual-connections/connect-through-webinars",
     isRolling: true,
   },
 
@@ -1194,7 +1197,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://www.wellesley.edu/admission/visit/virtual",
+    registrationUrl: "https://admission.wellesley.edu/portal/webinars",
     isRolling: true,
   },
 
@@ -1252,7 +1255,7 @@ export const sessions: Session[] = [
     dates: ["2026-03-12", "2026-03-26", "2026-04-09", "2026-04-23"],
     time: "6:00 PM ET",
     duration: "60 min",
-    registrationUrl: "https://admissions.umd.edu/visit/virtual-programs",
+    registrationUrl: "https://futureumdengr.wufoo.com/forms/m1lg5ndb16wvdzx/",
     isRolling: false,
   },
 
@@ -1266,7 +1269,7 @@ export const sessions: Session[] = [
     dates: ["2026-03-17", "2026-04-07", "2026-04-28"],
     time: "7:00 PM ET",
     duration: "60 min",
-    registrationUrl: "https://admissions.indiana.edu/visit/virtual.html",
+    registrationUrl: "https://admissions.indiana.edu/events/fall-virtual-open-house/registration.html",
     isRolling: false,
   },
 
@@ -1294,7 +1297,7 @@ export const sessions: Session[] = [
     dates: ["2026-03-11", "2026-03-25", "2026-04-08", "2026-04-22"],
     time: "6:00 PM CT",
     duration: "60 min",
-    registrationUrl: "https://admissions.tamu.edu/visit/virtual",
+    registrationUrl: "https://recruiter.tamu.edu/portal/nr_new_aggie_series",
     isRolling: false,
   },
 
@@ -1308,7 +1311,7 @@ export const sessions: Session[] = [
     dates: ["2026-03-18", "2026-04-01", "2026-04-15"],
     time: "5:00 PM MT",
     duration: "60 min",
-    registrationUrl: "https://www.colorado.edu/admissions/events",
+    registrationUrl: "https://ugrad.apply.colorado.edu/portal/virtual-visits",
     isRolling: false,
   },
 
@@ -1322,7 +1325,7 @@ export const sessions: Session[] = [
     dates: ["2026-03-16", "2026-03-30", "2026-04-13", "2026-04-27"],
     time: "6:00 PM ET",
     duration: "60 min",
-    registrationUrl: "https://www.admissions.vt.edu/visit/virtual.html",
+    registrationUrl: "https://admit.vt.edu/portal/additional_info_sessions?id=b05f4d41-4c42-4b01-9a1d-1b2df00b5205",
     isRolling: false,
   },
 
@@ -1336,7 +1339,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://admission.asu.edu/events",
+    registrationUrl: "https://visit.asu.edu/live-hosted-visit",
     isRolling: true,
   },
 
@@ -1350,7 +1353,7 @@ export const sessions: Session[] = [
     dates: ["2026-03-14", "2026-03-28", "2026-04-11", "2026-04-25"],
     time: "6:00 PM ET",
     duration: "60 min",
-    registrationUrl: "https://www.umass.edu/admissions/visits/virtual-programs",
+    registrationUrl: "https://yes.umass.edu/portal/virtual_student_guided_visits",
     isRolling: false,
   },
 
@@ -1401,7 +1404,7 @@ export const intlSchools: School[] = [
   // ── Hong Kong: Top 5 ──
   { id: 201, name: "University of Hong Kong", shortName: "HKU", type: "Research University", region: "HK", rank: 1, qsRank: 17, location: "Pokfulam, Hong Kong", state: "HK", color: "#006B3C", registrationPage: "https://admissions.hku.hk/events", admissionPage: "https://admissions.hku.hk/", tags: ["QS Top 30", "English-medium"] },
   { id: 202, name: "Hong Kong University of Science and Technology", shortName: "HKUST", type: "Research University", region: "HK", rank: 2, qsRank: 47, location: "Clear Water Bay, Hong Kong", state: "HK", color: "#003D7C", registrationPage: "https://join.hkust.edu.hk/whats-on", admissionPage: "https://join.hkust.edu.hk/", tags: ["QS Top 50", "STEM Focus"] },
-  { id: 203, name: "Chinese University of Hong Kong", shortName: "CUHK", type: "Research University", region: "HK", rank: 3, qsRank: 36, location: "Sha Tin, Hong Kong", state: "HK", color: "#6B0D0D", registrationPage: "https://admission.cuhk.edu.hk/news-and-events", admissionPage: "https://admission.cuhk.edu.hk/", tags: ["QS Top 50"] },
+  { id: 203, name: "Chinese University of Hong Kong", shortName: "CUHK", type: "Research University", region: "HK", rank: 3, qsRank: 36, location: "Sha Tin, Hong Kong", state: "HK", color: "#6B0D0D", registrationPage: "https://infoday.cuhk.edu.hk/", admissionPage: "https://admission.cuhk.edu.hk/", tags: ["QS Top 50"] },
   { id: 204, name: "City University of Hong Kong", shortName: "CityU", type: "Comprehensive University", region: "HK", rank: 4, qsRank: 62, location: "Kowloon Tong, Hong Kong", state: "HK", color: "#006F51", registrationPage: "https://www.cityu.edu.hk/admo/", admissionPage: "https://www.cityu.edu.hk/admo/", tags: ["QS Top 100"] },
   { id: 205, name: "Hong Kong Polytechnic University", shortName: "PolyU", type: "Comprehensive University", region: "HK", rank: 5, qsRank: 57, location: "Hung Hom, Hong Kong", state: "HK", color: "#8B0000", registrationPage: "https://www.polyu.edu.hk/study/events/", admissionPage: "https://www.polyu.edu.hk/study/ug", tags: ["QS Top 100"] },
   // ── Australia: Group of Eight ──
@@ -1440,7 +1443,7 @@ export const intlSessions: Session[] = [
   { id: "hku-events", schoolId: 201, title: "HKU Admissions Events", type: "General Info Session", description: "香港大学招生活动，包含学生大使在线分享系列和本科招生信息日，适合国际申请者。", dates: ["2026-03-15", "2026-04-20", "2026-05-11"], time: "varies (HKT)", duration: "varies", registrationUrl: "https://admissions.hku.hk/events", isRolling: false },
   { id: "hkust-intl-session", schoolId: 202, title: "HKUST International Qualifications Application Walkthrough", type: "International Student Session", description: "香港科技大学专为持国际资质（IB、A-Level、SAT 等）申请者举办的在线申请指导宣讲，通过 Zoom 进行，招生官逐步讲解申请流程和材料要求。", dates: null, time: "多时段可选 (HKT)", duration: "60 min", registrationUrl: "https://join.hkust.edu.hk/whats-on", isRolling: true },
   { id: "hkust-webinars", schoolId: 202, title: "HKUST Programs Showcase Webinars", type: "General Info Session", description: "香港科技大学专业展示宣讲，招生官介绍工程、商科、理学和人文学科的课程特色。", dates: null, time: "多时段可选", duration: "60 min", registrationUrl: "https://join.hkust.edu.hk/whats-on", isRolling: true },
-  { id: "cuhk-events", schoolId: 203, title: "CUHK Admissions Events", type: "General Info Session", description: "香港中文大学招生活动，了解本科课程、书院制度和国际学生申请流程。", dates: null, time: "多时段可选", duration: "varies", registrationUrl: "https://admission.cuhk.edu.hk/news-and-events", isRolling: true },
+  { id: "cuhk-events", schoolId: 203, title: "CUHK Admissions Events", type: "General Info Session", description: "香港中文大学招生活动，了解本科课程、书院制度和国际学生申请流程。", dates: null, time: "多时段可选", duration: "varies", registrationUrl: "https://infoday.cuhk.edu.hk/", isRolling: true },
   // ── AU Sessions ──
   { id: "unsw-intl-webinar", schoolId: 305, title: "UNSW International Students Webinar", type: "International Student Session", description: "新南威尔士大学专为国际学生举办的在线宣讲，招生官介绍入学要求、奖学金和国际生支持服务，约30分钟。", dates: null, time: "多时段可选 (AEDT)", duration: "30 min", registrationUrl: "https://www.unsw.edu.au/study/events/international", isRolling: true },
   { id: "unsw-events", schoolId: 305, title: "UNSW Undergraduate Info Sessions", type: "General Info Session", description: "新南威尔士大学本科招生信息宣讲，招生官介绍工程、商科、法学和医学课程。", dates: ["2026-03-11", "2026-03-31", "2026-04-22", "2026-05-06", "2026-05-20"], time: "varies (AEDT)", duration: "60 min", registrationUrl: "https://www.unsw.edu.au/study/events/undergraduate", isRolling: false },

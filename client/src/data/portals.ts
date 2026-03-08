@@ -128,7 +128,7 @@ export const schoolPortals: SchoolPortal[] = [
     schoolId: 6,
     name: "University of Pennsylvania",
     shortName: "UPenn",
-    portalUrl: "https://admissions.upenn.edu/applicant-portal",
+    portalUrl: "https://admissions.upenn.edu/how-to-apply/for-applicants",
     portalName: "Penn Applicant Portal",
     portalNameZh: "宾大申请者门户",
     decisionDates: [
@@ -152,7 +152,7 @@ export const schoolPortals: SchoolPortal[] = [
   {
     schoolId: 8,
     name: "Duke University",
-    portalUrl: "https://admissions.duke.edu/applicant-portal/",
+    portalUrl: "https://admiss.ugrad.duke.edu/portal/status",
     portalName: "Duke Applicant Portal",
     portalNameZh: "杜克申请者门户",
     decisionDates: [
@@ -189,8 +189,8 @@ export const schoolPortals: SchoolPortal[] = [
   {
     schoolId: 11,
     name: "Northwestern University",
-    portalUrl: "https://admissions.northwestern.edu/applicant-portal/",
-    portalName: "Northwestern Applicant Portal",
+    portalUrl: "https://ugadmission.northwestern.edu/apply/status",
+    portalName: "Northwestern Applicant Status Portal",
     portalNameZh: "西北大学申请者门户",
     decisionDates: [
       { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
@@ -201,8 +201,8 @@ export const schoolPortals: SchoolPortal[] = [
   {
     schoolId: 12,
     name: "Dartmouth College",
-    portalUrl: "https://admissions.dartmouth.edu/applicant-portal",
-    portalName: "Dartmouth Applicant Portal",
+    portalUrl: "https://admissions.dartmouth.edu/check-your-application",
+    portalName: "Dartmouth Application Portal",
     portalNameZh: "达特茅斯申请者门户",
     decisionDates: [
       { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
@@ -213,8 +213,8 @@ export const schoolPortals: SchoolPortal[] = [
   {
     schoolId: 13,
     name: "Vanderbilt University",
-    portalUrl: "https://admissions.vanderbilt.edu/applicant-portal/",
-    portalName: "Vanderbilt Applicant Portal",
+    portalUrl: "https://myappvu.vanderbilt.edu/",
+    portalName: "Vanderbilt MyAppVU Portal",
     portalNameZh: "范德堡申请者门户",
     decisionDates: [
       { round: "ED", label: "Early Decision I", labelZh: "早决定 I", date: "Mid-December 2025", dateZh: "2025年12月中旬", releaseDate: "2025-12-15" },
@@ -307,7 +307,7 @@ export const schoolPortals: SchoolPortal[] = [
   {
     schoolId: 21,
     name: "UC Berkeley",
-    portalUrl: "https://admissions.berkeley.edu/applicant-portal/",
+    portalUrl: "https://apply.berkeley.edu/",
     portalName: "UC Berkeley Applicant Portal",
     portalNameZh: "伯克利申请者门户",
     decisionDates: [
@@ -441,8 +441,8 @@ export const schoolPortals: SchoolPortal[] = [
     schoolId: 33,
     name: "University of Texas at Austin",
     shortName: "UT Austin",
-    portalUrl: "https://admissions.utexas.edu/applicant-portal",
-    portalName: "UT Austin Applicant Portal",
+    portalUrl: "https://admissions.utexas.edu/mystatus/",
+    portalName: "UT Austin MyStatus Portal",
     portalNameZh: "德克萨斯大学奥斯汀分校申请者门户",
     decisionDates: [
       { round: "EA", label: "Early Action", labelZh: "早申", date: "February 2026", dateZh: "2026年2月", releaseDate: "approx:2026-02-01" },

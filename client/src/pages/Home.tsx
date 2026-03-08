@@ -204,6 +204,10 @@ const T: Record<Lang, Record<string, string>> = {
     mobileEmailInvalid: "请输入有效邮箱",
     mobileCopyLink: "复制链接",
     mobileCopied: "已复制",
+    linkDeadWarning: "此链接可能已失效",
+    linkDeadReport: "反馈失效链接",
+    linkDeadReported: "已反馈，感谢！",
+    linkDeadFallback: "前往招生主页",
   },
   en: {
     tagline: "Global University Admissions Info Hub",
@@ -362,6 +366,10 @@ const T: Record<Lang, Record<string, string>> = {
     mobileEmailInvalid: "Please enter a valid email",
     mobileCopyLink: "Copy link",
     mobileCopied: "Copied!",
+    linkDeadWarning: "This link may be broken",
+    linkDeadReport: "Report broken link",
+    linkDeadReported: "Reported, thank you!",
+    linkDeadFallback: "Visit admissions page",
   },
   hi: {
     tagline: "विश्वविद्यालय प्रवेश सूचना केंद्र",
@@ -520,6 +528,10 @@ const T: Record<Lang, Record<string, string>> = {
     mobileEmailInvalid: "कृपया वैध ईमेल दर्ज करें",
     mobileCopyLink: "लिंक कॉपी करें",
     mobileCopied: "कॉपी हो गई!",
+    linkDeadWarning: "यह लिंक अमान्य हो सकती है",
+    linkDeadReport: "टूटी लिंक रिपोर्ट करें",
+    linkDeadReported: "रिपोर्ट किया, धन्यवाद!",
+    linkDeadFallback: "प्रवेश पृष्ठ पर जाएं",
   },
 } as const;
 
@@ -797,6 +809,8 @@ function ScheduledSessionCard({ session, t, isSelected, onToggle, lang, onView }
   const expired = isExpiredSession(session);
   const localTime = session.time ? convertToLocalTime(session.time, session.dates?.[0]) : null;
   const [expanded, setExpanded] = useState(false);
+  const [reported, setReported] = useState(false);
+  const isDead = session.linkStatus === "dead";
 
   return (
     <div className={`border-b border-stone-100 last:border-b-0 ${
@@ -864,16 +878,44 @@ function ScheduledSessionCard({ session, t, isSelected, onToggle, lang, onView }
         </button>
 
         {/* Register CTA — always visible */}
-        <a
-          href={session.registrationUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => { e.stopPropagation(); onView?.(school); }}
-          className="shrink-0 flex items-center gap-0.5 text-[11px] px-2 py-0.5 border border-stone-300 text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-colors duration-150"
-        >
-          {t.register}
-          <ArrowUpRight size={10} />
-        </a>
+        <div className="shrink-0 flex items-center gap-1">
+          {isDead ? (
+            <>
+              {/* Fallback: go to admissions page */}
+              <a
+                href={school?.admissionPage || session.registrationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => { e.stopPropagation(); onView?.(school); }}
+                title={t.linkDeadWarning}
+                className="flex items-center gap-0.5 text-[11px] px-2 py-0.5 border border-red-200 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 transition-colors duration-150"
+              >
+                <span className="text-[9px]">!</span>
+                {t.linkDeadFallback}
+                <ArrowUpRight size={10} />
+              </a>
+              {/* Report button */}
+              <button
+                onClick={(e) => { e.stopPropagation(); setReported(true); }}
+                title={t.linkDeadReport}
+                className="text-[9px] text-stone-400 hover:text-red-400 transition-colors px-1 py-0.5 border border-stone-200 hover:border-red-200"
+              >
+                {reported ? "✓" : "🚩"}
+              </button>
+            </>
+          ) : (
+            <a
+              href={session.registrationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => { e.stopPropagation(); onView?.(school); }}
+              className="flex items-center gap-0.5 text-[11px] px-2 py-0.5 border border-stone-300 text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-colors duration-150"
+            >
+              {t.register}
+              <ArrowUpRight size={10} />
+            </a>
+          )}
+        </div>
       </div>
 
       {/* Expanded details */}
