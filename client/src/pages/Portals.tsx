@@ -9,7 +9,7 @@ import { getInitialLang, saveLang, type Lang } from "@/lib/lang";
 
 const T = {
   zh: {
-    pageTitle: "申请结果 Portal",
+    pageTitle: "Applicant Portal 入口",
     pageDesc: "汇聚各大学申请结果查询入口，一键直达官方 Portal，掌握结果发布时间",
     search: "搜索学校",
     searchPlaceholder: "学校名称…",

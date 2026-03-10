@@ -42,14 +42,14 @@ export const sendLinkRouter = router({
 
       const subjects: Record<string, string> = {
         zh: "你的景深链接",
-        en: "Your AdmitLens Link",
-        hi: "आपका AdmitLens लिंक",
+        en: "Your Kollegers Link",
+        hi: "आपका Kollegers लिंक",
       };
 
       const bodies: Record<string, string> = {
         zh: `你好！\n\n你在手机端请求将景深发送到电脑。\n\n点击下方链接在电脑上打开：\n${url}\n\n祝申请顺利！\n景深团队`,
-        en: `Hello!\n\nYou requested to send AdmitLens to your computer.\n\nClick the link below to open on your computer:\n${url}\n\nBest of luck with your applications!\nAdmitLens Team`,
-        hi: `नमस्ते!\n\nआपने AdmitLens को अपने कंप्यूटर पर भेजने का अनुरोध किया।\n\nअपने कंप्यूटर पर खोलने के लिए नीचे दिए गए लिंक पर क्लिक करें:\n${url}\n\nआपके आवेदन के लिए शुभकामनाएं!\nAdmitLens Team`,
+        en: `Hello!\n\nYou requested to send Kollegers to your computer.\n\nClick the link below to open on your computer:\n${url}\n\nBest of luck with your applications!\nKollegers Team`,
+        hi: `नमस्ते!\n\nआपने Kollegers को अपने कंप्यूटर पर भेजने का अनुरोध किया।\n\nअपने कंप्यूटर पर खोलने के लिए नीचे दिए गए लिंक पर क्लिक करें:\n${url}\n\nआपके आवेदन के लिए शुभकामनाएं!\nKollegers Team`,
       };
 
       const subject = subjects[lang] ?? subjects.en;

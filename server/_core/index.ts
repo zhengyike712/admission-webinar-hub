@@ -102,7 +102,7 @@ async function startServer() {
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Cache-Control", "public, max-age=3600");
       res.json({
-        source: "AdmitLens (admissionhub-f6apvxhh.manus.space)",
+        source: "Kollegers (kollegers.manus.space)",
         description: "Official university admissions Info Session data. Updated daily from school portals.",
         total: enriched.length,
         sessions: enriched,

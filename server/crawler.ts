@@ -80,7 +80,7 @@ async function fetchWithTimeout(url: string, timeoutMs = 15000): Promise<string>
       signal: controller.signal,
       headers: {
         "User-Agent":
-          "Mozilla/5.0 (compatible; AdmitLens-Crawler/1.0; +https://admitlens.manus.space)",
+          "Mozilla/5.0 (compatible; Kollegers-Crawler/1.0; +https://kollegers.manus.space)",
         Accept: "text/html,application/xhtml+xml",
         "Accept-Language": "en-US,en;q=0.9",
       },
@@ -359,7 +359,7 @@ export async function crawlSchool(schoolId: number): Promise<CrawlResult> {
       // Alert owner if threshold reached
       if (consecutiveFailures === CONSECUTIVE_FAIL_ALERT_THRESHOLD) {
         notifyOwner({
-          title: `⚠️ AdmitLens 爬取告警：${school.name}`,
+          title: `⚠️ Kollegers 爬取告警：${school.name}`,
           content: `${school.name} 已连续 ${consecutiveFailures} 次爬取失败。\n最新错误：${errorMessage ?? "未知错误"}\n请检查官网链接是否已变更：${crawlUrl}`,
         }).catch(console.error);
         console.warn(`[Crawler] ALERT: ${school.name} has failed ${consecutiveFailures} times consecutively`);
@@ -442,7 +442,7 @@ export async function crawlAllSchools(): Promise<CrawlResult[]> {
 
           // Notify owner with subscriber summary (Manus notification is owner-only)
           await notifyOwner({
-            title: `📅 AdmitLens 有新活动，已通知 ${activeSubscribers.length} 位订阅者`,
+            title: `📅 Kollegers 有新活动，已通知 ${activeSubscribers.length} 位订阅者`,
             content: `本次爬取共更新 ${totalNew} 场活动，涉及院校：${successSchools || "无"}。\n订阅者列表（${activeSubscribers.length} 人）：${activeSubscribers.slice(0, 10).map((s) => s.email).join("、")}${activeSubscribers.length > 10 ? " ...等" : ""}`,
           });
           console.log(`[Crawler] Notified owner about ${activeSubscribers.length} subscribers with new sessions`);

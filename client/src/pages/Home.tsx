@@ -3009,7 +3009,6 @@ message = client.messages.create(
               <span className="hidden lg:block text-[10px] text-stone-300 select-none">
                 {t.dataUpdated} {DATA_LAST_UPDATED}
               </span>
-              {/* Applicant Portal link — silenced, re-enable when feature is ready
               <a
                 href="/portals"
                 className="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-stone-400 hover:text-stone-600 transition-colors flex items-center gap-1"
@@ -3017,7 +3016,6 @@ message = client.messages.create(
                 {lang === "zh" ? "Applicant Portal 入口" : lang === "hi" ? "Applicant Portal" : "Applicant Portals"}
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </a>
-              */}
             </div>
           </div>
         </div>

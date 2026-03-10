@@ -349,3 +349,12 @@
 - [x] 修复 7 个 Applicant Portal 404 链接（Berkeley→apply.berkeley.edu、Dartmouth→admissions.dartmouth.edu/check-your-application、Duke→admiss.ugrad.duke.edu/portal/status、Northwestern→ugadmission.northwestern.edu/apply/status、UPenn→admissions.upenn.edu/how-to-apply/for-applicants、UT Austin→admissions.utexas.edu/mystatus/、Vanderbilt→myappvu.vanderbilt.edu）
 - [x] 替换 server/scheduler.ts 中的 AdmitLens → Kollegers（3 处 notifyOwner 标题）
 - [x] 重新启用 /portals 路由（取消 App.tsx 中的注释）
+
+## MVP 发布前最终修复
+
+- [x] 修复 crawler.ts 中的 AdmitLens 品牌名残留（User-Agent、通知标题）
+- [x] 修复 server/routers/sendLink.ts 中的 AdmitLens 品牌名残留（邮件标题/正文）
+- [x] 修复 server/_core/index.ts 中的 AdmitLens 品牌名残留（source 字段）
+- [x] 启用 Home.tsx 中 Portals 导航链接（取消注释）
+- [x] 修正 Portals.tsx 中文 pageTitle：「申请结果 Portal」→「Applicant Portal 入口」
+- [x] 实现过期活动自动降权（低透明度 + 移至底部）（已存在，确认有效）
