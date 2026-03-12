@@ -358,3 +358,9 @@
 - [x] 启用 Home.tsx 中 Portals 导航链接（取消注释）
 - [x] 修正 Portals.tsx 中文 pageTitle：「申请结果 Portal」→「Applicant Portal 入口」
 - [x] 实现过期活动自动降权（低透明度 + 移至底部）（已存在，确认有效）
+
+## 爬虫 crawlUrl 批量修复（第二轮）
+
+- [x] 提取全部 404 学校清单（57 个 URL 失效）
+- [x] 并行搜索各校当前有效招生活动页面 URL
+- [x] 批量更新 schools.ts 中的 registrationPage（51 所学校）
