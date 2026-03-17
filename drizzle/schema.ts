@@ -181,3 +181,30 @@ export const portalSubscriptions = mysqlTable("portal_subscriptions", {
 
 export type PortalSubscription = typeof portalSubscriptions.$inferSelect;
 export type InsertPortalSubscription = typeof portalSubscriptions.$inferInsert;
+
+/**
+ * announcements table — admin-managed site-wide announcement banners.
+ * Displayed at the top of the page for all visitors.
+ */
+export const announcements = mysqlTable("announcements", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 256 }).notNull(),
+  content: text("content").notNull(),
+  /** Optional CTA link URL */
+  link: text("link"),
+  /** Optional CTA link label, e.g. "查看详情" */
+  linkText: varchar("linkText", { length: 64 }),
+  /** Visual style: info (blue), success (green), warning (yellow), urgent (red) */
+  type: mysqlEnum("type", ["info", "success", "warning", "urgent"]).default("info").notNull(),
+  /** Whether this announcement is currently shown */
+  isActive: boolean("isActive").default(true).notNull(),
+  /** Higher number = shown first when multiple are active */
+  priority: int("priority").default(0).notNull(),
+  /** If set, the announcement auto-hides after this time */
+  expiresAt: timestamp("expiresAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Announcement = typeof announcements.$inferSelect;
+export type InsertAnnouncement = typeof announcements.$inferInsert;

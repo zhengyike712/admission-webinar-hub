@@ -364,3 +364,11 @@
 - [x] 提取全部 404 学校清单（57 个 URL 失效）
 - [x] 并行搜索各校当前有效招生活动页面 URL
 - [x] 批量更新 schools.ts 中的 registrationPage（51 所学校）
+
+## 自定义公告条（Announcement Banner）
+
+- [ ] 数据库表 announcements（id, title, content, link, linkText, type, isActive, priority, expiresAt, createdAt）
+- [ ] tRPC 接口：公开查询当前有效公告 + 管理员增删改
+- [ ] 前端 AnnouncementBanner 组件（顶部固定条，支持关闭）
+- [ ] 集成到 Home.tsx 顶部
+- [ ] 管理员后台页面 /admin/announcements
