@@ -29,13 +29,19 @@ const GET_USER_INFO_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserInfo`;
 const GET_USER_INFO_WITH_JWT_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserInfoWithJwt`;
 
 class OAuthService {
+  private enabled: boolean;
+  
   constructor(private client: ReturnType<typeof axios.create>) {
-    console.log("[OAuth] Initialized with baseURL:", ENV.oAuthServerUrl);
-    if (!ENV.oAuthServerUrl) {
-      console.error(
-        "[OAuth] ERROR: OAUTH_SERVER_URL is not configured! Set OAUTH_SERVER_URL environment variable."
-      );
+    this.enabled = !!ENV.oAuthServerUrl;
+    if (this.enabled) {
+      console.log("[OAuth] Initialized with baseURL:", ENV.oAuthServerUrl);
+    } else {
+      console.log("[OAuth] Disabled - OAUTH_SERVER_URL not configured");
     }
+  }
+
+  isEnabled(): boolean {
+    return this.enabled;
   }
 
   private decodeState(state: string): string {
@@ -76,19 +82,25 @@ class OAuthService {
   }
 }
 
-const createOAuthHttpClient = (): AxiosInstance =>
-  axios.create({
+const createOAuthHttpClient = (): AxiosInstance | null => {
+  if (!ENV.oAuthServerUrl) return null;
+  return axios.create({
     baseURL: ENV.oAuthServerUrl,
     timeout: AXIOS_TIMEOUT_MS,
   });
+};
 
 class SDKServer {
-  private readonly client: AxiosInstance;
-  private readonly oauthService: OAuthService;
+  private readonly client: AxiosInstance | null;
+  private readonly oauthService: OAuthService | null;
 
-  constructor(client: AxiosInstance = createOAuthHttpClient()) {
+  constructor(client: AxiosInstance | null = createOAuthHttpClient()) {
     this.client = client;
-    this.oauthService = new OAuthService(this.client);
+    this.oauthService = client ? new OAuthService(client) : null;
+  }
+
+  isOAuthEnabled(): boolean {
+    return this.oauthService?.isEnabled() ?? false;
   }
 
   private deriveLoginMethod(
