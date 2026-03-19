@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kollegers</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      width: 360px;
+      min-height: 200px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #fff;
+      padding: 16px;
+    }
+    
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    
+    .title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .subtitle {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+    
+    .stats {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .stat {
+      flex: 1;
+      background: rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+    
+    .stat-num {
+      font-size: 24px;
+      font-weight: 700;
+      color: #667eea;
+    }
+    
+    .stat-label {
+      font-size: 11px;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+    
+    .section {
+      margin-bottom: 16px;
+    }
+    
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .event-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .event-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .event-item:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateX(4px);
+    }
+    
+    .event-date {
+      font-size: 10px;
+      padding: 2px 6px;
+      background: #667eea;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    
+    .event-school {
+      font-size: 13px;
+      font-weight: 500;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .event-arrow {
+      opacity: 0.5;
+      font-size: 12px;
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      margin-top: 8px;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.15);
+    }
+    
+    .footer {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 11px;
+      opacity: 0.5;
+      text-align: center;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px 0;
+      opacity: 0.7;
+    }
+    
+    .empty {
+      text-align: center;
+      padding: 20px;
+      opacity: 0.6;
+      font-size: 13px;
+    }
+    
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .toggle-label {
+      font-size: 13px;
+    }
+    
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    .toggle.active {
+      background: #667eea;
+    }
+    
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+    
+    .toggle.active::after {
+      transform: translateX(20px);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">K</div>
+    <div>
+      <div class="title">Kollegers</div>
+      <div class="subtitle">电子田野助手</div>
+    </div>
+  </div>
+  
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num" id="todayCount">-</div>
+      <div class="stat-label">今日活动</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="weekCount">-</div>
+      <div class="stat-label">本周活动</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="schoolCount">-</div>
+      <div class="stat-label">收录学校</div>
+    </div>
+  </div>
+  
+  <div class="toggle-container">
+    <span class="toggle-label">🔔 活动提醒通知</span>
+    <div class="toggle" id="notificationToggle"></div>
+  </div>
+  
+  <div class="section">
+    <div class="section-title">📅 今日活动</div>
+    <div class="event-list" id="eventList">
+      <div class="loading">加载中...</div>
+    </div>
+  </div>
+  
+  <button class="btn btn-primary" id="openFull">
+    🌐 打开完整网站
+  </button>
+  
+  <button class="btn btn-secondary" id="refreshBtn">
+    🔄 刷新数据
+  </button>
+  
+  <div class="footer">
+    数据来源: kollegers.com
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

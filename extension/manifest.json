@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Kollegers - 电子田野助手",
+  "version": "1.0.0",
+  "description": "美国大学招生宣讲电子田野助手，一键查看今日活动、快速跳转、智能提醒",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "permissions": [
+    "activeTab",
+    "notifications",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.kollegers.com/*",
+    "https://kollegers.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*"],
+      "matches": ["https://www.kollegers.com/*"]
+    }
+  ]
+}

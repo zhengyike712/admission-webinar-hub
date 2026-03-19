@@ -290,7 +290,13 @@
 - [x] 未接入时按鈕显示「接入 AI 助手」，接入后改为「 AI 助手」
 - [x] 3 步引导向导：选服务商 → 粘贴 Key 并验证 → 进入对话
 
-## 申请结果 Portal 汇总页面
+## Chrome Extension 开发
+
+- [x] Chrome Extension 基础架构（manifest.json、popup、background）
+- [x] 集成中心添加 Chrome Extension 入口
+- [ ] 图标优化（当前为 AI 生成，可后续替换）
+- [ ] 添加"访问大学官网时识别"功能
+- [ ] 添加兴趣追踪功能
 
 - [x] 收集各校 applicant portal URL 和结果发布时间
 - [x] 创建 portal 数据文件

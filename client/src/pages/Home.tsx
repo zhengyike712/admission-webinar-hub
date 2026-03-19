@@ -2352,6 +2352,31 @@ message = client.messages.create(
               externalHref: "/api-docs",
             },
           },
+          {
+            id: "chrome",
+            name: zh ? "Chrome 扩展" : "Chrome Extension",
+            color: "bg-blue-600",
+            icon: <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" strokeWidth="2" /><path d="M12 2a10 10 0 0 1 10 10" stroke="white" strokeWidth="2" /><circle cx="12" cy="12" r="3" fill="white" /><circle cx="8" cy="10" r="1.5" fill="white" /></svg>,
+            desc: zh ? "浏览器插件 · 随时查看活动" : "Browser ext · sessions in one click",
+            detail: {
+              title: zh ? "Chrome 扩展安装" : "Chrome Extension",
+              steps: zh
+                ? [
+                    "在 GitHub Releases 下载最新版本的 CRX 文件或源码",
+                    "打开 Chrome → 设置 → 扩展程序 → 开启「开发者模式」",
+                    "点击「加载已解压的扩展程序」，选择 extension 文件夹",
+                    "安装后点击图标即可查看今日活动，支持通知提醒",
+                  ]
+                : [
+                    "Download the latest CRX file or source code from GitHub Releases",
+                    "Open Chrome → Settings → Extensions → Enable \"Developer mode\"",
+                    "Click \"Load unpacked\" and select the extension folder",
+                    "Click the icon to view today's events, supports notification alerts",
+                  ],
+              code: `GitHub: github.com/zhengyike712/admission-webinar-hub/tree/main/extension`,
+              externalHref: "https://github.com/zhengyike712/admission-webinar-hub/tree/main/extension",
+            },
+          },
         ];
         const active = activeIntegration ? platforms.find(p => p.id === activeIntegration) : null;
         return (
