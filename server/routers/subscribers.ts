@@ -57,7 +57,7 @@ export const subscribersRouter = router({
         .limit(1);
 
       const token = row?.unsubscribeToken ?? unsubscribeToken;
-      const origin = input.origin ?? "https://admissionhub-f6apvxhh.manus.space";
+      const origin = input.origin ?? "https://www.kollegers.com";
       const unsubscribeUrl = `${origin}/unsubscribe?token=${token}`;
 
       // Send confirmation email (fire-and-forget)

@@ -1,22 +1,22 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "AdmitLens (景深) API",
+    "title": "Kollegers (景深) API",
     "description": "Real-time database of university admissions info sessions and interview policies. Covers 100+ top universities across the US, UK, Hong Kong, and Australia. All data is sourced directly from official university admissions websites and updated daily.\n\nUse this API to:\n- Find upcoming info sessions for specific schools\n- Check interview availability and application methods\n- Get registration links directly to official portals\n- Filter by region, session type, or school name",
     "version": "1.0.0",
     "contact": {
-      "name": "AdmitLens",
-      "url": "https://admissionhub-f6apvxhh.manus.space",
+      "name": "Kollegers",
+      "url": "https://www.kollegers.com",
       "email": "api@admitlens.com"
     },
     "license": {
       "name": "Free for non-commercial use",
-      "url": "https://admissionhub-f6apvxhh.manus.space/api-docs"
+      "url": "https://www.kollegers.com/api-docs"
     }
   },
   "servers": [
     {
-      "url": "https://admissionhub-f6apvxhh.manus.space",
+      "url": "https://www.kollegers.com",
       "description": "Production server"
     }
   ],
@@ -137,7 +137,7 @@
       "get": {
         "operationId": "getSchools",
         "summary": "List schools with info session coverage",
-        "description": "Returns all schools in the AdmitLens database with their basic info and coverage status.",
+        "description": "Returns all schools in the Kollegers database with their basic info and coverage status.",
         "parameters": [
           {
             "name": "region",
@@ -399,6 +399,6 @@
   },
   "externalDocs": {
     "description": "Full API documentation with examples",
-    "url": "https://admissionhub-f6apvxhh.manus.space/api-docs"
+    "url": "https://www.kollegers.com/api-docs"
   }
 }

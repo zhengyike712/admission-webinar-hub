@@ -53,7 +53,7 @@ async function fetchWithTimeout(url: string, timeoutMs = 15000): Promise<string>
       signal: controller.signal,
       headers: {
         "User-Agent":
-          "Mozilla/5.0 (compatible; JingShenBot/1.0; +https://admissionhub-f6apvxhh.manus.space)",
+          "Mozilla/5.0 (compatible; JingShenBot/1.0; +https://www.kollegers.com)",
       },
     });
     clearTimeout(timer);

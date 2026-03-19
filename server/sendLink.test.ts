@@ -24,7 +24,7 @@ describe("sendLink.sendToEmail", () => {
     const caller = appRouter.createCaller(createCtx("10.0.0.1"));
     const result = await caller.sendLink.sendToEmail({
       email: "test@example.com",
-      url: "https://admissionhub-f6apvxhh.manus.space/",
+      url: "https://www.kollegers.com/",
       lang: "zh",
     });
     expect(result).toEqual({ success: true });
@@ -35,7 +35,7 @@ describe("sendLink.sendToEmail", () => {
     await expect(
       caller.sendLink.sendToEmail({
         email: "not-an-email",
-        url: "https://admissionhub-f6apvxhh.manus.space/",
+        url: "https://www.kollegers.com/",
         lang: "en",
       })
     ).rejects.toThrow();
@@ -59,7 +59,7 @@ describe("sendLink.sendToEmail", () => {
       const caller = appRouter.createCaller(createCtx(ip));
       const result = await caller.sendLink.sendToEmail({
         email: `user${i}@example.com`,
-        url: "https://admissionhub-f6apvxhh.manus.space/",
+        url: "https://www.kollegers.com/",
         lang: "en",
       });
       expect(result).toEqual({ success: true });
@@ -69,7 +69,7 @@ describe("sendLink.sendToEmail", () => {
     await expect(
       caller.sendLink.sendToEmail({
         email: "user4@example.com",
-        url: "https://admissionhub-f6apvxhh.manus.space/",
+        url: "https://www.kollegers.com/",
         lang: "en",
       })
     ).rejects.toThrow("Too many requests");

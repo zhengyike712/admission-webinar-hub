@@ -183,7 +183,7 @@ export const portalSubscriptionsRouter = router({
         .map((s) => `• ${s.schoolName} (${s.round})`)
         .join("\n");
 
-      const content = `你订阅的以下学校申请结果今天应已发布，请前往景深查看各校 Portal：\n\n${schoolList}\n\n前往景深查看：https://admissionhub-f6apvxhh.manus.space/portals\n\n如不想继续接收提醒，可忽略此邮件。`;
+      const content = `你订阅的以下学校申请结果今天应已发布，请前往景深查看各校 Portal：\n\n${schoolList}\n\n前往景深查看：https://www.kollegers.com/portals\n\n如不想继续接收提醒，可忽略此邮件。`;
 
       // Use notifyOwner as the email channel (sends to platform owner)
       // For user-facing emails, we log the intent and mark as notified

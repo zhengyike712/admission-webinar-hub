@@ -2105,7 +2105,7 @@ export default function Home() {
                     "Or use our template: search \"Kollegers\" in Notion template gallery",
                     "The embed widget supports real-time filtering, no manual updates needed",
                   ],
-              code: `<iframe src="https://admissionhub-f6apvxhh.manus.space/embed" width="100%" height="600" frameborder="0"></iframe>`,
+              code: `<iframe src="https://www.kollegers.com/embed" width="100%" height="600" frameborder="0"></iframe>`,
               externalHref: "/notion-template#notion",
             },
           },
@@ -2128,7 +2128,7 @@ export default function Home() {
                     "Or create a URL column in Feishu Base, fill in each session's registration link",
                     "Advanced: use Feishu automation to call the API and refresh data periodically",
                   ],
-              code: `https://admissionhub-f6apvxhh.manus.space/embed`,
+              code: `https://www.kollegers.com/embed`,
               externalHref: "/notion-template#feishu",
             },
           },
@@ -2151,7 +2151,7 @@ export default function Home() {
                     "Or install Dataview plugin, use dataviewjs to call the API and render dynamically",
                     "The embed supports real-time filtering and search",
                   ],
-              code: `<iframe src="https://admissionhub-f6apvxhh.manus.space/embed" width="100%" height="500" style="border:none;"></iframe>`,
+              code: `<iframe src="https://www.kollegers.com/embed" width="100%" height="500" style="border:none;"></iframe>`,
               externalHref: "/notion-template#obsidian",
             },
           },
@@ -2174,7 +2174,7 @@ export default function Home() {
                     "Or use a Web embed block to embed the session page into your application tracker object",
                     "Recommended: create one object per target school with a registration link field",
                   ],
-              code: `https://admissionhub-f6apvxhh.manus.space`,
+              code: `https://www.kollegers.com`,
               externalHref: "/notion-template#anytype",
             },
           },
@@ -2197,7 +2197,7 @@ export default function Home() {
                     "Or add a URL column in a wolai database, fill in each session's registration link",
                     "Advanced: use wolai API + automation to sync latest session data periodically",
                   ],
-              code: `https://admissionhub-f6apvxhh.manus.space/embed`,
+              code: `https://www.kollegers.com/embed`,
               externalHref: "/notion-template#wolai",
             },
           },
@@ -2225,7 +2225,7 @@ export default function Home() {
               code: zh
                 ? `# 方式一：Claude.ai Projects MCP 配置
 # 在 Settings → Tools 中添加：
-MCP Server URL: https://admissionhub-f6apvxhh.manus.space/mcp
+MCP Server URL: https://www.kollegers.com/mcp
 
 # 方式二：Claude Desktop (claude_desktop_config.json)
 {
@@ -2242,7 +2242,7 @@ MCP Server URL: https://admissionhub-f6apvxhh.manus.space/mcp
 import anthropic, requests
 
 # 从 openapi.json 自动加载工具定义
-schema = requests.get("https://admissionhub-f6apvxhh.manus.space/openapi.json").json()
+schema = requests.get("https://www.kollegers.com/openapi.json").json()
 
 client = anthropic.Anthropic()
 message = client.messages.create(
@@ -2264,7 +2264,7 @@ message = client.messages.create(
 )`
                 : `# Option 1: Claude.ai Projects MCP Config
 # In Settings → Tools, add:
-MCP Server URL: https://admissionhub-f6apvxhh.manus.space/mcp
+MCP Server URL: https://www.kollegers.com/mcp
 
 # Option 2: Claude Desktop (claude_desktop_config.json)
 {
@@ -2298,7 +2298,7 @@ message = client.messages.create(
     }],
     messages=[{"role": "user", "content": "Find MIT info sessions"}]
 )`,
-              externalHref: "https://admissionhub-f6apvxhh.manus.space/openapi.json",
+              externalHref: "https://www.kollegers.com/openapi.json",
             },
           },
           {
@@ -2346,7 +2346,7 @@ message = client.messages.create(
                     "GET /api/schools — List schools with basic info",
                     "Free tier: 100 calls/day, no login required. See full docs →",
                   ],
-              code: `fetch('https://admissionhub-f6apvxhh.manus.space/api/sessions?school=MIT')
+              code: `fetch('https://www.kollegers.com/api/sessions?school=MIT')
   .then(r => r.json())
   .then(data => console.log(data))`,
               externalHref: "/api-docs",

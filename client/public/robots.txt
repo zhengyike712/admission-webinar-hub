@@ -29,6 +29,6 @@ User-agent: Bingbot
 Allow: /
 
 # LLMs.txt — machine-readable site description for AI agents
-# https://admissionhub-f6apvxhh.manus.space/llms.txt
+# https://www.kollegers.com/llms.txt
 
-Sitemap: https://admissionhub-f6apvxhh.manus.space/sitemap.xml
+Sitemap: https://www.kollegers.com/sitemap.xml
