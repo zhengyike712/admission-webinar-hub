@@ -10,7 +10,7 @@ declare const __DATA_LAST_UPDATED__: string;
 export const DATA_LAST_UPDATED: string = typeof __DATA_LAST_UPDATED__ !== "undefined" ? __DATA_LAST_UPDATED__ : "2026-02-28";
 
 export type SchoolType = "National University" | "Liberal Arts College" | "Research University" | "Comprehensive University";
-export type Region = "US" | "UK" | "HK" | "AU";
+export type Region = "US" | "UK" | "HK" | "AU" | "CA";
 
 export type SessionType =
   | "General Info Session"
