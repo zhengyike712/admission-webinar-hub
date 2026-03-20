@@ -12,6 +12,7 @@
 
 import { crawlAllSchools, seedStaticSessions } from "./crawler";
 import { verifyAllDeadlines } from "./interviewCrawler";
+import { crawlCanadaSchools } from "./canadaCrawler";
 import { notifyOwner } from "./_core/notification";
 
 let schedulerStarted = false;
