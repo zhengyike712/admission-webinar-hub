@@ -3689,19 +3689,23 @@ message = client.messages.create(
               <div className="text-[11px] uppercase tracking-widest text-stone-400 mb-2">{t.footerRoadmap}</div>
               <div className="space-y-1.5">
                 {([
-                  { label: t.footerUs, status: t.footerUsLive, state: "live" as const },
-                  { label: t.footerUk, status: t.footerUsLive, state: "live" as const },
-                  { label: t.footerHk, status: t.footerUsLive, state: "live" as const },
-                  { label: t.footerCa, status: t.footerSoon, state: "soon" as const },
-                  { label: t.footerGrad, status: t.footerPlanned, state: "planned" as const },
-                ] as { label: string; status: string; state: "live" | "soon" | "planned" }[]).map((item) => (
+                  { label: t.footerUs, status: t.footerUsLive, state: "live" as const, link: "/" },
+                  { label: t.footerUk, status: t.footerUsLive, state: "live" as const, link: "/?region=UK" },
+                  { label: t.footerHk, status: t.footerUsLive, state: "live" as const, link: "/?region=HK" },
+                  { label: t.footerCa, status: t.footerUsLive, state: "live" as const, link: "/canada" },
+                  { label: t.footerGrad, status: t.footerPlanned, state: "planned" as const, link: "" },
+                ] as { label: string; status: string; state: "live" | "soon" | "planned"; link: string }[]).map((item) => (
                   <div key={item.label} className="flex items-center gap-2 text-xs">
                     <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                       item.state === "live" ? "bg-stone-900" :
                       item.state === "soon" ? "bg-stone-300" :
                       "border border-dashed border-stone-300"
                     }`} />
-                    <span className={item.state === "live" ? "text-stone-700" : "text-stone-400"}>{item.label}</span>
+                    {item.link ? (
+                      <a href={item.link} className={item.state === "live" ? "text-stone-700 hover:underline" : "text-stone-400"}>{item.label}</a>
+                    ) : (
+                      <span className={item.state === "live" ? "text-stone-700" : "text-stone-400"}>{item.label}</span>
+                    )}
                     <span className={`text-[10px] px-1.5 py-0.5 ${
                       item.state === "live" ? "bg-stone-900 text-white" :
                       item.state === "soon" ? "bg-stone-100 text-stone-500 border border-stone-200" :

@@ -11,6 +11,7 @@ import NotionEmbed from "./pages/NotionEmbed";
 import NotionTemplate from "./pages/NotionTemplate";
 import ApiDocs from "./pages/ApiDocs";
 import Portals from "./pages/Portals";
+import CanadaU15 from "./pages/CanadaU15";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -23,6 +24,8 @@ function Router() {
       <Route path={"/api-docs"} component={ApiDocs} />
       <Route path={"/portals"} component={Portals} />
       <Route path={"/unsubscribe"} component={Unsubscribe} />
+      <Route path={"/canada"} component={CanadaU15} />
+      <Route path={"/canada/u15"} component={CanadaU15} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
