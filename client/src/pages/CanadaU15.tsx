@@ -1,5 +1,5 @@
 // Canada U15 Page Component
-import { canadaU15Schools, canadaProvinces } from "../data/canada-u15-seed";
+import { canadaU15SchoolsData, canadaProvincesData } from "../data/canada-schools";
 
 export default function CanadaU15Page() {
   return (
@@ -50,8 +50,8 @@ export default function CanadaU15Page() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <h2 className="text-2xl font-bold mb-6">按省份浏览</h2>
         <div className="flex flex-wrap gap-3">
-          {canadaProvinces.map((province) => {
-            const schoolCount = canadaU15Schools.filter(
+          {canadaProvincesData.map((province) => {
+            const schoolCount = canadaU15SchoolsData.filter(
               (s) => s.province === province.code
             ).length;
             return (
@@ -77,7 +77,7 @@ export default function CanadaU15Page() {
           <span>🎓</span> U15 大学联盟成员
         </h2>
         <div className="grid gap-4">
-          {canadaU15Schools
+          {canadaU15SchoolsData
             .sort((a, b) => (a.u15Rank || "99").localeCompare(b.u15Rank || "99"))
             .map((school, index) => (
               <a
