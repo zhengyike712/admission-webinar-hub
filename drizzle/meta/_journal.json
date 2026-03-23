@@ -36,6 +36,13 @@
       "when": 1772539547357,
       "tag": "0004_glorious_absorbing_man",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1773317114313,
+      "tag": "0005_known_rumiko_fujikawa",
+      "breakpoints": true
     }
   ]
 }
