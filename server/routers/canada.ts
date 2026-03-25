@@ -1,6 +1,6 @@
 // Canada Schools Router - Public API
-import { router, publicProcedure } from "../trpc";
-import { canadaU15Schools } from "../../data/canada-u15-seed";
+import { router, publicProcedure } from "../_core/trpc";
+import { canadaU15Schools } from "../data/canada-u15-seed";
 
 export const canadaRouter = router({
   // 获取所有加拿大 U15 学校
