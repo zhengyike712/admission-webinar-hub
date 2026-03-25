@@ -378,3 +378,11 @@
 - [ ] 前端 AnnouncementBanner 组件（顶部固定条，支持关闭）
 - [ ] 集成到 Home.tsx 顶部
 - [ ] 管理员后台页面 /admin/announcements
+
+## Chrome Extension 下载入口
+- [x] 修复 Extension 图标尺寸（16/48/128px）
+- [x] 创建 /extension 页面（安装说明 + 下载入口）
+- [x] 主导航添加 Extension 入口链接
+- [x] 集成中心浮层 Extension 标签页更新为真实下载链接
+- [x] GitHub Release v1.0.0 发布（含 ZIP 下载）
+- [x] 修复 server/routers/canada.ts import 路径错误（服务器启动失败）

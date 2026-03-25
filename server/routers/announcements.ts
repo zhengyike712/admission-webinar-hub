@@ -7,7 +7,7 @@
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq, gt, isNull, or } from "drizzle-orm";
 import { z } from "zod";
-import { db } from "../db";
+import { getDb } from "../db";
 import { announcements } from "../../drizzle/schema";
 import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 
@@ -31,8 +31,10 @@ const announcementInput = z.object({
 });
 
 export const announcementsRouter = router({
-  /** Public: returns the single highest-priority active announcement */
+  /** Public: returns the highest-priority active announcements (up to 5) */
   getActive: publicProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
     const now = new Date();
     const rows = await db
       .select()
@@ -50,6 +52,8 @@ export const announcementsRouter = router({
 
   /** Admin: list all announcements */
   list: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
     return db
       .select()
       .from(announcements)
@@ -58,6 +62,8 @@ export const announcementsRouter = router({
 
   /** Admin: create a new announcement */
   create: adminProcedure.input(announcementInput).mutation(async ({ input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "DB unavailable" });
     const [result] = await db.insert(announcements).values({
       title: input.title,
       content: input.content,
@@ -75,6 +81,8 @@ export const announcementsRouter = router({
   update: adminProcedure
     .input(z.object({ id: z.number().int(), data: announcementInput.partial() }))
     .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "DB unavailable" });
       await db
         .update(announcements)
         .set({
@@ -91,6 +99,8 @@ export const announcementsRouter = router({
   toggleActive: adminProcedure
     .input(z.object({ id: z.number().int(), isActive: z.boolean() }))
     .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "DB unavailable" });
       await db
         .update(announcements)
         .set({ isActive: input.isActive })
@@ -102,6 +112,8 @@ export const announcementsRouter = router({
   delete: adminProcedure
     .input(z.object({ id: z.number().int() }))
     .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "DB unavailable" });
       await db.delete(announcements).where(eq(announcements.id, input.id));
       return { success: true };
     }),
