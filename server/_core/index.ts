@@ -47,6 +47,33 @@ async function startServer() {
     next();
   });
 
+  // ── robots.txt ──
+  app.get("/robots.txt", (_req, res) => {
+    res.type("text/plain").send(
+      "User-agent: *\nAllow: /\nDisallow: /api/trpc/\nSitemap: https://www.kollegers.com/sitemap.xml\n"
+    );
+  });
+
+  // ── sitemap.xml ──
+  app.get("/sitemap.xml", (_req, res) => {
+    const urls = [
+      { loc: "https://www.kollegers.com/", priority: "1.0", changefreq: "daily" },
+      { loc: "https://www.kollegers.com/portals", priority: "0.8", changefreq: "weekly" },
+      { loc: "https://www.kollegers.com/canada", priority: "0.8", changefreq: "weekly" },
+    ];
+    const lastmod = new Date().toISOString().slice(0, 10);
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map(u => `  <url>
+    <loc>${u.loc}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`).join("\n")}
+</urlset>`;
+    res.type("application/xml").send(xml);
+  });
+
   // ── Public JSON API (no auth required) ──
   // GET /api/public/sessions?school=MIT&upcoming=true&limit=10
   app.get("/api/public/sessions", async (req, res) => {

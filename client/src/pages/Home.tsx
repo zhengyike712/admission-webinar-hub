@@ -2515,7 +2515,7 @@ message = client.messages.create(
           <div className="flex items-center gap-2">
             {/* Language switcher */}
             <div className="flex items-center border border-stone-200 bg-white overflow-hidden">
-              {(["zh", "en", "hi"] as Lang[]).map((l, i) => (
+              {(["zh", "en"] as Lang[]).map((l, i) => (
                 <button
                   key={l}
                   onClick={() => { setLang(l); saveLang(l); }}
@@ -2622,76 +2622,6 @@ message = client.messages.create(
         </div>
       </header>
 
-      {/* ── Hero ── */}
-      <div className="border-b border-stone-100 bg-stone-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex items-center gap-6">
-          {/* Left: headline */}
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 mb-2 leading-tight">
-              {t.heroTitle}
-            </h1>
-            <p className="text-xs text-stone-400 tracking-wide italic">
-              {t.mission}
-            </p>
-          </div>
-          {/* Right: Integration Hub card */}
-          <button
-            onClick={() => setShowIntegrationHub(true)}
-            className="group hidden sm:flex shrink-0 flex-col gap-2 border border-stone-200 bg-white hover:border-stone-400 hover:shadow-sm transition-all px-4 py-3 w-56 text-left"
-          >
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-semibold text-stone-700 uppercase tracking-wide">
-                {lang === "zh" ? "集成中心" : lang === "hi" ? "इंटीग्रेशन हब" : "Integration Hub"}
-              </span>
-              <span className="ml-auto text-[9px] font-bold bg-stone-900 text-white px-1 py-0.5 leading-none">{t.footerNotionNew}</span>
-            </div>
-            {/* Platform favicons row */}
-            <div className="flex items-center gap-2">
-              {/* Notion */}
-              <div title="Notion" className="w-5 h-5 rounded bg-stone-900 flex items-center justify-center shrink-0">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
-                  <rect x="3" y="3" width="18" height="18" rx="2" stroke="white" strokeWidth="2" />
-                  <path d="M8 8h8M8 12h5M8 16h6" stroke="white" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </div>
-              {/* Feishu */}
-              <div title="飞书" className="w-5 h-5 rounded bg-sky-500 flex items-center justify-center shrink-0">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 4L4 8l8 4 8-4-8-4z" fill="white" />
-                  <path d="M4 12l8 4 8-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-                  <path d="M4 16l8 4 8-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
-                </svg>
-              </div>
-              {/* Obsidian */}
-              <div title="Obsidian" className="w-5 h-5 rounded bg-purple-700 flex items-center justify-center shrink-0">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
-                  <polygon points="12,2 20,7 20,17 12,22 4,17 4,7" stroke="white" strokeWidth="2" fill="none" />
-                  <circle cx="12" cy="12" r="3" fill="white" />
-                </svg>
-              </div>
-              {/* Anytype */}
-              <div title="Anytype" className="w-5 h-5 rounded bg-teal-600 flex items-center justify-center shrink-0">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
-                  <rect x="4" y="4" width="7" height="7" rx="1" fill="white" />
-                  <rect x="13" y="4" width="7" height="7" rx="1" fill="white" opacity="0.6" />
-                  <rect x="4" y="13" width="7" height="7" rx="1" fill="white" opacity="0.6" />
-                  <rect x="13" y="13" width="7" height="7" rx="1" fill="white" opacity="0.3" />
-                </svg>
-              </div>
-              {/* wolai */}
-              <div title="wolai" className="w-5 h-5 rounded bg-violet-600 flex items-center justify-center shrink-0">
-                <span className="text-white font-bold" style={{fontSize: "8px", lineHeight: 1}}>W</span>
-              </div>
-              <span className="text-[10px] text-stone-400 ml-auto group-hover:text-stone-600 transition-colors">
-                {lang === "zh" ? "查看全部 →" : lang === "hi" ? "सभी देखें →" : "View all →"}
-              </span>
-            </div>
-            <p className="text-[11px] text-stone-500 leading-snug">
-              {lang === "zh" ? "将实时活动数据嵌入你的申请追踪工具" : lang === "hi" ? "रियल-टाइम डेटा अपने टूल में एम्बेड करें" : "Embed live session data into your tracker"}
-            </p>
-          </button>
-        </div>
-      </div>
       {/* ── This Week Banner (desktop only) ── */}
       {(() => {
         const today = new Date();

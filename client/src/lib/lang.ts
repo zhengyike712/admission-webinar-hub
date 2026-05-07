@@ -28,20 +28,22 @@ export function detectBrowserLang(): Lang {
   for (const l of langs) {
     const lower = l.toLowerCase();
     if (lower.startsWith("zh")) return "zh";
-    if (lower.startsWith("hi")) return "hi";
   }
   return "en";
 }
 
 /**
  * Get the initial language:
- *  1. Saved preference in localStorage
+ *  1. Saved preference in localStorage (hi treated as en — Hindi is muted)
  *  2. Browser language detection
+ *  3. Fallback: "en"
  */
 export function getInitialLang(): Lang {
   if (typeof localStorage !== "undefined") {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved === "zh" || saved === "en" || saved === "hi") return saved;
+    if (saved === "zh") return "zh";
+    if (saved === "en") return "en";
+    // "hi" was previously saveable — treat as en
   }
   return detectBrowserLang();
 }
