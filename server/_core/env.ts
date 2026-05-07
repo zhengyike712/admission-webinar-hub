@@ -6,5 +6,6 @@ export const ENV = {
   ownerOpenId: process.env.OWNER_OPEN_ID ?? "",
   isProduction: process.env.NODE_ENV === "production",
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
-  forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
+  // BUILT_IN_FORGE_API_KEY is auto-injected on Railway/Manus. For local dev, fall back to GOOGLE_API_KEY.
+  forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? process.env.GOOGLE_API_KEY ?? "",
 };

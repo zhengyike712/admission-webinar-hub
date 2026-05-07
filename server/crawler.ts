@@ -14,13 +14,44 @@
 import { eq, desc } from "drizzle-orm";
 import { getDb } from "./db";
 import { crawlLogs, sessions, subscribers } from "../drizzle/schema";
-import { invokeLLM } from "./_core/llm";
 import { notifyOwner } from "./_core/notification";
 import { allSchools, allSessions } from "../client/src/data/schools";
 
 const CONSECUTIVE_FAIL_ALERT_THRESHOLD = 3;
 const CRAWL_CONCURRENCY = 5;
 const JINA_READER_BASE = "https://r.jina.ai/";
+
+// ── Crawler LLM (Google Gemini, no Manus dependency) ──────────
+// Priority: BUILT_IN_FORGE_API_KEY (Manus/Railway) → GOOGLE_API_KEY (local dev / self-hosted)
+
+async function callLLM(systemPrompt: string, userContent: string, jsonSchema: object): Promise<string> {
+  const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+  const googleKey = process.env.GOOGLE_API_KEY;
+  const apiKey = forgeKey || googleKey;
+  if (!apiKey) throw new Error("No LLM API key found. Set BUILT_IN_FORGE_API_KEY or GOOGLE_API_KEY.");
+
+  const apiUrl = forgeKey
+    ? "https://forge.manus.im/v1/chat/completions"
+    : "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+
+  const res = await fetch(apiUrl, {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model: "gemini-2.5-flash",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userContent },
+      ],
+      response_format: { type: "json_schema", json_schema: { name: "sessions_extraction", strict: true, schema: jsonSchema } },
+      max_tokens: 4096,
+    }),
+  });
+
+  if (!res.ok) throw new Error(`LLM API error: ${res.status} ${await res.text()}`);
+  const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+  return data.choices?.[0]?.message?.content ?? "";
+}
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -173,6 +204,33 @@ If no upcoming events are found, return {"sessions": []}.
 Only return valid JSON, no markdown fences.`;
 }
 
+const SESSION_JSON_SCHEMA = {
+  type: "object",
+  properties: {
+    sessions: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          title: { type: "string" },
+          type: { type: "string" },
+          description: { type: "string" },
+          descriptionEn: { type: "string" },
+          dates: { oneOf: [{ type: "array", items: { type: "string" } }, { type: "null" }] },
+          time: { oneOf: [{ type: "string" }, { type: "null" }] },
+          duration: { oneOf: [{ type: "string" }, { type: "null" }] },
+          registrationUrl: { type: "string" },
+          isRolling: { type: "boolean" },
+        },
+        required: ["title", "type", "description", "descriptionEn", "dates", "time", "duration", "registrationUrl", "isRolling"],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ["sessions"],
+  additionalProperties: false,
+};
+
 async function extractSessionsWithAI(
   pageText: string,
   schoolId: number,
@@ -180,64 +238,13 @@ async function extractSessionsWithAI(
   pageUrl: string
 ): Promise<Array<ExtractedSession & { id: string }>> {
   const truncated = smartTruncate(pageText);
+  const userContent = `University: ${schoolName}\nPage URL: ${pageUrl}\n\nPage content:\n${truncated}`;
 
-  const response = await invokeLLM({
-    messages: [
-      { role: "system", content: buildExtractPrompt() },
-      {
-        role: "user",
-        content: `University: ${schoolName}\nPage URL: ${pageUrl}\n\nPage content:\n${truncated}`,
-      },
-    ],
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "sessions_extraction",
-        strict: true,
-        schema: {
-          type: "object",
-          properties: {
-            sessions: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  title: { type: "string" },
-                  type: { type: "string" },
-                  description: { type: "string" },
-                  descriptionEn: { type: "string" },
-                  dates: {
-                    oneOf: [
-                      { type: "array", items: { type: "string" } },
-                      { type: "null" },
-                    ],
-                  },
-                  time: { oneOf: [{ type: "string" }, { type: "null" }] },
-                  duration: { oneOf: [{ type: "string" }, { type: "null" }] },
-                  registrationUrl: { type: "string" },
-                  isRolling: { type: "boolean" },
-                },
-                required: [
-                  "title", "type", "description", "descriptionEn",
-                  "dates", "time", "duration", "registrationUrl", "isRolling",
-                ],
-                additionalProperties: false,
-              },
-            },
-          },
-          required: ["sessions"],
-          additionalProperties: false,
-        },
-      },
-    },
-  });
-
-  const rawContent = response.choices?.[0]?.message?.content;
-  const content = typeof rawContent === "string" ? rawContent : null;
-  if (!content) return [];
+  const rawContent = await callLLM(buildExtractPrompt(), userContent, SESSION_JSON_SCHEMA);
+  if (!rawContent) return [];
 
   try {
-    const parsed = JSON.parse(content);
+    const parsed = JSON.parse(rawContent);
     return (parsed.sessions || []).map((s: ExtractedSession) => ({
       ...s,
       id: makeSessionId(schoolId, s.title),
@@ -246,6 +253,7 @@ async function extractSessionsWithAI(
     return [];
   }
 }
+
 
 // ── Upsert sessions to DB ─────────────────────────────────────
 
