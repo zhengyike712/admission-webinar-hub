@@ -10,7 +10,7 @@ declare const __DATA_LAST_UPDATED__: string;
 export const DATA_LAST_UPDATED: string = typeof __DATA_LAST_UPDATED__ !== "undefined" ? __DATA_LAST_UPDATED__ : "2026-02-28";
 
 export type SchoolType = "National University" | "Liberal Arts College" | "Research University" | "Comprehensive University";
-export type Region = "US" | "UK" | "HK" | "AU" | "CA";
+export type Region = "US" | "UK" | "HK" | "AU" | "CA" | "SG";
 
 export type SessionType =
   | "General Info Session"
@@ -82,7 +82,7 @@ export const schools: School[] = [
   {
     id: 4, name: "Stanford University", type: "National University", region: "US", rank: 4, qsRank: 3,
     location: "Stanford, CA", state: "CA", color: "#8C1515",
-    registrationPage: "https://admission.stanford.edu/events/",
+    registrationPage: "https://apply.stanford.edu/portal/virtual-visits",
     admissionPage: "https://admission.stanford.edu",
     tags: ["Silicon Valley", "No Loan Policy"],
   },
@@ -163,7 +163,7 @@ export const schools: School[] = [
     id: 15, name: "Washington University in St. Louis", shortName: "WashU",
     type: "National University", region: "US", rank: 15, qsRank: 237,
     location: "St. Louis, MO", state: "MO", color: "#A51417",
-    registrationPage: "https://pathway.wustl.edu/portal/virtual_visit",
+    registrationPage: "https://admissions.washu.edu/visit-us/",
     admissionPage: "https://admissions.wustl.edu",
     tags: ["Pre-Med", "Business"],
   },
@@ -213,7 +213,7 @@ export const schools: School[] = [
     id: 22, name: "University of Michigan", shortName: "UMich",
     type: "National University", region: "US", rank: 22, qsRank: 45,
     location: "Ann Arbor, MI", state: "MI", color: "#00274C",
-    registrationPage: "https://admissions.umich.edu/visit/virtual-visits",
+    registrationPage: "https://admissions.umich.edu/explore-visit/virtual-resources",
     admissionPage: "https://admissions.umich.edu",
     tags: ["Public", "Business", "Engineering"],
   },
@@ -229,7 +229,7 @@ export const schools: School[] = [
     id: 24, name: "University of Virginia", shortName: "UVA",
     type: "National University", region: "US", rank: 24, qsRank: 375,
     location: "Charlottesville, VA", state: "VA", color: "#232D4B",
-    registrationPage: "https://admission.virginia.edu/visit/virtual",
+    registrationPage: "https://apply.undergradadmission.virginia.edu/portal/virtual_info_session",
     admissionPage: "https://admission.virginia.edu",
     tags: ["Public", "Honors"],
   },
@@ -614,7 +614,7 @@ export const schools: School[] = [
   {
     id: 76, name: "Kenyon College", type: "Liberal Arts College", region: "US", rank: 26,
     location: "Gambier, OH", state: "OH", color: "#4A2C6E",
-    registrationPage: "https://admissions.kenyon.edu/portal/virtual-infosession",
+    registrationPage: "https://www.kenyon.edu/admissions-aid/visit-kenyon/",
     admissionPage: "https://www.kenyon.edu/admissions-aid/",
     tags: ["Writing", "Literature"],
   },
@@ -947,7 +947,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://admission.stanford.edu/events/",
+    registrationUrl: "https://apply.stanford.edu/portal/virtual-visits",
     isRolling: true,
   },
 
@@ -1085,7 +1085,7 @@ export const sessions: Session[] = [
     dates: null,
     time: "多时段可选",
     duration: "60 min",
-    registrationUrl: "https://pathway.wustl.edu/portal/virtual_visit",
+    registrationUrl: "https://admissions.washu.edu/visit-us/",
     isRolling: true,
   },
 
@@ -1416,6 +1416,24 @@ export const intlSchools: School[] = [
   { id: 306, name: "Monash University", shortName: "Monash", type: "Research University", region: "AU", rank: 6, qsRank: 37, location: "Melbourne, VIC", state: "VIC", color: "#006DAE", registrationPage: "https://www.monash.edu/discover/events", admissionPage: "https://www.monash.edu/study/how-to-apply", tags: ["Group of Eight"] },
   { id: 307, name: "University of Western Australia", shortName: "UWA", type: "Research University", region: "AU", rank: 7, qsRank: 72, location: "Perth, WA", state: "WA", color: "#003087", registrationPage: "https://www.uwa.edu.au/study/EVENTS", admissionPage: "https://www.uwa.edu.au/study/how-to-apply/undergraduate", tags: ["Group of Eight"] },
   { id: 308, name: "University of Adelaide", shortName: "Adelaide", type: "Research University", region: "AU", rank: 8, qsRank: 82, location: "Adelaide, SA", state: "SA", color: "#005A9C", registrationPage: "https://www.adelaide.edu.au/study/events", admissionPage: "https://www.adelaide.edu.au/study/undergraduate", tags: ["Group of Eight"] },
+  // ── UK: Remaining Russell Group ──
+  { id: 111, name: "University of Glasgow", shortName: "Glasgow", type: "Research University", region: "UK", rank: 11, qsRank: 78, location: "Glasgow, Scotland", state: "Scotland", color: "#003865", registrationPage: "https://www.gla.ac.uk/study/visitandopendays/", admissionPage: "https://www.gla.ac.uk/study/undergraduate/", tags: ["Russell Group"] },
+  { id: 112, name: "University of Leeds", shortName: "Leeds", type: "Research University", region: "UK", rank: 12, qsRank: 86, location: "Leeds, England", state: "England", color: "#003DA5", registrationPage: "https://www.leeds.ac.uk/undergraduate-open-days", admissionPage: "https://www.leeds.ac.uk/applying", tags: ["Russell Group"] },
+  { id: 113, name: "Durham University", shortName: "Durham", type: "Research University", region: "UK", rank: 13, qsRank: 96, location: "Durham, England", state: "England", color: "#7B2C2E", registrationPage: "https://www.durham.ac.uk/study/undergraduate/open-days/", admissionPage: "https://www.durham.ac.uk/study/undergraduate/apply/", tags: ["Russell Group"] },
+  { id: 114, name: "University of Sheffield", shortName: "Sheffield", type: "Research University", region: "UK", rank: 14, qsRank: 105, location: "Sheffield, England", state: "England", color: "#C0002A", registrationPage: "https://www.sheffield.ac.uk/undergraduate/openday", admissionPage: "https://www.sheffield.ac.uk/study/apply/undergraduate", tags: ["Russell Group"] },
+  { id: 115, name: "University of Southampton", shortName: "Southampton", type: "Research University", region: "UK", rank: 15, qsRank: 104, location: "Southampton, England", state: "England", color: "#005C8A", registrationPage: "https://www.southampton.ac.uk/study/open-days-visits/undergraduate", admissionPage: "https://www.southampton.ac.uk/study/undergraduate-study/applying-to-southampton", tags: ["Russell Group", "STEM Focus"] },
+  { id: 116, name: "University of Nottingham", shortName: "Nottingham", type: "Research University", region: "UK", rank: 16, qsRank: 113, location: "Nottingham, England", state: "England", color: "#004B87", registrationPage: "https://www.nottingham.ac.uk/openday/undergraduate-open-days.aspx", admissionPage: "https://www.nottingham.ac.uk/ugstudy/apply.aspx", tags: ["Russell Group"] },
+  { id: 117, name: "Queen Mary University of London", shortName: "QMUL", type: "Research University", region: "UK", rank: 17, qsRank: 114, location: "London, England", state: "England", color: "#002147", registrationPage: "https://www.qmul.ac.uk/undergraduate/openday/", admissionPage: "https://www.qmul.ac.uk/undergraduate/apply/", tags: ["Russell Group"] },
+  { id: 118, name: "University of Birmingham", shortName: "Birmingham", type: "Research University", region: "UK", rank: 18, qsRank: 115, location: "Birmingham, England", state: "England", color: "#C4122F", registrationPage: "https://www.birmingham.ac.uk/study/undergraduate/visit-us", admissionPage: "https://www.birmingham.ac.uk/study/undergraduate/apply", tags: ["Russell Group"] },
+  { id: 119, name: "University of Exeter", shortName: "Exeter", type: "Research University", region: "UK", rank: 19, qsRank: 148, location: "Exeter, England", state: "England", color: "#003B49", registrationPage: "https://www.exeter.ac.uk/undergraduate/visit/", admissionPage: "https://www.exeter.ac.uk/undergraduate/apply/", tags: ["Russell Group"] },
+  { id: 120, name: "University of Liverpool", shortName: "Liverpool", type: "Research University", region: "UK", rank: 20, qsRank: 171, location: "Liverpool, England", state: "England", color: "#003DA5", registrationPage: "https://www.liverpool.ac.uk/undergraduate/visiting-liverpool/open-days/", admissionPage: "https://www.liverpool.ac.uk/study/undergraduate/applying/", tags: ["Russell Group"] },
+  { id: 121, name: "Newcastle University", shortName: "Newcastle", type: "Research University", region: "UK", rank: 21, qsRank: 131, location: "Newcastle upon Tyne, England", state: "England", color: "#000000", registrationPage: "https://www.ncl.ac.uk/study/opendays/undergraduate/", admissionPage: "https://www.ncl.ac.uk/study/undergraduate/applying/", tags: ["Russell Group"] },
+  { id: 122, name: "University of York", shortName: "York", type: "Research University", region: "UK", rank: 22, qsRank: 198, location: "York, England", state: "England", color: "#003566", registrationPage: "https://www.york.ac.uk/study/undergraduate/open-days/", admissionPage: "https://www.york.ac.uk/study/undergraduate/applying/", tags: ["Russell Group"] },
+  { id: 123, name: "Cardiff University", shortName: "Cardiff", type: "Research University", region: "UK", rank: 23, qsRank: 201, location: "Cardiff, Wales", state: "Wales", color: "#B5121B", registrationPage: "https://www.cardiff.ac.uk/study/undergraduate/visit-us/open-days", admissionPage: "https://www.cardiff.ac.uk/study/undergraduate/applying", tags: ["Russell Group"] },
+  { id: 124, name: "Queen's University Belfast", shortName: "Queen's Belfast", type: "Research University", region: "UK", rank: 24, qsRank: 291, location: "Belfast, Northern Ireland", state: "Northern Ireland", color: "#005EB8", registrationPage: "https://www.qub.ac.uk/study-here/open-days/", admissionPage: "https://www.qub.ac.uk/study-here/schools-of-study/", tags: ["Russell Group"] },
+  // ── Singapore: QS Top Universities ──
+  { id: 401, name: "National University of Singapore", shortName: "NUS", type: "Research University", region: "SG", rank: 1, qsRank: 8, location: "Singapore", state: "Singapore", color: "#003D7C", registrationPage: "https://www.nus.edu.sg/oam/engage-with-us/events", admissionPage: "https://www.nus.edu.sg/oam/apply-to-nus", tags: ["QS Top 10"] },
+  { id: 402, name: "Nanyang Technological University", shortName: "NTU", type: "Research University", region: "SG", rank: 2, qsRank: 26, location: "Singapore", state: "Singapore", color: "#005A9C", registrationPage: "https://www.ntu.edu.sg/admissions/undergraduate/events", admissionPage: "https://www.ntu.edu.sg/admissions/undergraduate", tags: ["QS Top 50"] },
 ];
 
 // Merge all schools

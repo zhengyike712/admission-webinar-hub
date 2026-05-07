@@ -19,7 +19,8 @@ export const sessionsRouter = router({
   list: publicProcedure
     .input(
       z.object({
-        region: z.enum(["All", "US", "UK", "HK", "AU"]).optional().default("All"),
+        // schoolId ranges: US 1–99, UK 100–199, HK 200–299, AU 300–399, SG 400–499
+        region: z.enum(["All", "US", "UK", "HK", "AU", "SG"]).optional().default("All"),
       })
     )
     .query(async ({ input }) => {
@@ -28,8 +29,6 @@ export const sessionsRouter = router({
 
       const rows = await db.select().from(sessions);
 
-      // Filter by region using schoolId ranges:
-      // US: 1–99, UK: 100–199, HK: 200–299, AU: 300–399
       const filtered =
         input.region === "All"
           ? rows
@@ -38,6 +37,7 @@ export const sessionsRouter = router({
               if (input.region === "UK") return s.schoolId >= 100 && s.schoolId <= 199;
               if (input.region === "HK") return s.schoolId >= 200 && s.schoolId <= 299;
               if (input.region === "AU") return s.schoolId >= 300 && s.schoolId <= 399;
+              if (input.region === "SG") return s.schoolId >= 400 && s.schoolId <= 499;
               return true;
             });
 

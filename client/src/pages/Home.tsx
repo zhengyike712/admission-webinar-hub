@@ -51,9 +51,9 @@ const T: Record<Lang, Record<string, string>> = {
     tagline: "全球高校招生公开信息平台",
     heroTitle: "好信息，早知道",
     heroDesc: "汇聚各校招生官（AO）主持的线上宣讲活动，一键直达官方报名入口",
-    mission: "",
+    mission: "官方信息，直达你手",
     tabSessions: "活动日程",
-    tabSchools: "学校目录",
+    tabSchools: "学校导航",
     tabInterviews: "面试入口",
     search: "搜索",
     searchPlaceholder: "学校或活动名称",
@@ -70,7 +70,7 @@ const T: Record<Lang, Record<string, string>> = {
     rolling: "全年开放报名",
     rollingNote: "滚动开放活动全年可选日期，点击报名后可在官网自行选择时间段。",
     register: "入口",
-    viewSchedule: "查看日程",
+    viewSchedule: "官网活动页",
     noFixed: "暂无固定日期活动",
     noMatch: "没有匹配的活动",
     clearFilter: "清除筛选",
@@ -104,6 +104,7 @@ const T: Record<Lang, Record<string, string>> = {
     regionHK: "香港",
     regionAU: "澳大利亚",
     regionCA: "加拿大",
+    regionSG: "新加坡",
     interviewAvailable: "提供面试",
     interviewNotAvailable: "不提供面试",
     interviewTypeLabel: "面试形式",
@@ -216,7 +217,7 @@ const T: Record<Lang, Record<string, string>> = {
     heroDesc: "Official virtual events hosted by admissions officers — direct links to registration.",
     mission: "Better info. Earlier.",
     tabSessions: "Events",
-    tabSchools: "Schools",
+    tabSchools: "Directory",
     tabInterviews: "Interviews",
     search: "Search",
     searchPlaceholder: "School or event name",
@@ -233,7 +234,7 @@ const T: Record<Lang, Record<string, string>> = {
     rolling: "Open Year-Round",
     rollingNote: "Rolling events allow you to pick a date on the school's website.",
     register: "Register",
-    viewSchedule: "View Schedule",
+    viewSchedule: "Events Page",
     noFixed: "No upcoming scheduled events",
     noMatch: "No matching events",
     clearFilter: "Clear filters",
@@ -266,6 +267,7 @@ const T: Record<Lang, Record<string, string>> = {
     regionHK: "Hong Kong",
     regionAU: "Australia",
     regionCA: "Canada",
+    regionSG: "Singapore",
     interviewAvailable: "Interview Available",
     interviewNotAvailable: "No Interview",
     interviewTypeLabel: "Interview Type",
@@ -378,7 +380,7 @@ const T: Record<Lang, Record<string, string>> = {
     heroDesc: "प्रवेश अधिकारियों द्वारा आयोजित ऑनलाइन कार्यक्रम — सीधे रजिस्ट्रेशन लिंक",
     mission: "अच्छी जानकारी। पहले।",
     tabSessions: "कार्यक्रम",
-    tabSchools: "विश्वविद्यालय",
+    tabSchools: "डायरेक्टरी",
     tabInterviews: "इंटरव्यू",
     search: "खोजें",
     searchPlaceholder: "विश्वविद्यालय या कार्यक्रम नाम",
@@ -395,7 +397,7 @@ const T: Record<Lang, Record<string, string>> = {
     rolling: "साल भर खुला",
     rollingNote: "रोलिंग इवेंट में आप विश्वविद्यालय की वेबसाइट पर तारीख चुन सकते हैं।",
     register: "रजिस्टर",
-    viewSchedule: "शेड्यूल देखें",
+    viewSchedule: "इवेंट पेज",
     noFixed: "कोई निर्धारित कार्यक्रम नहीं",
     noMatch: "कोई मिलान नहीं",
     clearFilter: "फ़िल्टर हटाएं",
@@ -428,6 +430,7 @@ const T: Record<Lang, Record<string, string>> = {
     regionHK: "हांगकांग",
     regionAU: "ऑस्ट्रेलिया",
     regionCA: "कनाडा",
+    regionSG: "सिंगापुर",
     interviewAvailable: "इंटरव्यू उपलब्ध",
     interviewNotAvailable: "इंटरव्यू नहीं",
     interviewTypeLabel: "इंटरव्यू प्रकार",
@@ -924,8 +927,8 @@ function ScheduledSessionCard({ session, t, isSelected, onToggle, lang, onView }
         <div className="px-4 pb-3 pt-1 border-t border-stone-50 bg-stone-50/60">
           {/* Time */}
           {session.time && (
-            <div className="flex items-center gap-1.5 text-[11px] text-stone-400 mb-2">
-              <Clock size={9} />
+            <div className="flex items-center gap-1.5 text-xs text-stone-400 mb-2">
+              <Clock size={10} />
               <span>{session.time}</span>
               {localTime && (
                 <span className="text-blue-500 font-medium">· {LOCAL_TZ_LABEL} {localTime}</span>
@@ -940,7 +943,7 @@ function ScheduledSessionCard({ session, t, isSelected, onToggle, lang, onView }
 
           {/* Description */}
           {session.description && (
-            <p className="mt-2 text-[11px] text-stone-500 leading-relaxed">{session.description}</p>
+            <p className="mt-2 text-xs text-stone-500 leading-relaxed">{session.description}</p>
           )}
         </div>
       )}
@@ -957,13 +960,13 @@ function RollingRow({ session, t }: { session: (typeof allSessions)[0]; t: typeo
         style={{ backgroundColor: school?.color || "#2563eb" }}
       />
       <div className="flex-1 min-w-0">
-        <div className="text-[11px] font-medium text-stone-700 truncate">
+        <div className="text-xs font-medium text-stone-700 truncate">
           {school?.shortName || school?.name}
           {school?.region && school.region !== "US" && (
-            <span className="ml-1 text-[9px] text-stone-400">{school.region}</span>
+            <span className="ml-1 text-[10px] text-stone-400">{school.region}</span>
           )}
         </div>
-        <div className="text-[10px] text-stone-400 truncate">{session.title}</div>
+        <div className="text-[11px] text-stone-400 truncate">{session.title}</div>
       </div>
       <a
         href={session.registrationUrl}
@@ -1020,7 +1023,7 @@ function SchoolCard({ school, t, rankMode = 'usnews', isSelected, onToggle }: { 
             <span className="shrink-0 text-[10px] text-stone-400 font-mono">#{school.rank}</span>
           )}
           {school.tags.slice(0, 2).map((tag) => (
-            <span key={tag} className="hidden sm:inline text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-400 rounded shrink-0">
+            <span key={tag} className="hidden sm:inline text-[11px] px-1.5 py-0.5 bg-stone-100 text-stone-400 rounded shrink-0">
               {tag}
             </span>
           ))}
@@ -1047,9 +1050,9 @@ function SchoolCard({ school, t, rankMode = 'usnews', isSelected, onToggle }: { 
       {expanded && (
         <div className="px-4 pb-3 pt-1 border-t border-stone-50 bg-stone-50/60">
           {school.shortName && (
-            <p className="text-[11px] text-stone-400 mb-1">{school.name}</p>
+            <p className="text-xs text-stone-400 mb-1">{school.name}</p>
           )}
-          <p className="text-[11px] text-stone-400 mb-2">{school.location}</p>
+          <p className="text-xs text-stone-400 mb-2">{school.location}</p>
           <div className="flex flex-wrap gap-1 mb-2">
             {school.tags.map((tag) => (
               <span key={tag} className="text-[10px] px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded">
@@ -1075,7 +1078,7 @@ function SchoolCard({ school, t, rankMode = 'usnews', isSelected, onToggle }: { 
               </span>
             )}
           </div>
-          <div className="text-[11px] text-stone-400 mb-2">
+          <div className="text-xs text-stone-400 mb-2">
             {schoolSessions.length} {t.tabSessions === "Events" ? "events" : "场活动可报名"}
           </div>
           <a
@@ -1122,7 +1125,7 @@ function InterviewPrepTools({ school, lang, t }: { school: SchoolInterview; lang
     <div className="mt-3 border-t border-stone-100 pt-2">
       <button
         onClick={() => setOpen(v => !v)}
-        className="flex items-center gap-1.5 text-[10px] text-stone-400 hover:text-blue-600 transition-colors w-full text-left"
+        className="flex items-center gap-1.5 text-[11px] text-stone-400 hover:text-blue-600 transition-colors w-full text-left"
       >
         <span className="text-[9px]">✦</span>
         <span>{lang === "en" ? "Interview Prep Tools" : "备考工具"}</span>
@@ -1149,7 +1152,7 @@ function InterviewPrepTools({ school, lang, t }: { school: SchoolInterview; lang
                   <span className="text-[11px] font-medium text-stone-800">{tool.name}</span>
                   <ExternalLink size={8} className="text-stone-300 group-hover:text-stone-500 shrink-0" />
                 </div>
-                <p className="text-[10px] text-stone-400 leading-snug">
+                <p className="text-[11px] text-stone-400 leading-snug">
                   {lang === "en" ? tool.desc_en : tool.desc_zh}
                 </p>
               </div>
@@ -1518,8 +1521,7 @@ function OnboardingModal({ t, lang }: { t: typeof T["zh"]; lang: Lang }) {
   const features = [
     { icon: "🌍", title: t.onboardingF1Title, desc: t.onboardingF1Desc },
     { icon: "📅", title: t.onboardingF3Title, desc: t.onboardingF3Desc },
-    // F4 Interview Portal silenced — re-enable when feature is ready
-    // { icon: "🤝", title: t.onboardingF4Title, desc: t.onboardingF4Desc },
+    { icon: "🤝", title: t.onboardingF4Title, desc: t.onboardingF4Desc },
   ];
 
   return (
@@ -1753,7 +1755,7 @@ function ShareButton({ lang }: { lang: Lang }) {
 
 // ── Main Page ─────────────────────────────────────────────────
 export default function Home() {
-  const [view, setView] = useState<ViewMode>("interviews");
+  const [view, setView] = useState<ViewMode>("sessions");
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<SessionType | "All">("All");
   const [regionFilter, setRegionFilter] = useState<Region | "All">("All");
@@ -1930,6 +1932,17 @@ export default function Home() {
     setSelectedSchools(new Set());
   }
 
+  function clearAllFilters() {
+    setSearch("");
+    setInterviewSearch("");
+    setTypeFilter("All");
+    setRegionFilter("All");
+    setInterviewFilter("all");
+    setInterviewMethodFilter("all");
+    setSchoolSubTypeFilter("all");
+    setRankRangeFilter("all");
+  }
+
   function exportSchoolsCSV() {
     const header = ["School Name", "Region", "Type", "Location", "USNews Rank", "QS Rank", "Admission Page", "Registration Page"];
     const rows = Array.from(selectedSchools).map((id) => {
@@ -2004,6 +2017,7 @@ export default function Home() {
     { value: "HK", label: t.regionHK },
     { value: "AU", label: t.regionAU },
     { value: "CA", label: t.regionCA },
+    { value: "SG", label: t.regionSG },
   ];
 
   const filteredSessions = useMemo(() => {
@@ -2080,6 +2094,11 @@ export default function Home() {
       return matchFilter && matchMethod && matchRegionInterview && matchSearch;
     });
   }, [interviewSearch, interviewFilter, interviewMethodFilter, regionFilter]);
+
+  const hasActiveFilters =
+    (view === "sessions" && (search !== "" || typeFilter !== "All" || regionFilter !== "All")) ||
+    (view === "interviews" && (interviewSearch !== "" || interviewFilter !== "all" || interviewMethodFilter !== "all" || regionFilter !== "All")) ||
+    (view === "schools" && (search !== "" || regionFilter !== "All" || schoolSubTypeFilter !== "all" || rankRangeFilter !== "all"));
 
   return (
     <div className="min-h-screen bg-white">
@@ -3001,16 +3020,6 @@ message = client.messages.create(
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex">
             <button
-              onClick={() => setView("interviews")}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                view === "interviews"
-                  ? "border-stone-900 text-stone-900"
-                  : "border-transparent text-stone-400 hover:text-stone-600"
-              }`}
-            >
-              {t.tabInterviews}
-            </button>
-            <button
               onClick={() => setView("sessions")}
               className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 view === "sessions"
@@ -3019,6 +3028,16 @@ message = client.messages.create(
               }`}
             >
               {t.tabSessions}
+            </button>
+            <button
+              onClick={() => setView("interviews")}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                view === "interviews"
+                  ? "border-stone-900 text-stone-900"
+                  : "border-transparent text-stone-400 hover:text-stone-600"
+              }`}
+            >
+              {t.tabInterviews}
             </button>
             <button
               onClick={() => setView("schools")}
@@ -3038,10 +3057,10 @@ message = client.messages.create(
               </span>
               <a
                 href="/portals"
-                className="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-stone-400 hover:text-stone-600 transition-colors flex items-center gap-1"
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-stone-200 text-stone-500 hover:border-stone-900 hover:text-stone-900 transition-colors"
               >
-                {lang === "zh" ? "Applicant Portal 入口" : lang === "hi" ? "Applicant Portal" : "Applicant Portals"}
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                {lang === "zh" ? "Applicant Portal" : lang === "hi" ? "Applicant Portal" : "Applicant Portals"}
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </a>
             </div>
           </div>
@@ -3085,7 +3104,7 @@ message = client.messages.create(
           <div className="sticky top-28 space-y-6">
             {/* Search */}
             <div>
-              <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
+              <label className="text-xs uppercase tracking-widest text-stone-400 block mb-2">
                 {t.search}
               </label>
               <div className="relative">
@@ -3134,7 +3153,7 @@ message = client.messages.create(
                       <button
                         key={name}
                         onClick={() => view === "interviews" ? setInterviewSearch(name) : setSearch(name)}
-                        className="text-[10px] px-1.5 py-0.5 border border-stone-200 text-stone-400 hover:border-stone-500 hover:text-stone-700 transition-colors"
+                        className="text-[11px] px-1.5 py-0.5 border border-stone-200 text-stone-400 hover:border-stone-500 hover:text-stone-700 transition-colors"
                       >
                         {name}
                       </button>
@@ -3146,7 +3165,7 @@ message = client.messages.create(
 
             {/* Region filter */}
             <div>
-              <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
+              <label className="text-xs uppercase tracking-widest text-stone-400 block mb-2">
                 {t.region}
               </label>
               <div className="space-y-0.5">
@@ -3172,7 +3191,7 @@ message = client.messages.create(
                 {/* Sub-type: National University vs Liberal Arts College */}
                 {(regionFilter === 'All' || regionFilter === 'US') && (
                   <div>
-                    <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
+                    <label className="text-xs uppercase tracking-widest text-stone-400 block mb-2">
                       {lang === "zh" ? "学校类型" : "School Type"}
                     </label>
                     <div className="space-y-0.5">
@@ -3198,7 +3217,7 @@ message = client.messages.create(
                 )}
                 {/* Rank range filter */}
                 <div>
-                  <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
+                  <label className="text-xs uppercase tracking-widest text-stone-400 block mb-2">
                     {lang === "zh" ? "排名区间" : "Rank Range"}
                   </label>
                   <div className="space-y-0.5">
@@ -3232,7 +3251,7 @@ message = client.messages.create(
               <div className="space-y-4">
                 {/* Status filter */}
                 <div>
-                  <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
+                  <label className="text-xs uppercase tracking-widest text-stone-400 block mb-2">
                     {t.interviewStatusLabel}
                   </label>
                   <div className="space-y-0.5">
@@ -3259,7 +3278,7 @@ message = client.messages.create(
 
                 {/* Method filter */}
                 <div>
-                  <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
+                  <label className="text-xs uppercase tracking-widest text-stone-400 block mb-2">
                     {t.interviewMethodFilterLabel}
                   </label>
                   <div className="space-y-0.5">
@@ -3286,10 +3305,21 @@ message = client.messages.create(
               </div>
             )}
 
+            {/* Clear all filters */}
+            {hasActiveFilters && (
+              <button
+                onClick={clearAllFilters}
+                className="w-full flex items-center justify-center gap-1.5 py-2 border border-stone-300 text-xs text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-colors"
+              >
+                <X size={11} />
+                {lang === "zh" ? "清除全部筛选" : lang === "hi" ? "सभी फ़िल्टर हटाएं" : "Clear all filters"}
+              </button>
+            )}
+
             {/* Session type */}
             {view === "sessions" && (
               <div>
-                <label className="text-[11px] uppercase tracking-widest text-stone-400 block mb-2">
+                <label className="text-xs uppercase tracking-widest text-stone-400 block mb-2">
                   {t.sessionType}
                 </label>
                 <div className="space-y-0.5">
@@ -3360,28 +3390,84 @@ message = client.messages.create(
                   </div>
                 )}
 {(() => {
-                  const nonRolling = filteredSessions.filter((s) => !s.isRolling);
-                  const activeSessions = nonRolling.filter(s => !isExpiredSession(s)).sort((a, b) => {
-                    const da = getNextDate(a);
-                    const db = getNextDate(b);
-                    if (!da && !db) return 0;
-                    if (!da) return 1;
-                    if (!db) return -1;
-                    return da.getTime() - db.getTime();
-                  });
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  const in7 = new Date(today.getTime() + 7 * 86400000);
+                  const in30 = new Date(today.getTime() + 30 * 86400000);
+
+                  const nonRolling = filteredSessions.filter(s => !s.isRolling);
+                  const upcoming = nonRolling
+                    .filter(s => !isExpiredSession(s))
+                    .sort((a, b) => {
+                      const da = getNextDate(a);
+                      const db = getNextDate(b);
+                      if (!da && !db) return 0;
+                      if (!da) return 1;
+                      if (!db) return -1;
+                      return da.getTime() - db.getTime();
+                    });
                   const expiredSessions = nonRolling.filter(s => isExpiredSession(s)).sort((a, b) => {
                     const da = getNextDate(a);
                     const db = getNextDate(b);
                     if (!da && !db) return 0;
                     if (!da) return 1;
                     if (!db) return -1;
-                    return db.getTime() - da.getTime(); // most recent first
+                    return db.getTime() - da.getTime();
                   });
+
+                  const dateGroups = [
+                    {
+                      key: "today",
+                      label: lang === "zh" ? "今天" : lang === "hi" ? "आज" : "Today",
+                      sessions: upcoming.filter(s => { const d = getNextDate(s); return d && d.getTime() === today.getTime(); }),
+                    },
+                    {
+                      key: "week",
+                      label: lang === "zh" ? "本周" : lang === "hi" ? "इस सप्ताह" : "This Week",
+                      sessions: upcoming.filter(s => { const d = getNextDate(s); return d && d > today && d <= in7; }),
+                    },
+                    {
+                      key: "month",
+                      label: lang === "zh" ? "本月" : lang === "hi" ? "इस महीने" : "This Month",
+                      sessions: upcoming.filter(s => { const d = getNextDate(s); return d && d > in7 && d <= in30; }),
+                    },
+                    {
+                      key: "later",
+                      label: lang === "zh" ? "之后" : lang === "hi" ? "बाद में" : "Later",
+                      sessions: upcoming.filter(s => { const d = getNextDate(s); return !d || d > in30; }),
+                    },
+                  ].filter(g => g.sessions.length > 0);
+
                   return (
                     <>
-                      {activeSessions.length > 0 ? (
-                        <div className="border border-stone-100">
-                          {activeSessions.map((s) => <ScheduledSessionCard key={s.id} session={s} t={t} lang={lang} isSelected={selectedSessions.has(s.id)} onToggle={toggleSelect} onView={(school) => { if (school?.type) trackSchoolType(school.type); if (school?.region) trackRegion(school.region); if (s.type) trackSessionType(s.type); }} />)}
+                      {dateGroups.length > 0 ? (
+                        <div className="space-y-6">
+                          {dateGroups.map(g => (
+                            <section key={g.key}>
+                              <div className="flex items-center gap-3 mb-2">
+                                <span className="text-xs uppercase tracking-widest text-stone-400 font-medium">{g.label}</span>
+                                <span className="text-[10px] text-stone-300 bg-stone-50 px-1.5 py-0.5 rounded-full">{g.sessions.length}</span>
+                                <div className="flex-1 h-px bg-stone-100" />
+                              </div>
+                              <div className="border border-stone-100">
+                                {g.sessions.map(s => (
+                                  <ScheduledSessionCard
+                                    key={s.id}
+                                    session={s}
+                                    t={t}
+                                    lang={lang}
+                                    isSelected={selectedSessions.has(s.id)}
+                                    onToggle={toggleSelect}
+                                    onView={(school) => {
+                                      if (school?.type) trackSchoolType(school.type);
+                                      if (school?.region) trackRegion(school.region);
+                                      if (s.type) trackSessionType(s.type);
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                            </section>
+                          ))}
                         </div>
                       ) : (
                         <div className="py-12 text-center text-stone-400">
@@ -3400,7 +3486,9 @@ message = client.messages.create(
                           </button>
                           {showExpiredSessions && (
                             <div className="border border-stone-100 opacity-50">
-                              {expiredSessions.map((s) => <ScheduledSessionCard key={s.id} session={s} t={t} lang={lang} isSelected={selectedSessions.has(s.id)} onToggle={toggleSelect} onView={(school) => { if (school?.type) trackSchoolType(school.type); if (school?.region) trackRegion(school.region); if (s.type) trackSessionType(s.type); }} />)}
+                              {expiredSessions.map(s => (
+                                <ScheduledSessionCard key={s.id} session={s} t={t} lang={lang} isSelected={selectedSessions.has(s.id)} onToggle={toggleSelect} onView={(school) => { if (school?.type) trackSchoolType(school.type); if (school?.region) trackRegion(school.region); if (s.type) trackSessionType(s.type); }} />
+                              ))}
                             </div>
                           )}
                         </div>
@@ -3458,7 +3546,7 @@ message = client.messages.create(
                       <p className="text-[11px] text-stone-300 py-3 text-center">{t.noRolling}</p>
                     )}
                   </div>
-                  <p className="text-[10px] text-stone-300 mt-2 leading-relaxed">{t.rollingNote}</p>
+                  <p className="text-[11px] text-stone-300 mt-2 leading-relaxed">{t.rollingNote}</p>
                 </div>
               </div>
             </div>

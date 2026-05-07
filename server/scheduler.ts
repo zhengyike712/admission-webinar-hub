@@ -14,6 +14,9 @@ import { crawlAllSchools, seedStaticSessions } from "./crawler";
 import { verifyAllDeadlines } from "./interviewCrawler";
 import { crawlCanadaSchools } from "./canadaCrawler";
 import { notifyOwner } from "./_core/notification";
+import { getDb } from "./db";
+import { crawlLogs } from "../drizzle/schema";
+import { desc } from "drizzle-orm";
 
 let schedulerStarted = false;
 
@@ -130,13 +133,29 @@ function scheduleWeeklyVerification(): void {
 
 // ── Entry point ───────────────────────────────────────────────
 
+async function shouldRunImmediateCrawl(): Promise<boolean> {
+  try {
+    const db = await getDb();
+    if (!db) return false;
+    const lastLog = await db.select({ createdAt: crawlLogs.createdAt })
+      .from(crawlLogs)
+      .orderBy(desc(crawlLogs.createdAt))
+      .limit(1);
+    if (lastLog.length === 0) return true; // never crawled
+    const hoursSinceLast = (Date.now() - lastLog[0].createdAt.getTime()) / 3_600_000;
+    return hoursSinceLast > 12;
+  } catch {
+    return false;
+  }
+}
+
 export async function startScheduler(): Promise<void> {
   if (schedulerStarted) return;
   schedulerStarted = true;
 
   console.log("[Scheduler] Initializing...");
 
-  // 1. Seed static data on first boot (no-op if already seeded)
+  // 1. Seed static data — always upserts new sessions, preserves crawled rows
   await seedStaticSessions();
 
   // 2. Schedule daily crawl (UTC 02:00)
@@ -145,5 +164,14 @@ export async function startScheduler(): Promise<void> {
   // 3. Schedule weekly deadline verification (every Monday UTC 03:00)
   scheduleWeeklyVerification();
 
-  console.log("[Scheduler] Ready. Static data seeded, daily crawl + weekly verification scheduled.");
+  // 4. Run an immediate background crawl if no crawl has happened in the last 12h
+  //    (catches first deploy and redeploys after long downtime)
+  shouldRunImmediateCrawl().then((run) => {
+    if (run) {
+      console.log("[Scheduler] No recent crawl detected — starting immediate background crawl...");
+      runDailyCrawl().catch(console.error);
+    }
+  }).catch(console.error);
+
+  console.log("[Scheduler] Ready.");
 }

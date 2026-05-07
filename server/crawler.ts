@@ -94,7 +94,8 @@ async function fetchWithTimeout(url: string, timeoutMs = 15000): Promise<string>
 
 // ── LLM extraction ────────────────────────────────────────────
 
-const EXTRACT_SYSTEM_PROMPT = `You are an expert at extracting university admissions event information from web pages.
+function buildExtractPrompt(): string {
+  return `You are an expert at extracting university admissions event information from web pages.
 Today's date is ${new Date().toISOString().slice(0, 10)}.
 
 Extract ALL upcoming virtual info sessions, webinars, open days, or admissions events from the provided page text.
@@ -112,6 +113,7 @@ Return a JSON object with a "sessions" array. Each session must have:
 
 If no upcoming events are found, return {"sessions": []}.
 Only return valid JSON, no markdown fences.`;
+}
 
 async function extractSessionsWithAI(
   pageText: string,
@@ -123,7 +125,7 @@ async function extractSessionsWithAI(
 
   const response = await invokeLLM({
     messages: [
-      { role: "system", content: EXTRACT_SYSTEM_PROMPT },
+      { role: "system", content: buildExtractPrompt() },
       {
         role: "user",
         content: `University: ${schoolName}\nPage URL: ${pageUrl}\n\nPage content:\n${truncated}`,
@@ -254,18 +256,15 @@ export async function seedStaticSessions(): Promise<void> {
   const db = await getDb();
   if (!db) return;
 
-  const existing = await db.select({ id: sessions.id }).from(sessions).limit(1);
-  if (existing.length > 0) {
-    console.log("[Crawler] Sessions table already seeded, skipping.");
-    return;
-  }
-
-  console.log("[Crawler] Seeding static sessions into DB...");
+  // Always INSERT IGNORE so new schools/sessions added to static data get persisted
+  // without overwriting rows the crawler has already refreshed with live dates.
+  console.log("[Crawler] Seeding static sessions into DB (INSERT IGNORE)...");
   const now = new Date();
+  let inserted = 0;
 
   for (const s of allSessions) {
     try {
-      await db.insert(sessions).ignore().values({
+      const result = await db.insert(sessions).ignore().values({
         id: s.id,
         schoolId: s.schoolId,
         title: s.title,
@@ -279,12 +278,13 @@ export async function seedStaticSessions(): Promise<void> {
         lastCrawledAt: now,
         crawlSourceUrl: null,
       });
+      if ((result as { affectedRows?: number }).affectedRows) inserted++;
     } catch (err) {
       console.error(`[Crawler] Failed to seed session ${s.id}:`, err);
     }
   }
 
-  console.log(`[Crawler] Seeded ${allSessions.length} static sessions.`);
+  console.log(`[Crawler] Seed complete: ${inserted} new rows inserted (${allSessions.length} total static sessions).`);
 }
 
 // ── Crawl a single school ─────────────────────────────────────
