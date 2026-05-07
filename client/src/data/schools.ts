@@ -44,7 +44,8 @@ export interface Session {
   schoolId: number;
   title: string;
   type: SessionType;
-  description: string;
+  description: string;        // Chinese description (default)
+  descriptionEn?: string;     // English description
   // null means "see registration page for dates" (rolling calendar like Princeton)
   dates: string[] | null;
   time?: string; // e.g. "7:00 PM ET"

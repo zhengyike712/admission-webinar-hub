@@ -1,35 +1,35 @@
 /**
  * crawler.ts
  * ──────────────────────────────────────────────────────────────
- * Core crawler service for fetching university admissions event pages
- * and using AI to extract structured session data.
- *
- * Flow:
- *   1. Fetch HTML from each school's registration page
- *   2. Strip HTML → plain text (keep dates, headings, links)
- *   3. Call LLM to extract structured event data
- *   4. Upsert into `sessions` table
- *   5. Write a row to `crawl_logs`
+ * Improved crawler with:
+ *   - Jina Reader for JS-rendered pages (primary), direct fetch as fallback
+ *   - Smart truncation: head + middle + tail sampling (25K chars total)
+ *   - Stable session IDs derived from school + title (not LLM-generated)
+ *   - Stale session cleanup after each school crawl
+ *   - JS shell detection to skip bad LLM calls
+ *   - Concurrent batch processing (5 schools at a time)
+ *   - Retry with backoff on transient failures
  */
 
-import { eq, and, desc } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { getDb } from "./db";
 import { crawlLogs, sessions, subscribers } from "../drizzle/schema";
 import { invokeLLM } from "./_core/llm";
 import { notifyOwner } from "./_core/notification";
 import { allSchools, allSessions } from "../client/src/data/schools";
 
-// Threshold: alert owner after this many consecutive failures for one school
 const CONSECUTIVE_FAIL_ALERT_THRESHOLD = 3;
+const CRAWL_CONCURRENCY = 5;
+const JINA_READER_BASE = "https://r.jina.ai/";
 
 // ── Types ─────────────────────────────────────────────────────
 
 interface ExtractedSession {
-  id: string;
   title: string;
   type: string;
   description: string;
-  dates: string[] | null; // YYYY-MM-DD
+  descriptionEn: string;
+  dates: string[] | null;
   time: string | null;
   duration: string | null;
   registrationUrl: string;
@@ -43,20 +43,30 @@ interface CrawlResult {
   status: "success" | "failed" | "partial";
   sessionsFound: number;
   sessionsUpdated: number;
+  sessionsDeleted: number;
+  fetchMethod: "jina" | "direct";
   errorMessage?: string;
+}
+
+// ── Stable ID ─────────────────────────────────────────────────
+// Deterministic: same event always maps to the same DB row across crawl runs.
+
+function makeSessionId(schoolId: number, title: string): string {
+  const slug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80);
+  return `${schoolId}-${slug}`.slice(0, 127);
 }
 
 // ── HTML → plain text ─────────────────────────────────────────
 
 function stripHtml(html: string): string {
-  // Remove script/style blocks
   let text = html.replace(/<script[\s\S]*?<\/script>/gi, "");
   text = text.replace(/<style[\s\S]*?<\/style>/gi, "");
-  // Replace block tags with newlines
   text = text.replace(/<(br|p|div|li|h[1-6]|tr|td|th)[^>]*>/gi, "\n");
-  // Remove remaining tags
   text = text.replace(/<[^>]+>/g, " ");
-  // Decode common HTML entities
   text = text
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
@@ -64,24 +74,35 @@ function stripHtml(html: string): string {
     .replace(/&nbsp;/g, " ")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'");
-  // Collapse whitespace
   text = text.replace(/[ \t]+/g, " ");
   text = text.replace(/\n{3,}/g, "\n\n");
   return text.trim();
 }
 
+// ── Smart truncation ──────────────────────────────────────────
+// Events often appear in the middle or end of a page.
+// Sample head + middle + tail to maximise coverage within token budget.
+
+function smartTruncate(text: string, maxChars = 25000): string {
+  if (text.length <= maxChars) return text;
+  const head = text.slice(0, 12000);
+  const midStart = Math.floor(text.length / 2) - 4000;
+  const mid = text.slice(midStart, midStart + 8000);
+  const tail = text.slice(-5000);
+  return `${head}\n\n[...page middle...]\n\n${mid}\n\n[...page end...]\n\n${tail}`;
+}
+
 // ── Fetch with timeout ────────────────────────────────────────
 
-async function fetchWithTimeout(url: string, timeoutMs = 15000): Promise<string> {
+async function fetchRaw(url: string, timeoutMs: number): Promise<string> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const res = await fetch(url, {
       signal: controller.signal,
       headers: {
-        "User-Agent":
-          "Mozilla/5.0 (compatible; Kollegers-Crawler/1.0; +https://kollegers.manus.space)",
-        Accept: "text/html,application/xhtml+xml",
+        "User-Agent": "Mozilla/5.0 (compatible; Kollegers-Crawler/2.0; +https://kollegers.com)",
+        Accept: "text/html,application/xhtml+xml,text/plain",
         "Accept-Language": "en-US,en;q=0.9",
       },
     });
@@ -92,24 +113,61 @@ async function fetchWithTimeout(url: string, timeoutMs = 15000): Promise<string>
   }
 }
 
+// ── Page fetcher: Jina Reader → direct fallback ───────────────
+// Jina Reader renders JavaScript and returns clean markdown.
+// Falls back to direct fetch + HTML stripping if Jina fails or returns too little.
+
+async function fetchPage(url: string): Promise<{ text: string; method: "jina" | "direct" }> {
+  // Try Jina Reader first
+  try {
+    const jinaUrl = `${JINA_READER_BASE}${url}`;
+    const raw = await fetchRaw(jinaUrl, 25000);
+    if (raw.trim().length > 800) {
+      return { text: raw, method: "jina" };
+    }
+  } catch {
+    // Jina failed — fall through to direct
+  }
+
+  // Direct fetch + strip HTML
+  const html = await fetchRaw(url, 15000);
+  const text = stripHtml(html);
+  return { text, method: "direct" };
+}
+
+// ── Retry wrapper ─────────────────────────────────────────────
+
+async function withRetry<T>(fn: () => Promise<T>, attempts = 2, delayMs = 3000): Promise<T> {
+  let lastErr: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      if (i < attempts - 1) await new Promise(r => setTimeout(r, delayMs));
+    }
+  }
+  throw lastErr;
+}
+
 // ── LLM extraction ────────────────────────────────────────────
 
 function buildExtractPrompt(): string {
   return `You are an expert at extracting university admissions event information from web pages.
 Today's date is ${new Date().toISOString().slice(0, 10)}.
 
-Extract ALL upcoming virtual info sessions, webinars, open days, or admissions events from the provided page text.
+Extract ALL upcoming virtual info sessions, webinars, open days, or admissions events.
 Focus only on events scheduled in the future (today or later).
 Return a JSON object with a "sessions" array. Each session must have:
-- id: a short slug like "oxford-info-2026-03" (school-type-year-month)
-- title: event title (string)
+- title: exact event title
 - type: one of "General Info Session", "Up Close / Specialty", "Multi-College Session", "Regional Session", "Student Forum", "Financial Aid Session", "International Student Session"
 - description: 1-2 sentence description in Chinese (简体中文)
+- descriptionEn: 1-2 sentence description in English
 - dates: array of "YYYY-MM-DD" strings for specific dates, or null if rolling/on-demand
-- time: time string like "7:00 PM ET" or "2:00 PM GMT" or null
-- duration: like "60 min" or "90 min" or null
-- registrationUrl: the direct URL to register (use the page URL if no specific link found)
-- isRolling: true if the event is on-demand or rolling (no fixed dates), false otherwise
+- time: time string like "7:00 PM ET" or "2:00 PM GMT", or null
+- duration: like "60 min" or "90 min", or null
+- registrationUrl: the direct registration link (use the page URL if no specific link found)
+- isRolling: true if the event is on-demand or has no fixed dates, false otherwise
 
 If no upcoming events are found, return {"sessions": []}.
 Only return valid JSON, no markdown fences.`;
@@ -120,8 +178,8 @@ async function extractSessionsWithAI(
   schoolId: number,
   schoolName: string,
   pageUrl: string
-): Promise<ExtractedSession[]> {
-  const truncated = pageText.slice(0, 8000); // keep within context limits
+): Promise<Array<ExtractedSession & { id: string }>> {
+  const truncated = smartTruncate(pageText);
 
   const response = await invokeLLM({
     messages: [
@@ -144,10 +202,10 @@ async function extractSessionsWithAI(
               items: {
                 type: "object",
                 properties: {
-                  id: { type: "string" },
                   title: { type: "string" },
                   type: { type: "string" },
                   description: { type: "string" },
+                  descriptionEn: { type: "string" },
                   dates: {
                     oneOf: [
                       { type: "array", items: { type: "string" } },
@@ -160,15 +218,8 @@ async function extractSessionsWithAI(
                   isRolling: { type: "boolean" },
                 },
                 required: [
-                  "id",
-                  "title",
-                  "type",
-                  "description",
-                  "dates",
-                  "time",
-                  "duration",
-                  "registrationUrl",
-                  "isRolling",
+                  "title", "type", "description", "descriptionEn",
+                  "dates", "time", "duration", "registrationUrl", "isRolling",
                 ],
                 additionalProperties: false,
               },
@@ -189,7 +240,7 @@ async function extractSessionsWithAI(
     const parsed = JSON.parse(content);
     return (parsed.sessions || []).map((s: ExtractedSession) => ({
       ...s,
-      id: `${schoolId}-${s.id}`.slice(0, 127), // ensure unique per school
+      id: makeSessionId(schoolId, s.title),
     }));
   } catch {
     return [];
@@ -199,7 +250,7 @@ async function extractSessionsWithAI(
 // ── Upsert sessions to DB ─────────────────────────────────────
 
 async function upsertSessions(
-  extracted: ExtractedSession[],
+  extracted: Array<ExtractedSession & { id: string }>,
   schoolId: number,
   crawlUrl: string
 ): Promise<number> {
@@ -219,6 +270,7 @@ async function upsertSessions(
           title: s.title,
           type: s.type,
           description: s.description,
+          // descriptionEn omitted until migration 0006 is applied
           dates: s.dates,
           time: s.time ?? undefined,
           duration: s.duration ?? undefined,
@@ -232,6 +284,7 @@ async function upsertSessions(
             title: s.title,
             type: s.type,
             description: s.description,
+            // descriptionEn omitted until migration 0006 is applied
             dates: s.dates,
             time: s.time ?? undefined,
             duration: s.duration ?? undefined,
@@ -250,14 +303,51 @@ async function upsertSessions(
   return updated;
 }
 
-// ── Seed static data on first run ─────────────────────────────
+// ── Stale session cleanup ─────────────────────────────────────
+// After a crawl, delete sessions for this school that:
+//   (a) were NOT found in the current crawl, AND
+//   (b) have no future dates (i.e. all dates are in the past)
+// Rolling sessions are never deleted.
+
+async function cleanupStaleSessions(schoolId: number, foundIds: string[]): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  const existing = await db
+    .select({ id: sessions.id, dates: sessions.dates, isRolling: sessions.isRolling })
+    .from(sessions)
+    .where(eq(sessions.schoolId, schoolId));
+
+  const toDelete = existing
+    .filter((s) => {
+      if (foundIds.includes(s.id)) return false;
+      if (s.isRolling) return false;
+      if (!s.dates || (s.dates as string[]).length === 0) return false;
+      return (s.dates as string[]).every((d) => d < today);
+    })
+    .map((s) => s.id);
+
+  if (toDelete.length === 0) return 0;
+
+  for (const id of toDelete) {
+    try {
+      await db.delete(sessions).where(eq(sessions.id, id));
+    } catch (err) {
+      console.error(`[Crawler] Failed to delete stale session ${id}:`, err);
+    }
+  }
+
+  return toDelete.length;
+}
+
+// ── Seed static data ──────────────────────────────────────────
 
 export async function seedStaticSessions(): Promise<void> {
   const db = await getDb();
   if (!db) return;
 
-  // Always INSERT IGNORE so new schools/sessions added to static data get persisted
-  // without overwriting rows the crawler has already refreshed with live dates.
   console.log("[Crawler] Seeding static sessions into DB (INSERT IGNORE)...");
   const now = new Date();
   let inserted = 0;
@@ -284,7 +374,7 @@ export async function seedStaticSessions(): Promise<void> {
     }
   }
 
-  console.log(`[Crawler] Seed complete: ${inserted} new rows inserted (${allSessions.length} total static sessions).`);
+  console.log(`[Crawler] Seed complete: ${inserted} new rows inserted (${allSessions.length} total).`);
 }
 
 // ── Crawl a single school ─────────────────────────────────────
@@ -299,6 +389,8 @@ export async function crawlSchool(schoolId: number): Promise<CrawlResult> {
       status: "failed",
       sessionsFound: 0,
       sessionsUpdated: 0,
+      sessionsDeleted: 0,
+      fetchMethod: "direct",
       errorMessage: "School not found in static data",
     };
   }
@@ -306,29 +398,34 @@ export async function crawlSchool(schoolId: number): Promise<CrawlResult> {
   const crawlUrl = school.registrationPage;
   console.log(`[Crawler] Crawling ${school.name} → ${crawlUrl}`);
 
-  let rawHtml = "";
+  let rawPageText = "";
+  let fetchMethod: "jina" | "direct" = "direct";
   let errorMessage: string | undefined;
   let status: "success" | "failed" | "partial" = "success";
   let sessionsFound = 0;
   let sessionsUpdated = 0;
+  let sessionsDeleted = 0;
 
   try {
-    rawHtml = await fetchWithTimeout(crawlUrl);
-    const pageText = stripHtml(rawHtml);
-    const extracted = await extractSessionsWithAI(
-      pageText,
-      school.id,
-      school.name,
-      crawlUrl
-    );
+    const { text, method } = await withRetry(() => fetchPage(crawlUrl), 2, 4000);
+    rawPageText = text;
+    fetchMethod = method;
 
-    sessionsFound = extracted.length;
-
-    if (extracted.length > 0) {
-      sessionsUpdated = await upsertSessions(extracted, school.id, crawlUrl);
-    } else {
+    // Detect JS shell — page rendered to almost nothing
+    if (rawPageText.trim().length < 500) {
       status = "partial";
-      errorMessage = "No upcoming events found on page";
+      errorMessage = `JS shell detected via ${method} (${rawPageText.trim().length} chars) — no renderable content`;
+    } else {
+      const extracted = await extractSessionsWithAI(rawPageText, school.id, school.name, crawlUrl);
+      sessionsFound = extracted.length;
+
+      if (extracted.length > 0) {
+        sessionsUpdated = await upsertSessions(extracted, school.id, crawlUrl);
+        sessionsDeleted = await cleanupStaleSessions(school.id, extracted.map((s) => s.id));
+      } else {
+        status = "partial";
+        errorMessage = `No upcoming events found (${method}, ${rawPageText.length} chars)`;
+      }
     }
   } catch (err: unknown) {
     status = "failed";
@@ -336,12 +433,11 @@ export async function crawlSchool(schoolId: number): Promise<CrawlResult> {
     console.error(`[Crawler] Error crawling ${school.name}:`, errorMessage);
   }
 
-  // ── Compute consecutive failures ────────────────────────────
+  // ── Consecutive failure tracking ──────────────────────────
   let consecutiveFailures = 0;
   try {
     const db = await getDb();
     if (db) {
-      // Get the last N logs for this school to count consecutive failures
       const recentLogs = await db
         .select({ status: crawlLogs.status, consecutiveFailures: crawlLogs.consecutiveFailures })
         .from(crawlLogs)
@@ -350,26 +446,20 @@ export async function crawlSchool(schoolId: number): Promise<CrawlResult> {
         .limit(1);
 
       const lastConsecutive = recentLogs[0]?.consecutiveFailures ?? 0;
-      if (status === "failed") {
-        consecutiveFailures = lastConsecutive + 1;
-      } else {
-        consecutiveFailures = 0; // reset on success/partial
-      }
+      consecutiveFailures = status === "failed" ? lastConsecutive + 1 : 0;
 
-      // Alert owner if threshold reached
       if (consecutiveFailures === CONSECUTIVE_FAIL_ALERT_THRESHOLD) {
         notifyOwner({
           title: `⚠️ Kollegers 爬取告警：${school.name}`,
-          content: `${school.name} 已连续 ${consecutiveFailures} 次爬取失败。\n最新错误：${errorMessage ?? "未知错误"}\n请检查官网链接是否已变更：${crawlUrl}`,
+          content: `${school.name} 已连续 ${consecutiveFailures} 次爬取失败。\n最新错误：${errorMessage ?? "未知"}\n请检查：${crawlUrl}`,
         }).catch(console.error);
-        console.warn(`[Crawler] ALERT: ${school.name} has failed ${consecutiveFailures} times consecutively`);
       }
     }
   } catch (err) {
     console.error("[Crawler] Failed to compute consecutive failures:", err);
   }
 
-  // ── Write crawl log ───────────────────────────────────────────
+  // ── Write crawl log ───────────────────────────────────────
   try {
     const db = await getDb();
     if (db) {
@@ -381,13 +471,20 @@ export async function crawlSchool(schoolId: number): Promise<CrawlResult> {
         sessionsFound,
         sessionsUpdated,
         consecutiveFailures,
-        errorMessage,
-        rawContent: rawHtml.slice(0, 2000), // store first 2KB for debugging
+        errorMessage: errorMessage
+          ? `[${fetchMethod.toUpperCase()}] ${errorMessage}`.slice(0, 500)
+          : undefined,
+        rawContent: rawPageText.slice(0, 2000),
       });
     }
   } catch (logErr) {
     console.error("[Crawler] Failed to write crawl log:", logErr);
   }
+
+  console.log(
+    `[Crawler] ${school.name}: ${status} via ${fetchMethod} — ` +
+    `${sessionsFound} found, ${sessionsUpdated} updated, ${sessionsDeleted} stale deleted`
+  );
 
   return {
     schoolId: school.id,
@@ -396,36 +493,45 @@ export async function crawlSchool(schoolId: number): Promise<CrawlResult> {
     status,
     sessionsFound,
     sessionsUpdated,
+    sessionsDeleted,
+    fetchMethod,
     errorMessage,
   };
 }
 
-// ── Crawl all schools ─────────────────────────────────────────
+// ── Crawl all schools (concurrent batches) ────────────────────
 
 export async function crawlAllSchools(): Promise<CrawlResult[]> {
-  console.log(`[Crawler] Starting full crawl of ${allSchools.length} schools...`);
+  console.log(`[Crawler] Starting full crawl of ${allSchools.length} schools (${CRAWL_CONCURRENCY} concurrent)...`);
   const results: CrawlResult[] = [];
 
-  // Process schools sequentially to avoid rate limiting
-  for (const school of allSchools) {
-    const result = await crawlSchool(school.id);
-    results.push(result);
+  // Process in batches to balance speed vs. rate limits
+  for (let i = 0; i < allSchools.length; i += CRAWL_CONCURRENCY) {
+    const batch = allSchools.slice(i, i + CRAWL_CONCURRENCY);
+    const batchResults = await Promise.all(batch.map((s) => crawlSchool(s.id)));
+    results.push(...batchResults);
 
-    // Polite delay between requests: 3 seconds
-    await new Promise((r) => setTimeout(r, 3000));
+    // Brief pause between batches to be polite to both target sites and Jina
+    if (i + CRAWL_CONCURRENCY < allSchools.length) {
+      await new Promise((r) => setTimeout(r, 2000));
+    }
   }
 
   const succeeded = results.filter((r) => r.status === "success").length;
   const failed = results.filter((r) => r.status === "failed").length;
   const partial = results.filter((r) => r.status === "partial").length;
-  const totalNew = results.reduce((sum, r) => sum + r.sessionsUpdated, 0);
+  const jinaCount = results.filter((r) => r.fetchMethod === "jina").length;
+  const totalUpdated = results.reduce((sum, r) => sum + r.sessionsUpdated, 0);
+  const totalDeleted = results.reduce((sum, r) => sum + r.sessionsDeleted, 0);
 
   console.log(
-    `[Crawler] Full crawl complete: ${succeeded} success, ${partial} partial, ${failed} failed, ${totalNew} sessions updated`
+    `[Crawler] Full crawl done: ${succeeded} success, ${partial} partial, ${failed} failed | ` +
+    `${jinaCount}/${allSchools.length} via Jina | ` +
+    `${totalUpdated} sessions updated, ${totalDeleted} stale deleted`
   );
 
-  // ── Notify subscribers if new sessions were found ───────────────────
-  if (totalNew > 0) {
+  // ── Notify subscribers ────────────────────────────────────
+  if (totalUpdated > 0) {
     try {
       const db = await getDb();
       if (db) {
@@ -440,12 +546,10 @@ export async function crawlAllSchools(): Promise<CrawlResult[]> {
             .map((r) => r.schoolName)
             .join("、");
 
-          // Notify owner with subscriber summary (Manus notification is owner-only)
           await notifyOwner({
             title: `📅 Kollegers 有新活动，已通知 ${activeSubscribers.length} 位订阅者`,
-            content: `本次爬取共更新 ${totalNew} 场活动，涉及院校：${successSchools || "无"}。\n订阅者列表（${activeSubscribers.length} 人）：${activeSubscribers.slice(0, 10).map((s) => s.email).join("、")}${activeSubscribers.length > 10 ? " ...等" : ""}`,
+            content: `本次爬取共更新 ${totalUpdated} 场活动，院校：${successSchools || "无"}。\n订阅者（${activeSubscribers.length} 人）：${activeSubscribers.slice(0, 10).map((s) => s.email).join("、")}${activeSubscribers.length > 10 ? " ...等" : ""}`,
           });
-          console.log(`[Crawler] Notified owner about ${activeSubscribers.length} subscribers with new sessions`);
         }
       }
     } catch (notifyErr) {

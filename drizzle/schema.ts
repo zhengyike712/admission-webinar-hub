@@ -37,6 +37,7 @@ export const sessions = mysqlTable("sessions", {
   title: varchar("title", { length: 512 }).notNull(),
   type: varchar("type", { length: 128 }).notNull(),
   description: text("description").notNull(),
+  descriptionEn: text("descriptionEn"),
   /** JSON array of "YYYY-MM-DD" strings, or null for rolling */
   dates: json("dates").$type<string[] | null>(),
   time: varchar("time", { length: 64 }),

@@ -821,11 +821,11 @@ function ScheduledSessionCard({ session, t, isSelected, onToggle, lang, onView }
       expired ? "opacity-40" : ""
     }`}>
       {/* Row — always visible */}
-      <div className="flex items-center gap-2 py-2 px-1">
+      <div className="flex items-start gap-2 py-2 px-1">
         {/* Checkbox */}
         {onToggle && (
           <div
-            className="shrink-0 flex items-center justify-center w-5 cursor-pointer"
+            className="shrink-0 flex items-center justify-center w-5 cursor-pointer mt-[3px]"
             onClick={(e) => { e.preventDefault(); onToggle(session.id); }}
           >
             <div className={`w-3.5 h-3.5 border-2 flex items-center justify-center transition-colors ${
@@ -854,35 +854,61 @@ function ScheduledSessionCard({ session, t, isSelected, onToggle, lang, onView }
           </span>
         )}
 
-        {/* Expand button: school + title */}
+        {/* Expand button: school + title (line 1) + meta (line 2) */}
         <button
           onClick={() => setExpanded(v => !v)}
-          className="flex items-center gap-2 min-w-0 flex-1 text-left hover:opacity-70 transition-opacity cursor-pointer"
+          className="flex items-start gap-2 min-w-0 flex-1 text-left hover:opacity-70 transition-opacity cursor-pointer"
         >
           <span
-            className="shrink-0 w-1.5 h-1.5 rounded-full"
+            className="shrink-0 w-1.5 h-1.5 rounded-full mt-[5px]"
             style={{ backgroundColor: school?.color || "#2563eb" }}
           />
-          <span className="text-xs text-stone-800 font-medium min-w-0 flex items-baseline gap-1 overflow-hidden">
-            <span className="text-stone-500 shrink-0">{school?.shortName || school?.name}</span>
-            <span className="truncate text-stone-700">{session.title}</span>
+          <span className="min-w-0 flex-1 overflow-hidden">
+            {/* Line 1: school name + title + urgency */}
+            <span className="flex items-baseline gap-1 overflow-hidden">
+              <span className="text-xs text-stone-500 font-medium shrink-0">{school?.shortName || school?.name}</span>
+              <span className="text-xs text-stone-700 truncate">{session.title}</span>
+              {urgency === "imminent" && (
+                <span className="shrink-0 text-[9px] px-1 py-0.5 bg-red-500 text-white font-semibold rounded-sm animate-pulse">{t.imminent}</span>
+              )}
+              {urgency === "soon" && (
+                <span className="shrink-0 text-[9px] px-1 py-0.5 bg-orange-100 text-orange-600 font-semibold rounded-sm border border-orange-200">{t.soon}</span>
+              )}
+            </span>
+            {/* Line 2: time · duration · description (always visible, language-aware) */}
+            {(session.time || session.duration || session.description) && (
+              <span className="flex items-center gap-1 text-[10px] text-stone-400 mt-0.5 overflow-hidden">
+                {session.time && (
+                  <span className="shrink-0">{localTime ? `${localTime} ${LOCAL_TZ_LABEL}` : session.time}</span>
+                )}
+                {session.duration && (
+                  <>
+                    {session.time && <span className="shrink-0">·</span>}
+                    <span className="shrink-0">{session.duration}</span>
+                  </>
+                )}
+                {(() => {
+                  const desc = lang === "zh" ? session.description : session.descriptionEn;
+                  return desc ? (
+                    <>
+                      {(session.time || session.duration) && <span className="shrink-0">·</span>}
+                      <span className="truncate">{desc}</span>
+                    </>
+                  ) : null;
+                })()}
+              </span>
+            )}
           </span>
-          {urgency === "imminent" && (
-            <span className="shrink-0 text-[9px] px-1 py-0.5 bg-red-500 text-white font-semibold rounded-sm animate-pulse">{t.imminent}</span>
-          )}
-          {urgency === "soon" && (
-            <span className="shrink-0 text-[9px] px-1 py-0.5 bg-orange-100 text-orange-600 font-semibold rounded-sm border border-orange-200">{t.soon}</span>
-          )}
           <ChevronDown
             size={12}
-            className={`shrink-0 text-stone-300 transition-transform duration-150 ${
+            className={`shrink-0 text-stone-300 transition-transform duration-150 mt-[3px] ${
               expanded ? "rotate-180" : ""
             }`}
           />
         </button>
 
         {/* Register CTA — always visible */}
-        <div className="shrink-0 flex items-center gap-1">
+        <div className="shrink-0 flex items-start gap-1 mt-[2px]">
           {isDead ? (
             <>
               {/* Fallback: go to admissions page */}
@@ -942,9 +968,10 @@ function ScheduledSessionCard({ session, t, isSelected, onToggle, lang, onView }
           </div>
 
           {/* Description */}
-          {session.description && (
-            <p className="mt-2 text-xs text-stone-500 leading-relaxed">{session.description}</p>
-          )}
+          {(() => {
+            const desc = lang === "zh" ? session.description : session.descriptionEn;
+            return desc ? <p className="mt-2 text-xs text-stone-500 leading-relaxed">{desc}</p> : null;
+          })()}
         </div>
       )}
     </div>
