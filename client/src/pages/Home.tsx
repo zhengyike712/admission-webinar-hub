@@ -2981,10 +2981,28 @@ message = client.messages.create(
             </button>
             {/* Portals link */}
             <div className="ml-auto flex items-center gap-4">
-              {/* Data last updated */}
-              <span className="hidden lg:block text-[10px] text-stone-300 select-none">
-                {t.dataUpdated} {DATA_LAST_UPDATED}
-              </span>
+              {/* Data freshness indicator */}
+              {(() => {
+                const crawledAt = dbData?.lastCrawledAt ? new Date(dbData.lastCrawledAt) : null;
+                const isLive = dbData?.source === "db";
+                let label = "";
+                if (crawledAt) {
+                  const hoursAgo = Math.floor((Date.now() - crawledAt.getTime()) / 3_600_000);
+                  if (hoursAgo < 1) label = lang === "zh" ? "刚刚更新" : "Updated just now";
+                  else if (hoursAgo < 24) label = lang === "zh" ? `${hoursAgo}小时前更新` : `Updated ${hoursAgo}h ago`;
+                  else label = lang === "zh" ? "今日更新" : "Updated today";
+                } else if (isLive) {
+                  label = lang === "zh" ? "数据实时" : "Live data";
+                } else {
+                  label = lang === "zh" ? `静态数据 ${DATA_LAST_UPDATED}` : `Static · ${DATA_LAST_UPDATED}`;
+                }
+                return (
+                  <span className="hidden lg:flex items-center gap-1 text-[10px] text-stone-400 select-none">
+                    <span className={`w-1.5 h-1.5 rounded-full ${isLive ? "bg-green-400" : "bg-stone-300"}`} />
+                    {label}
+                  </span>
+                );
+              })()}
               <a
                 href="/portals"
                 className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-stone-200 text-stone-500 hover:border-stone-900 hover:text-stone-900 transition-colors"
@@ -3375,8 +3393,8 @@ message = client.messages.create(
                           {dateGroups.map(g => (
                             <section key={g.key}>
                               <div className="flex items-center gap-3 mb-2">
-                                <span className="text-xs uppercase tracking-widest text-stone-400 font-medium">{g.label}</span>
-                                <span className="text-[10px] text-stone-300 bg-stone-50 px-1.5 py-0.5 rounded-full">{g.sessions.length}</span>
+                                <span className="text-sm font-semibold text-stone-600 tracking-wide">{g.label}</span>
+                                <span className="text-xs text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full font-medium">{g.sessions.length}</span>
                                 <div className="flex-1 h-px bg-stone-100" />
                               </div>
                               <div className="border border-stone-100">

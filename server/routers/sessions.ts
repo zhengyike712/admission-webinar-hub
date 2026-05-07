@@ -29,6 +29,12 @@ export const sessionsRouter = router({
 
       const rows = await db.select().from(sessions);
 
+      // Most recent crawl timestamp across all sessions
+      const lastCrawledAt = rows.reduce<Date | null>((max, s) => {
+        if (!s.lastCrawledAt) return max;
+        return !max || s.lastCrawledAt > max ? s.lastCrawledAt : max;
+      }, null);
+
       const filtered =
         input.region === "All"
           ? rows
@@ -41,7 +47,7 @@ export const sessionsRouter = router({
               return true;
             });
 
-      return { sessions: filtered, source: "db" as const };
+      return { sessions: filtered, source: "db" as const, lastCrawledAt };
     }),
 
   /**
