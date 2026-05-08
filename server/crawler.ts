@@ -24,24 +24,19 @@ const JINA_READER_BASE = "https://r.jina.ai/";
 // ── Crawler LLM (Google Gemini, no Manus dependency) ──────────
 // Priority: BUILT_IN_FORGE_API_KEY (Manus/Railway) → GOOGLE_API_KEY (local dev / self-hosted)
 
-// Key priority: DEEPSEEK_API_KEY → GOOGLE_API_KEY → BUILT_IN_FORGE_API_KEY (Manus)
+// Key priority: DEEPSEEK_API_KEY → GOOGLE_API_KEY
 function resolveLLM(): { apiKey: string; apiUrl: string; model: string } {
   if (process.env.DEEPSEEK_API_KEY) return {
     apiKey: process.env.DEEPSEEK_API_KEY,
     apiUrl: "https://api.deepseek.com/chat/completions",
-    model: "deepseek-chat", // DeepSeek V3
+    model: "deepseek-chat",
   };
   if (process.env.GOOGLE_API_KEY) return {
     apiKey: process.env.GOOGLE_API_KEY,
     apiUrl: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
     model: "gemini-2.5-flash",
   };
-  if (process.env.BUILT_IN_FORGE_API_KEY) return {
-    apiKey: process.env.BUILT_IN_FORGE_API_KEY,
-    apiUrl: "https://forge.manus.im/v1/chat/completions",
-    model: "gemini-2.5-flash",
-  };
-  throw new Error("No LLM API key found. Set DEEPSEEK_API_KEY, GOOGLE_API_KEY, or BUILT_IN_FORGE_API_KEY.");
+  throw new Error("No LLM API key found. Set DEEPSEEK_API_KEY or GOOGLE_API_KEY.");
 }
 
 async function callLLM(systemPrompt: string, userContent: string, jsonSchema: object): Promise<string> {
