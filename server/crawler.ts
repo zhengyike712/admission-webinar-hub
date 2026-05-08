@@ -29,7 +29,7 @@ function resolveLLM(): { apiKey: string; apiUrl: string; model: string } {
   if (process.env.DEEPSEEK_API_KEY) return {
     apiKey: process.env.DEEPSEEK_API_KEY,
     apiUrl: "https://api.deepseek.com/chat/completions",
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
   };
   if (process.env.GOOGLE_API_KEY) return {
     apiKey: process.env.GOOGLE_API_KEY,
