@@ -24,21 +24,34 @@ const JINA_READER_BASE = "https://r.jina.ai/";
 // ── Crawler LLM (Google Gemini, no Manus dependency) ──────────
 // Priority: BUILT_IN_FORGE_API_KEY (Manus/Railway) → GOOGLE_API_KEY (local dev / self-hosted)
 
-async function callLLM(systemPrompt: string, userContent: string, jsonSchema: object): Promise<string> {
-  const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
-  const googleKey = process.env.GOOGLE_API_KEY;
-  const apiKey = forgeKey || googleKey;
-  if (!apiKey) throw new Error("No LLM API key found. Set BUILT_IN_FORGE_API_KEY or GOOGLE_API_KEY.");
+// Key priority: DEEPSEEK_API_KEY → GOOGLE_API_KEY → BUILT_IN_FORGE_API_KEY (Manus)
+function resolveLLM(): { apiKey: string; apiUrl: string; model: string } {
+  if (process.env.DEEPSEEK_API_KEY) return {
+    apiKey: process.env.DEEPSEEK_API_KEY,
+    apiUrl: "https://api.deepseek.com/chat/completions",
+    model: "deepseek-chat", // DeepSeek V3
+  };
+  if (process.env.GOOGLE_API_KEY) return {
+    apiKey: process.env.GOOGLE_API_KEY,
+    apiUrl: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+    model: "gemini-2.5-flash",
+  };
+  if (process.env.BUILT_IN_FORGE_API_KEY) return {
+    apiKey: process.env.BUILT_IN_FORGE_API_KEY,
+    apiUrl: "https://forge.manus.im/v1/chat/completions",
+    model: "gemini-2.5-flash",
+  };
+  throw new Error("No LLM API key found. Set DEEPSEEK_API_KEY, GOOGLE_API_KEY, or BUILT_IN_FORGE_API_KEY.");
+}
 
-  const apiUrl = forgeKey
-    ? "https://forge.manus.im/v1/chat/completions"
-    : "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+async function callLLM(systemPrompt: string, userContent: string, jsonSchema: object): Promise<string> {
+  const { apiKey, apiUrl, model } = resolveLLM();
 
   const res = await fetch(apiUrl, {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Bearer ${apiKey}` },
     body: JSON.stringify({
-      model: "gemini-2.5-flash",
+      model,
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userContent },
@@ -48,7 +61,7 @@ async function callLLM(systemPrompt: string, userContent: string, jsonSchema: ob
     }),
   });
 
-  if (!res.ok) throw new Error(`LLM API error: ${res.status} ${await res.text()}`);
+  if (!res.ok) throw new Error(`LLM API error (${model}): ${res.status} ${await res.text()}`);
   const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
   return data.choices?.[0]?.message?.content ?? "";
 }
