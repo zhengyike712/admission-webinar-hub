@@ -209,15 +209,30 @@ const normalizeToolChoice = (
   return toolChoice;
 };
 
-const resolveApiUrl = () =>
-  ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
-    ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
-    : "https://forge.manus.im/v1/chat/completions";
+// Key priority: DEEPSEEK_API_KEY → GOOGLE_API_KEY → BUILT_IN_FORGE_API_KEY
+const resolveLLMConfig = (): { apiKey: string; apiUrl: string; model: string } => {
+  if (process.env.DEEPSEEK_API_KEY) return {
+    apiKey: process.env.DEEPSEEK_API_KEY,
+    apiUrl: "https://api.deepseek.com/chat/completions",
+    model: "deepseek-v4-flash",
+  };
+  if (process.env.GOOGLE_API_KEY) return {
+    apiKey: process.env.GOOGLE_API_KEY,
+    apiUrl: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+    model: "gemini-2.5-flash",
+  };
+  if (ENV.forgeApiKey) return {
+    apiKey: ENV.forgeApiKey,
+    apiUrl: ENV.forgeApiUrl?.trim()
+      ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
+      : "https://forge.manus.im/v1/chat/completions",
+    model: "gemini-2.5-flash",
+  };
+  throw new Error("No LLM API key found. Set DEEPSEEK_API_KEY or GOOGLE_API_KEY.");
+};
 
 const assertApiKey = () => {
-  if (!ENV.forgeApiKey) {
-    throw new Error("OPENAI_API_KEY is not configured");
-  }
+  resolveLLMConfig(); // throws if no key found
 };
 
 const normalizeResponseFormat = ({
@@ -279,8 +294,10 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     response_format,
   } = params;
 
+  const { apiKey, apiUrl, model } = resolveLLMConfig();
+
   const payload: Record<string, unknown> = {
-    model: "gemini-2.5-flash",
+    model,
     messages: messages.map(normalizeMessage),
   };
 
@@ -312,11 +329,11 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     payload.response_format = normalizedResponseFormat;
   }
 
-  const response = await fetch(resolveApiUrl(), {
+  const response = await fetch(apiUrl, {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${ENV.forgeApiKey}`,
+      authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify(payload),
   });
