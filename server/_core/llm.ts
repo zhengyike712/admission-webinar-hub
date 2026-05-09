@@ -209,8 +209,25 @@ const normalizeToolChoice = (
   return toolChoice;
 };
 
-// Key priority: DEEPSEEK_API_KEY → GOOGLE_API_KEY → BUILT_IN_FORGE_API_KEY
+/**
+ * LLM provider resolution — priority order:
+ *
+ * 1. Generic (any OpenAI-compatible API):
+ *      LLM_API_KEY + LLM_API_URL + LLM_MODEL
+ *    → use this for MiniMax, Kimi, Qwen, Baichuan, or any other provider
+ *
+ * 2. DeepSeek shorthand:
+ *      DEEPSEEK_API_KEY  →  deepseek-v4-flash
+ *
+ * 3. Google Gemini shorthand:
+ *      GOOGLE_API_KEY  →  gemini-2.5-flash
+ */
 const resolveLLMConfig = (): { apiKey: string; apiUrl: string; model: string } => {
+  if (process.env.LLM_API_KEY && process.env.LLM_API_URL && process.env.LLM_MODEL) return {
+    apiKey: process.env.LLM_API_KEY,
+    apiUrl: process.env.LLM_API_URL,
+    model: process.env.LLM_MODEL,
+  };
   if (process.env.DEEPSEEK_API_KEY) return {
     apiKey: process.env.DEEPSEEK_API_KEY,
     apiUrl: "https://api.deepseek.com/chat/completions",
@@ -221,14 +238,7 @@ const resolveLLMConfig = (): { apiKey: string; apiUrl: string; model: string } =
     apiUrl: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
     model: "gemini-2.5-flash",
   };
-  if (ENV.forgeApiKey) return {
-    apiKey: ENV.forgeApiKey,
-    apiUrl: ENV.forgeApiUrl?.trim()
-      ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
-      : "https://forge.manus.im/v1/chat/completions",
-    model: "gemini-2.5-flash",
-  };
-  throw new Error("No LLM API key found. Set DEEPSEEK_API_KEY or GOOGLE_API_KEY.");
+  throw new Error("No LLM API key configured. Set LLM_API_KEY + LLM_API_URL + LLM_MODEL, or DEEPSEEK_API_KEY, or GOOGLE_API_KEY.");
 };
 
 const assertApiKey = () => {
